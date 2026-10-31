@@ -1,0 +1,8 @@
+asgiref==3.13.0
+dj-database-url==3.1.2
+Django==5.2.18
+django-unfold==0.91.0
+gunicorn==26.2.0
+sqlparse==0.6.0
+tzdata==2026.6
+whitenoise==6.12.0

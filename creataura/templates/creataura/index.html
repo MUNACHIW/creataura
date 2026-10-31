@@ -1,0 +1,62 @@
+{% extends "creataura/base.html" %}
+{% load static %}
+
+{% block title %}Home - Creataura{% endblock %}
+
+{% block content %}
+<div class="secondsection">
+    <div class="subsec1">
+        <img src="{% static '/creataura/images/app.png'%}" alt="">
+    </div>
+    <div class="subsec2">
+        <h4>OUR COMPANY</h4>
+        <h1> Fast Growing Investment Asset Company </h1>
+        <p>
+            CreatAura understands the complexities and responsibilities that come with institutional investing. Our
+            Institutional Funds are designed to meet the unique demands of institutions, offering a sophisticated and
+            strategic approach to wealth management.
+        </p>
+        <blockquote class="company-quote">
+            <span class="quote-icon" aria-hidden="true">“</span>
+            <p>CreatAura ensures transparency with regular and detailed reporting, fostering trust and accountability.</p>
+        </blockquote>
+        <div class="company-attribution">
+            <p class="ceoname">OLIVIA MICHELLE</p>
+            <p class="ceorole">Investor, CEO of evermed</p>
+        </div>
+    </div>
+</div>
+<section class="values-section" aria-labelledby="values-title">
+    <p class="values-eyebrow">OUR VALUES</p>
+    <div class="values-content">
+        <h2 id="values-title">Guiding Principles for Sustainable Prosperity</h2>
+        <div class="values-grid">
+            <article class="value-card">
+                <h3>Adaptability</h3>
+                <p>In a dynamic world, adaptability is key. CreatAura remains agile, adjusting our strategies to navigate the ever-changing landscapes of real estate, cryptocurrency, and renewable energy.</p>
+            </article>
+            <article class="value-card">
+                <h3>Client-Centric Approach</h3>
+                <p>Our clients are the core of our existence. CreatAura is dedicated to understanding and fulfilling their unique needs, providing tailored investment solutions that align with their goals.</p>
+            </article>
+            <article class="value-card">
+                <h3>Commitment</h3>
+                <p>We pursue excellence in every facet of our operations. From real estate ventures to cryptocurrency investments, CreatAura strives for the highest standards, ensuring our clients receive unparalleled value.</p>
+            </article>
+        </div>
+    </div>
+</section>
+<section class="returns-section" aria-labelledby="returns-title">
+    <h2 id="returns-title">Breaking Boundaries,<br>Boosting Returns</h2>
+    <div class="returns-copy">
+        <p>With a forward-thinking approach encompassing renewable energy, bonds &amp; ETFs, cryptocurrencies, and real estate, we are committed to shaping a brighter financial landscape for our clients.</p>
+        <a href="#">Read More <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+    </div>
+</section>
+<section class="innovation-section" aria-labelledby="innovation-title">
+    <div class="innovation-inner">
+        <h2 id="innovation-title">Beyond boundaries, beyond convention. Creatura is rewriting the rules of investment.</h2>
+        <p>What sets us apart is not just our expertise, but our approach. We blend data-driven insights with personalized guidance, ensuring that your investment decisions are backed by informed choices. Our team of seasoned professionals is dedicated to staying ahead of the curve, identifying emerging trends, and embracing disruptive technologies to shape investment opportunities that yield results.</p>
+    </div>
+</section>
+{% endblock %}
