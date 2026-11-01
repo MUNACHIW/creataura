@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +10,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
 </head>
+
 <body class="auth-body">
     <header class="auth-header">
         <a href="{% url 'home' %}" class="auth-back" aria-label="Back to home"><i class="bi bi-chevron-left"></i></a>
         <a href="{% url 'login' %}" class="auth-top-link">Login</a>
     </header>
     <main class="auth-main auth-register-main">
-        <div class="auth-heading"><h1>Register now</h1><p>Create an account</p></div>
+        <div class="auth-heading">
+            <h1>Register now</h1>
+            <p>Create an account</p>
+        </div>
         {% if messages %}
         <div class="auth-messages">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>
         {% endif %}
@@ -26,18 +31,25 @@
                 <div class="theme-row">
                     <span class="theme-icon"><i class="bi bi-moon-stars-fill"></i></span>
                     <span>Dark Mode</span>
-                    <label class="theme-switch" aria-label="Toggle dark mode"><input type="checkbox" class="theme-toggle"><span></span></label>
+                    <label class="theme-switch" aria-label="Toggle dark mode"><input type="checkbox"
+                            class="theme-toggle"><span></span></label>
                 </div>
             </div>
             <div class="auth-fields">
                 <label>Username<input type="text" name="username" placeholder="Your Username" required></label>
                 <label>E-mail<input type="email" name="email" placeholder="Your e-mail" required></label>
                 <label>Full Name<input type="text" name="full_name" placeholder="Your Full Name" required></label>
-                <label>Phone Number<input type="tel" name="phone_number" placeholder="Your Phone Number" required></label>
-                <label>Bitcoin Address<input type="text" name="bitcoin_address" placeholder="Your Bitcoin Address" required></label>
-                <label>Country<select name="country" required><option value="" selected disabled>Choose Country</option>{% for country in countries %}<option value="{{ country }}">{{ country }}</option>{% endfor %}</select></label>
+                <label>Phone Number<input type="tel" name="phone_number" placeholder="Your Phone Number"
+                        required></label>
+                <label>Bitcoin Address<input type="text" name="bitcoin_address" placeholder="Your Bitcoin Address"
+                        required></label>
+                <label>Country<select name="country" required>
+                        <option value="" selected disabled>Choose Country</option>{% for country in countries %}<option
+                            value="{{ country }}">{{ country }}</option>{% endfor %}
+                    </select></label>
                 <label>Password<input type="password" name="password" placeholder="Your password" required></label>
-                <label>Password Again<input type="password" name="password_again" placeholder="Type password again" required></label>
+                <label>Password Again<input type="password" name="password_again" placeholder="Type password again"
+                        required></label>
                 <label>Referral ID<input type="text" name="referral_id" placeholder="optional referral id"></label>
             </div>
             <button type="submit" class="auth-submit">Register</button>
@@ -46,4 +58,5 @@
     <footer class="auth-footer">&copy; Copyright {% now "Y" %} &nbsp; CreatAura &nbsp; All Rights Reserved.</footer>
     <script src="{% static 'creataura/auth.js' %}"></script>
 </body>
+
 </html>
