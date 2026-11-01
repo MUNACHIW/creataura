@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Creataura</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
+</head>
+
+<body class="auth-body">
+    <header class="auth-header">
+        <a href="{% url 'home' %}" class="auth-back" aria-label="Back to home"><i class="bi bi-chevron-left"></i></a>
+        <a href="{% url 'home' %}" class="auth-top-link">Home</a>
+    </header>
+    <main class="auth-main auth-login-main">
+        <div class="auth-heading">
+            <h1>Log in</h1>
+            <p>Fill the form to log in</p>
+        </div>
+        {% if messages %}
+        <div class="auth-messages">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>
+        {% endif %}
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            <div class="theme-panel">
+                <span class="theme-label">Theme</span>
+                <div class="theme-row">
+                    <span class="theme-icon"><i class="bi bi-moon-stars-fill"></i></span>
+                    <span>Dark Mode</span>
+                    <label class="theme-switch" aria-label="Toggle dark mode"><input type="checkbox"
+                            class="theme-toggle"><span></span></label>
+                </div>
+            </div>
+            <div class="auth-fields login-fields">
+                <label>E-mail<input type="email" name="email" placeholder="Your e-mail" required></label>
+                <label>Password<input type="password" name="password" placeholder="Your password" required></label>
+                <label class="remember-row">
+                    <input type="checkbox" name="remember">
+                    <span class="remember-check" aria-hidden="true">
+                        <i class="bi bi-check-circle remember-check-empty"></i>
+                        <i class="bi bi-check-circle-fill remember-check-filled"></i>
+                    </span>
+                    <span>Remember Me</span>
+                </label>
+            </div>
+            <div class="auth-links"><a href="{% url 'register' %}">Register Now</a><a href="#">Forgot Password?</a>
+            </div>
+            <button type="submit" class="auth-submit">Log in</button>
+        </form>
+    </main>
+    <footer class="auth-footer">&copy; Copyright {% now "Y" %} &nbsp; CreatAura &nbsp; All Rights Reserved.</footer>
+    <script src="{% static 'creataura/auth.js' %}"></script>
+</body>
+
+</html>

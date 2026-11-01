@@ -1,0 +1,298 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CreatAura</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
+</head>
+
+<body class="dashboard-body">
+    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+    <aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Dashboard sidebar" aria-hidden="true">
+        <header class="sidebar-user">
+            <span class="sidebar-avatar">{{ request.user.first_name|default:request.user.username|slice:":1"|upper }}</span>
+            <div>
+                <strong>{{ request.user.username }}</strong>
+                <small>{{ request.user.id|stringformat:"06d" }}</small>
+            </div>
+            <button type="button" class="sidebar-close" aria-label="Close menu"><i class="bi bi-x-lg"></i></button>
+        </header>
+
+        <section class="sidebar-balance">
+            <span>Balance</span>
+            <strong>$5.00</strong>
+            <div class="sidebar-shortcuts">
+                <a href="#"><i class="bi bi-plus"></i><span>Deposit</span></a>
+                <a href="#"><i class="bi bi-arrow-down"></i><span>Withdraw</span></a>
+                <a href="#"><i class="bi bi-credit-card"></i><span>Crypto Exchange</span></a>
+                <a href="#"><i class="bi bi-person-badge"></i><span>KYC</span></a>
+            </div>
+        </section>
+
+        <nav class="sidebar-nav" aria-label="Sidebar navigation">
+            <p>Menu</p>
+            <a href="{% url 'dashboard' %}" class="active"><i class="bi bi-pie-chart"></i><span>Dashboard</span><b>*</b></a>
+            <a href="#"><i class="bi bi-file-earmark-text"></i><span>Profit Record</span><i class="bi bi-chevron-right"></i></a>
+            <a href="#"><i class="bi bi-file-earmark-text"></i><span>Transaction History</span><i class="bi bi-chevron-right"></i></a>
+            <a href="#"><i class="bi bi-credit-card"></i><span>Invest</span><i class="bi bi-chevron-right"></i></a>
+            <a href="#"><i class="bi bi-credit-card"></i><span>My Investments</span><i class="bi bi-chevron-right"></i></a>
+
+            <p class="sidebar-section-title">Others</p>
+            <a href="#"><i class="bi bi-gear"></i><span>Refer Users</span><i class="bi bi-chevron-right"></i></a>
+            <a href="#"><i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-right"></i></a>
+            <a href="#"><i class="bi bi-chat"></i><span>Help/Support</span><i class="bi bi-chevron-right"></i></a>
+
+            <div class="sidebar-language">
+                <select aria-label="Language">
+                    <option>English</option>
+                    <option>French</option>
+                    <option>Spanish</option>
+                </select>
+            </div>
+            <a href="{% url 'logout' %}" class="sidebar-logout"><i class="bi bi-box-arrow-right"></i><span>Log Out</span></a>
+            <small class="google-credit">Powered by Google Translate</small>
+        </nav>
+    </aside>
+    <main class="dashboard-shell">
+        <section class="dashboard-overview" aria-label="Account overview">
+            <div class="balance-card">
+                <div>
+                    <p>Total Balance</p>
+                    <strong>$0.00</strong>
+                </div>
+                <button class="balance-add" type="button" aria-label="Add funds"><i class="bi bi-plus"></i></button>
+            </div>
+
+            <nav class="dashboard-actions" aria-label="Dashboard actions">
+                <a href="#" class="dashboard-action">
+                    <span class="action-icon action-withdraw"><i class="bi bi-arrow-down"></i></span>
+                    <span>Withdraw</span>
+                </a>
+                <a href="#" class="dashboard-action">
+                    <span class="action-icon action-invest"><i class="bi bi-credit-card"></i></span>
+                    <span>Invest</span>
+                </a>
+                <a href="#" class="dashboard-action">
+                    <span class="action-icon action-exchange"><i class="bi bi-arrow-left-right"></i></span>
+                    <span>Crypto Exchange</span>
+                </a>
+                <a href="#" class="dashboard-action">
+                    <span class="action-icon action-kyc"><i class="bi bi-person-badge"></i></span>
+                    <span>KYC</span>
+                </a>
+            </nav>
+
+            <div class="welcome-banner">Welcome to Creattaura with a lot of cool Features</div>
+
+            <section class="withdrawal-card" aria-label="Withdrawal balance">
+                <h2>Withdrawal Bal</h2>
+                <div class="dashboard-stats">
+                    <article><span>Total Profit</span><strong class="stat-profit">$0.00</strong></article>
+                    <article><span>Total Bonus</span><strong class="stat-bonus">$0.00</strong></article>
+                    <article><span>Total Referral Bonus</span><strong>$0.00</strong></article>
+                    <article><span>Total Deposit</span><strong>$0.00</strong></article>
+                    <article><span>Total Withdrawals</span><strong>$0.00</strong></article>
+                    <article><span>Total Investment Plan</span><strong>0</strong></article>
+                    <article><span>Total Active Investment Plans</span><strong class="stat-active">0</strong></article>
+                </div>
+            </section>
+        </section>
+
+        <section class="transactions-section" aria-label="Transactions">
+            <article class="transaction-card">
+                <div class="transaction-heading">
+                    <h2>Deposit Transactions</h2><a href="#">View all</a>
+                </div>
+                <div class="empty-transaction">
+                    <span class="empty-icon"><i class="bi bi-chevron-right"></i></span>
+                    <div><strong>No transaction yet</strong><small>Deposit</small></div>
+                </div>
+            </article>
+            <article class="transaction-card">
+                <div class="transaction-heading">
+                    <h2>Withdrawal Transactions</h2><a href="#">View all</a>
+                </div>
+                <div class="empty-transaction">
+                    <span class="empty-icon"><i class="bi bi-chevron-right"></i></span>
+                    <div><strong>No transaction yet</strong><small>Withdrawal</small></div>
+                </div>
+            </article>
+        </section>
+
+        <nav class="dashboard-bottom-nav" aria-label="Dashboard navigation">
+            <div class="bottom-nav-left">
+                <button type="button" id="dashboardMenuButton" aria-label="Open menu" aria-controls="dashboardSidebar" aria-expanded="false"><i class="bi bi-list"></i></button>
+                <button type="button" aria-label="Support"><i class="bi bi-headset"></i></button>
+                <button type="button" aria-label="Notifications"><i class="bi bi-bell"></i></button>
+                <a href="{% url 'logout' %}" aria-label="Log out"><span>{{
+                        request.user.first_name|default:request.user.username|slice:":1"|upper }}</span></a>
+            </div>
+        </nav>
+
+        <section class="chart-section" aria-label="Trading chart">
+            <div class="tradingview-widget-container dashboard-chart">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript"
+                    src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                        {
+                            "autosize": true,
+                                "symbol": "BITSTAMP:BTCUSD",
+                                    "interval": "5",
+                                        "timezone": "Etc/UTC",
+                                            "theme": "light",
+                                                "style": "1",
+                                                    "locale": "en",
+                                                        "enable_publishing": false,
+                                                            "allow_symbol_change": true,
+                                                                "support_host": "https://www.tradingview.com"
+                        }
+                    </script>
+            </div>
+        </section>
+
+        <section class="market-section" aria-label="Market overview">
+            <div class="market-table-wrap">
+                <table class="market-table">
+                    <thead>
+                        <tr>
+                            <th>Currency</th>
+                            <th colspan="7">Buy/Sell</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>EUR</td>
+                            <td>1.1597</td>
+                            <td>176.259</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>GBP</td>
+                            <td>0.8738</td>
+                            <td>0.9973</td>
+                            <td>-</td>
+                            <td>0.0427</td>
+                            <td>0.922110</td>
+                            <td>1.89461</td>
+                            <td>1.59911</td>
+                        </tr>
+                        <tr>
+                            <td>AUD</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>0.8656</td>
+                            <td>0.82410</td>
+                            <td>1.4222</td>
+                            <td>0.8533</td>
+                        </tr>
+                        <tr>
+                            <td>JPY</td>
+                            <td>0.00594</td>
+                            <td>0.00856</td>
+                            <td>-</td>
+                            <td>0.0543</td>
+                            <td>0.00523</td>
+                            <td>1.1862</td>
+                            <td>0.590</td>
+                        </tr>
+                        <tr>
+                            <td>BTC</td>
+                            <td>112.387</td>
+                            <td>12,422.189</td>
+                            <td>33.427</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>ETH</td>
+                            <td>2,018.36</td>
+                            <td>3,633.83</td>
+                            <td>-</td>
+                            <td>40.4321</td>
+                            <td>1.6833</td>
+                            <td>3,263.832</td>
+                            <td>4,000.542</td>
+                        </tr>
+                        <tr>
+                            <td>LTC</td>
+                            <td>19.39</td>
+                            <td>55.897</td>
+                            <td>8.409</td>
+                            <td>11.690</td>
+                            <td>79.33</td>
+                            <td>18.472</td>
+                            <td>13.963</td>
+                        </tr>
+                        <tr>
+                            <td>USDT</td>
+                            <td>1.1636</td>
+                            <td>1.6734</td>
+                            <td>21,615</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>CHF</td>
+                            <td>1.0557</td>
+                            <td>1.2523</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>XRP</td>
+                            <td>0.5190</td>
+                            <td>0.1020</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="dashboard-footer">&copy; Copyright {% now "Y" %} CreatAura. All Rights Reserved.</footer>
+    <script>
+        const menuButton = document.getElementById("dashboardMenuButton");
+        const sidebar = document.getElementById("dashboardSidebar");
+        const sidebarOverlay = document.getElementById("sidebarOverlay");
+        const sidebarClose = document.querySelector(".sidebar-close");
+
+        function setSidebar(open) {
+            sidebar.classList.toggle("is-open", open);
+            sidebarOverlay.classList.toggle("is-open", open);
+            document.body.classList.toggle("sidebar-open", open);
+            sidebar.setAttribute("aria-hidden", String(!open));
+            menuButton.setAttribute("aria-expanded", String(open));
+        }
+
+        menuButton.addEventListener("click", () => setSidebar(true));
+        sidebarClose.addEventListener("click", () => setSidebar(false));
+        sidebarOverlay.addEventListener("click", () => setSidebar(false));
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") setSidebar(false);
+        });
+    </script>
+</body>
+
+</html>
