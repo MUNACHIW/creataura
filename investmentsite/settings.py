@@ -128,6 +128,10 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Default session lifetime is 12 hours. "Remember Me" extends it to 14 days.
+SESSION_COOKIE_AGE = 12 * 60 * 60
+SESSION_SAVE_EVERY_REQUEST = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/

@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 from .models import UserProfile
@@ -19,6 +19,16 @@ def dashboard(request):
     return render(request, "creataura/dashboard.html")
 
 
+@login_required(login_url="login")
+def crypto_exchange(request):
+    return render(request, "creataura/crypto_exchange.html")
+
+
+@login_required(login_url="login")
+def support(request):
+    return render(request, "creataura/support.html")
+
+
 COUNTRIES = [
     "Nigeria", "United States", "United Kingdom", "Canada", "Australia",
     "Ghana", "South Africa", "Kenya", "Germany", "France", "India",
@@ -28,7 +38,7 @@ COUNTRIES = [
 
 def register(request):
     if request.user.is_authenticated:
-        return redirect("home")
+        return redirect("dashboard")
 
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
@@ -67,15 +77,15 @@ def register(request):
                         country=country,
                         referral_id=referral_id,
                     )
-                login(request, user)
-                return redirect("dashboard")
+                messages.success(request, "Account created successfully. Please log in.")
+                return redirect("login")
 
     return render(request, "creataura/register.html", {"countries": COUNTRIES})
 
 
 def user_login(request):
     if request.user.is_authenticated:
-        return redirect("home")
+        return redirect("dashboard")
 
     if request.method == "POST":
         email = request.POST.get("email", "").strip().lower()
@@ -88,6 +98,10 @@ def user_login(request):
         )
         if authenticated_user is not None:
             login(request, authenticated_user)
+            if request.POST.get("remember"):
+                request.session.set_expiry(14 * 24 * 60 * 60)
+            else:
+                request.session.set_expiry(12 * 60 * 60)
             return redirect(request.GET.get("next") or "dashboard")
         messages.error(request, "Invalid email or password.")
 

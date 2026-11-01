@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Createaura | Support</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/support.css' %}">
+</head>
+<body>
+    <main class="support-page">
+        <header class="support-header">
+            <a href="{% url 'dashboard' %}" class="support-back" aria-label="Back"><i class="bi bi-chevron-left"></i></a>
+            <h1>Support</h1>
+            <a href="{% url 'dashboard' %}" class="support-home">Home</a>
+        </header>
+
+        <section class="support-content">
+            <article class="support-card support-intro">
+                <strong>CreatAura Support</strong>
+                <p>For inquiries, suggestions or complaints, Mail us</p>
+                <a href="mailto:support@creataura.com">support@creataura.com</a>
+            </article>
+
+            <form class="support-card support-form">
+                <header>
+                    <h2>Get in Touch</h2>
+                    <p>Fill the form to contact us</p>
+                </header>
+                <label for="subject">Subject</label>
+                <input id="subject" name="subject" type="text">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5"></textarea>
+                <button type="submit">Send</button>
+            </form>
+
+            <article class="support-card support-address">
+                <strong>Our Address</strong>
+                <p>4587 Crestview Terrace, La Vernia, Texas, USA</p>
+            </article>
+
+            <article class="support-card social-card">
+                <strong>Social Profiles</strong>
+                <div class="social-links" aria-label="Social profiles">
+                    <a href="#" aria-label="Facebook" class="social-facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="#" aria-label="Twitter" class="social-twitter"><i class="bi bi-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn" class="social-linkedin"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" aria-label="WhatsApp" class="social-whatsapp"><i class="bi bi-whatsapp"></i></a>
+                    <a href="#" aria-label="Instagram" class="social-instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="#" aria-label="Twitch" class="social-twitch"><i class="bi bi-twitch"></i></a>
+                </div>
+            </article>
+        </section>
+
+        <footer class="support-footer">
+            <strong>&copy; Copyright © CreatAura 2026. All Rights Reserved.</strong>
+            <span>CreatAura Financial Institutions.</span>
+        </footer>
+    </main>
+
+    <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="#"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="#"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'support' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+    </nav>
+</body>
+</html>

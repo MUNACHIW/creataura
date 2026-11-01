@@ -17,7 +17,9 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from creataura.views import home, register, user_login, user_logout, dashboard
+from creataura.views import (
+    home, register, user_login, user_logout, dashboard, crypto_exchange, support,
+)
 
 urlpatterns = [
     path("", home, name="home"),
@@ -25,5 +27,7 @@ urlpatterns = [
     path("login/", user_login, name="login"),
     path("logout/", user_logout, name="logout"),
     path("dashboard/", dashboard, name="dashboard"),
+    path("crypto-exchange/", crypto_exchange, name="crypto_exchange"),
+    path("support/", support, name="support"),
     path("admin/", admin.site.urls),
 ]

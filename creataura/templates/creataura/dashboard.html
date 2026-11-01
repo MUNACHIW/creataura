@@ -5,137 +5,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - CreatAura</title>
-    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css'%}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
+    <title>Createaura | User panel </title>
 </head>
 
-<body class="dashboard-body">
-    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
-    <aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Dashboard sidebar" aria-hidden="true">
-        <header class="sidebar-user">
-            <span class="sidebar-avatar">{{ request.user.first_name|default:request.user.username|slice:":1"|upper }}</span>
+<body>
+    <div class="dashboard-sidebar-overlay" id="dashboardSidebarOverlay" aria-hidden="true"></div>
+    <aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Dashboard menu" aria-hidden="true">
+        <header class="dashboard-sidebar-header">
+            <span class="dashboard-sidebar-avatar">
+                <i class="bi bi-person-fill"></i>
+            </span>
             <div>
-                <strong>{{ request.user.username }}</strong>
-                <small>{{ request.user.id|stringformat:"06d" }}</small>
+                <strong>munasom</strong>
+                <small>7853190</small>
             </div>
-            <button type="button" class="sidebar-close" aria-label="Close menu"><i class="bi bi-x-lg"></i></button>
+            <button type="button" class="dashboard-sidebar-close" aria-label="Close sidebar">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </header>
-
-        <section class="sidebar-balance">
+        <section class="dashboard-sidebar-balance">
             <span>Balance</span>
             <strong>$5.00</strong>
-            <div class="sidebar-shortcuts">
-                <a href="#"><i class="bi bi-plus"></i><span>Deposit</span></a>
+            <div class="dashboard-sidebar-actions">
+                <a href="#"><i class="bi bi-plus-lg"></i><span>Deposit</span></a>
                 <a href="#"><i class="bi bi-arrow-down"></i><span>Withdraw</span></a>
-                <a href="#"><i class="bi bi-credit-card"></i><span>Crypto Exchange</span></a>
+                <a href="{% url 'crypto_exchange' %}"><i class="bi bi-credit-card"></i><span>Crypto Exchange</span></a>
                 <a href="#"><i class="bi bi-person-badge"></i><span>KYC</span></a>
             </div>
         </section>
-
-        <nav class="sidebar-nav" aria-label="Sidebar navigation">
+        <nav class="dashboard-sidebar-menu" aria-label="Sidebar menu">
             <p>Menu</p>
-            <a href="{% url 'dashboard' %}" class="active"><i class="bi bi-pie-chart"></i><span>Dashboard</span><b>*</b></a>
-            <a href="#"><i class="bi bi-file-earmark-text"></i><span>Profit Record</span><i class="bi bi-chevron-right"></i></a>
-            <a href="#"><i class="bi bi-file-earmark-text"></i><span>Transaction History</span><i class="bi bi-chevron-right"></i></a>
-            <a href="#"><i class="bi bi-credit-card"></i><span>Invest</span><i class="bi bi-chevron-right"></i></a>
-            <a href="#"><i class="bi bi-credit-card"></i><span>My Investments</span><i class="bi bi-chevron-right"></i></a>
-
-            <p class="sidebar-section-title">Others</p>
-            <a href="#"><i class="bi bi-gear"></i><span>Refer Users</span><i class="bi bi-chevron-right"></i></a>
-            <a href="#"><i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-right"></i></a>
-            <a href="#"><i class="bi bi-chat"></i><span>Help/Support</span><i class="bi bi-chevron-right"></i></a>
-
-            <div class="sidebar-language">
-                <select aria-label="Language">
-                    <option>English</option>
-                    <option>French</option>
-                    <option>Spanish</option>
-                </select>
-            </div>
-            <a href="{% url 'logout' %}" class="sidebar-logout"><i class="bi bi-box-arrow-right"></i><span>Log Out</span></a>
-            <small class="google-credit">Powered by Google Translate</small>
+            <a href="{% url 'dashboard' %}" class="dashboard-sidebar-active">
+                <span class="dashboard-menu-icon"><i class="bi bi-pie-chart"></i></span>
+                <span>Dashboard</span>
+                <b>*</b>
+                <i class="bi bi-chevron-right dashboard-menu-arrow"></i>
+            </a>
+            <a href="{% url 'crypto_exchange' %}">
+                <span class="dashboard-menu-icon"><i class="bi bi-file-earmark-text"></i></span>
+                <span>Profit Record</span>
+                <i class="bi bi-chevron-right dashboard-menu-arrow"></i>
+            </a>
+            <a href="#">
+                <span class="dashboard-menu-icon"><i class="bi bi-file-earmark-text"></i></span>
+                <span>Transaction History</span>
+                <i class="bi bi-chevron-right dashboard-menu-arrow"></i>
+            </a>
+            <a href="#">
+                <span class="dashboard-menu-icon"><i class="bi bi-credit-card"></i></span>
+                <span>Invest</span>
+                <i class="bi bi-chevron-right dashboard-menu-arrow"></i>
+            </a>
+            <a href="#">
+                <span class="dashboard-menu-icon"><i class="bi bi-wallet2"></i></span>
+                <span>My Investments</span>
+                <i class="bi bi-chevron-right dashboard-menu-arrow"></i>
+            </a>
+            <p>Others</p>
+            <a href="#">
+                <span class="dashboard-menu-icon"><i class="bi bi-gear"></i></span>
+                <span>Refer Users</span>
+            </a>
+            <a href="#">
+                <span class="dashboard-menu-icon"><i class="bi bi-gear"></i></span>
+                <span>settings</span>
+            </a>
+            <a href="{% url 'support' %}">
+                <span class="dashboard-menu-icon"><i class="bi bi-chat"></i></span>
+                <span>Help/Support</span>
+            </a>
+            <a href="{% url 'logout' %}">
+                <span class="dashboard-menu-icon"><i class="bi bi-door-open"></i></span>
+                <span>Logout</span>
+            </a>
         </nav>
     </aside>
-    <main class="dashboard-shell">
-        <section class="dashboard-overview" aria-label="Account overview">
-            <div class="balance-card">
-                <div>
-                    <p>Total Balance</p>
-                    <strong>$0.00</strong>
-                </div>
-                <button class="balance-add" type="button" aria-label="Add funds"><i class="bi bi-plus"></i></button>
+    <section class="first-section">
+        <div class="navbar">
+            <button type="button" class="dashboard-menu-toggle" aria-label="Open sidebar"
+                aria-controls="dashboardSidebar" aria-expanded="false">
+                <i class="bi bi-list text-white fs-3"></i>
+            </button>
+            <div class="logo">
+                <img src="{% static '/creataura/images/cropped-creataura-6-48x48.png'%}" alt="">
             </div>
-
-            <nav class="dashboard-actions" aria-label="Dashboard actions">
-                <a href="#" class="dashboard-action">
-                    <span class="action-icon action-withdraw"><i class="bi bi-arrow-down"></i></span>
+            <div class="profile">
+                <a href="">
+                    <img src="{% static '/creataura/images/chats.png'%}" alt="profile">
+                </a>
+            </div>
+        </div>
+        <div class="dashboard-overview-card">
+            <div class="balance-panel">
+                <div>
+                    <span>Total Balance</span>
+                    <strong>$5.00</strong>
+                </div>
+                <button type="button" aria-label="Add funds">+</button>
+            </div>
+            <nav class="dashboard-actions" aria-label="Account actions">
+                <a href="#">
+                    <span class="dashboard-action-icon action-withdraw"><i class="bi bi-arrow-down"></i></span>
                     <span>Withdraw</span>
                 </a>
-                <a href="#" class="dashboard-action">
-                    <span class="action-icon action-invest"><i class="bi bi-credit-card"></i></span>
+                <a href="#">
+                    <span class="dashboard-action-icon action-invest"><i class="bi bi-credit-card"></i></span>
                     <span>Invest</span>
                 </a>
-                <a href="#" class="dashboard-action">
-                    <span class="action-icon action-exchange"><i class="bi bi-arrow-left-right"></i></span>
+                <a href="{% url 'crypto_exchange' %}">
+                    <span class="dashboard-action-icon action-exchange"><i class="bi bi-arrow-left-right"></i></span>
                     <span>Crypto Exchange</span>
                 </a>
-                <a href="#" class="dashboard-action">
-                    <span class="action-icon action-kyc"><i class="bi bi-person-badge"></i></span>
+                <a href="#">
+                    <span class="dashboard-action-icon action-kyc"><i class="bi bi-person-circle"></i></span>
                     <span>KYC</span>
                 </a>
             </nav>
-
-            <div class="welcome-banner">Welcome to Creattaura with a lot of cool Features</div>
-
-            <section class="withdrawal-card" aria-label="Withdrawal balance">
-                <h2>Withdrawal Bal</h2>
-                <div class="dashboard-stats">
-                    <article><span>Total Profit</span><strong class="stat-profit">$0.00</strong></article>
-                    <article><span>Total Bonus</span><strong class="stat-bonus">$0.00</strong></article>
-                    <article><span>Total Referral Bonus</span><strong>$0.00</strong></article>
-                    <article><span>Total Deposit</span><strong>$0.00</strong></article>
-                    <article><span>Total Withdrawals</span><strong>$0.00</strong></article>
-                    <article><span>Total Investment Plan</span><strong>0</strong></article>
-                    <article><span>Total Active Investment Plans</span><strong class="stat-active">0</strong></article>
-                </div>
-            </section>
-        </section>
-
-        <section class="transactions-section" aria-label="Transactions">
-            <article class="transaction-card">
-                <div class="transaction-heading">
-                    <h2>Deposit Transactions</h2><a href="#">View all</a>
-                </div>
-                <div class="empty-transaction">
-                    <span class="empty-icon"><i class="bi bi-chevron-right"></i></span>
-                    <div><strong>No transaction yet</strong><small>Deposit</small></div>
-                </div>
+        </div>
+    </section>
+    <section class="user-welcome">
+        <h2>Welcome, James Clark!</h2>
+        <p>Welcome to Creataura with alot of cool features</p>
+    </section>
+    <section class="withdrawal-roi" aria-label="Withdrawal ROI statistics">
+        <div class="withdrawal-roi-title">Withdraw ROI</div>
+        <div class="withdrawal-roi-grid">
+            <article class="roi-card">
+                <span>Total Profit</span>
+                <strong class="roi-green">$0.00</strong>
             </article>
-            <article class="transaction-card">
-                <div class="transaction-heading">
-                    <h2>Withdrawal Transactions</h2><a href="#">View all</a>
-                </div>
-                <div class="empty-transaction">
-                    <span class="empty-icon"><i class="bi bi-chevron-right"></i></span>
-                    <div><strong>No transaction yet</strong><small>Withdrawal</small></div>
-                </div>
+            <article class="roi-card">
+                <span>Total Bonus</span>
+                <strong class="roi-pink">$5.00</strong>
             </article>
-        </section>
-
-        <nav class="dashboard-bottom-nav" aria-label="Dashboard navigation">
-            <div class="bottom-nav-left">
-                <button type="button" id="dashboardMenuButton" aria-label="Open menu" aria-controls="dashboardSidebar" aria-expanded="false"><i class="bi bi-list"></i></button>
-                <button type="button" aria-label="Support"><i class="bi bi-headset"></i></button>
-                <button type="button" aria-label="Notifications"><i class="bi bi-bell"></i></button>
-                <a href="{% url 'logout' %}" aria-label="Log out"><span>{{
-                        request.user.first_name|default:request.user.username|slice:":1"|upper }}</span></a>
+            <article class="roi-card">
+                <span>Total Referral Bonus</span>
+                <strong>$0.00</strong>
+            </article>
+            <article class="roi-card">
+                <span>Total Deposit</span>
+                <strong>$0.00</strong>
+            </article>
+            <article class="roi-card roi-card-wide">
+                <span>Total Withdrawals</span>
+                <strong>$0.00</strong>
+            </article>
+            <article class="roi-card">
+                <span>Total Investment Plans</span>
+                <strong class="roi-green">0</strong>
+            </article>
+            <article class="roi-card">
+                <span>Total Active Investment Plans</span>
+                <strong class="roi-pink">0</strong>
+            </article>
+        </div>
+    </section>
+    <section class="transaction-section" aria-label="Account transactions">
+        <article class="transaction-group">
+            <div class="transaction-heading">
+                <h2>Deposit Transactions</h2>
+                <a href="#">View All</a>
             </div>
-        </nav>
-
-        <section class="chart-section" aria-label="Trading chart">
-            <div class="tradingview-widget-container dashboard-chart">
+            <div class="empty-transaction">
+                <span class="transaction-icon"><i class="bi bi-cash"></i></span>
+                <div>
+                    <strong>No transaction yet</strong>
+                    <small>Deposit</small>
+                </div>
+            </div>
+        </article>
+        <article class="transaction-group">
+            <div class="transaction-heading">
+                <h2>Withdrawal Transactions</h2>
+                <a href="#">View All</a>
+            </div>
+            <div class="empty-transaction">
+                <span class="transaction-icon"><i class="bi bi-cash"></i></span>
+                <div>
+                    <strong>No transaction yet</strong>
+                    <small>Withdrawal</small>
+                </div>
+            </div>
+        </article>
+    </section>
+    <section class="chart">
+        <p>Personal Trading Chart</p>
+        <div class="chart-widget">
+            <div class="tradingview-widget-container">
                 <div class="tradingview-widget-container__widget"></div>
                 <script type="text/javascript"
                     src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
@@ -147,152 +208,180 @@
                                             "theme": "light",
                                                 "style": "1",
                                                     "locale": "en",
-                                                        "enable_publishing": false,
-                                                            "allow_symbol_change": true,
-                                                                "support_host": "https://www.tradingview.com"
+                                                        "backgroundColor": "rgba(255, 255, 255, 1)",
+                                                            "gridColor": "rgba(242, 242, 242, 1)",
+                                                                "hide_top_toolbar": false,
+                                                                    "hide_legend": false,
+                                                                        "allow_symbol_change": false,
+                                                                            "save_image": false,
+                                                                                "calendar": false,
+                                                                                    "support_host": "https://www.tradingview.com"
                         }
                     </script>
             </div>
-        </section>
+        </div>
 
-        <section class="market-section" aria-label="Market overview">
-            <div class="market-table-wrap">
-                <table class="market-table">
-                    <thead>
-                        <tr>
-                            <th>Currency</th>
-                            <th colspan="7">Buy/Sell</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>EUR</td>
-                            <td>1.1597</td>
-                            <td>176.259</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>GBP</td>
-                            <td>0.8738</td>
-                            <td>0.9973</td>
-                            <td>-</td>
-                            <td>0.0427</td>
-                            <td>0.922110</td>
-                            <td>1.89461</td>
-                            <td>1.59911</td>
-                        </tr>
-                        <tr>
-                            <td>AUD</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>0.8656</td>
-                            <td>0.82410</td>
-                            <td>1.4222</td>
-                            <td>0.8533</td>
-                        </tr>
-                        <tr>
-                            <td>JPY</td>
-                            <td>0.00594</td>
-                            <td>0.00856</td>
-                            <td>-</td>
-                            <td>0.0543</td>
-                            <td>0.00523</td>
-                            <td>1.1862</td>
-                            <td>0.590</td>
-                        </tr>
-                        <tr>
-                            <td>BTC</td>
-                            <td>112.387</td>
-                            <td>12,422.189</td>
-                            <td>33.427</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>ETH</td>
-                            <td>2,018.36</td>
-                            <td>3,633.83</td>
-                            <td>-</td>
-                            <td>40.4321</td>
-                            <td>1.6833</td>
-                            <td>3,263.832</td>
-                            <td>4,000.542</td>
-                        </tr>
-                        <tr>
-                            <td>LTC</td>
-                            <td>19.39</td>
-                            <td>55.897</td>
-                            <td>8.409</td>
-                            <td>11.690</td>
-                            <td>79.33</td>
-                            <td>18.472</td>
-                            <td>13.963</td>
-                        </tr>
-                        <tr>
-                            <td>USDT</td>
-                            <td>1.1636</td>
-                            <td>1.6734</td>
-                            <td>21,615</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>CHF</td>
-                            <td>1.0557</td>
-                            <td>1.2523</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>XRP</td>
-                            <td>0.5190</td>
-                            <td>0.1020</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                    </tbody>
-                </table>
+        <p class="forex-market-title">Forex Market Fundamental Data</p>
+        <div class="forex-market-widget">
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <div class="forex-widget-fallback" aria-label="Forex and crypto market data">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>EUR</th>
+                                <th>USD</th>
+                                <th>JPY</th>
+                                <th>GBP</th>
+                                <th>CHF</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>EUR</th>
+                                <td>-</td>
+                                <td>1.1577</td>
+                                <td>176.259</td>
+                                <td>0.8352</td>
+                                <td>0.9220</td>
+                            </tr>
+                            <tr>
+                                <th>USD</th>
+                                <td>0.8938</td>
+                                <td>-</td>
+                                <td>157.500</td>
+                                <td>0.7465</td>
+                                <td>0.8249</td>
+                            </tr>
+                            <tr>
+                                <th>JPY</th>
+                                <td>0.0056730</td>
+                                <td>0.006346</td>
+                                <td>-</td>
+                                <td>0.004735</td>
+                                <td>0.005229</td>
+                            </tr>
+                            <tr>
+                                <th>BTC</th>
+                                <td>69,755.88</td>
+                                <td>77,803</td>
+                                <td>12,253,172</td>
+                                <td>58,168.69</td>
+                                <td>64,261.60</td>
+                            </tr>
+                            <tr>
+                                <th>ETH</th>
+                                <td>2,032.60</td>
+                                <td>2,267.41</td>
+                                <td>357,678</td>
+                                <td>1,694.90</td>
+                                <td>1,873.84</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <script type="text/javascript"
+                    src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+                        {
+                            "width": "100%",
+                                "height": "400",
+                                    "locale": "en",
+                                        "colorTheme": "light",
+                                            "isTransparent": false,
+                                                "showSymbolLogo": true,
+                                                    "showChart": true,
+                                                        "symbolsGroups": [
+                                                            {
+                                                                "name": "Forex",
+                                                                "originalName": "Forex",
+                                                                "symbols": [
+                                                                    { "name": "FX:EURUSD", "displayName": "EUR/USD" },
+                                                                    { "name": "FX:GBPUSD", "displayName": "GBP/USD" },
+                                                                    { "name": "FX:USDJPY", "displayName": "USD/JPY" },
+                                                                    { "name": "FX:USDCAD", "displayName": "USD/CAD" },
+                                                                    { "name": "FX:AUDUSD", "displayName": "AUD/USD" },
+                                                                    { "name": "FX:USDCHF", "displayName": "USD/CHF" },
+                                                                    { "name": "FX:NZDUSD", "displayName": "NZD/USD" },
+                                                                    { "name": "FX:USDCNY", "displayName": "USD/CNY" }
+                                                                ]
+                                                            },
+                                                            {
+                                                                "name": "Crypto",
+                                                                "originalName": "Crypto",
+                                                                "symbols": [
+                                                                    { "name": "BITSTAMP:BTCUSD", "displayName": "BTC/USD" },
+                                                                    { "name": "BITSTAMP:ETHUSD", "displayName": "ETH/USD" },
+                                                                    { "name": "COINBASE:LTCUSD", "displayName": "LTC/USD" }
+                                                                ]
+                                                            }
+                                                        ],
+                                                            "largeChartUrl": ""
+                        }
+                    </script>
             </div>
-        </section>
-    </main>
+        </div>
+        <script>
+            window.addEventListener("load", function () {
+                const widgetContainer = document.querySelector(".forex-market-widget .tradingview-widget-container__widget");
+                const forexWidget = document.querySelector(".forex-market-widget");
 
-    <footer class="dashboard-footer">&copy; Copyright {% now "Y" %} CreatAura. All Rights Reserved.</footer>
+                function updateForexWidgetFallback() {
+                    if (!widgetContainer || !forexWidget) return;
+                    if (widgetContainer.children.length > 0 || widgetContainer.querySelector("iframe")) {
+                        forexWidget.classList.add("widget-loaded");
+                    }
+                }
+
+                setTimeout(updateForexWidgetFallback, 2500);
+                setTimeout(updateForexWidgetFallback, 7000);
+            });
+        </script>
+    </section>
+    <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'dashboard' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span>
+        </a>
+        <a class="fixed-nav-item" href="#">
+            <span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span>
+            <span>Transaction History</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
+            <span>Crypto Exchange</span>
+        </a>
+        <a class="fixed-nav-item" href="#">
+            <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
+            <span>Invest</span>
+        </a>
+        <a class="fixed-nav-item" href="#">
+            <span class="fixed-nav-icon"><i class="bi bi-gear"></i></span>
+            <span>Settings</span>
+        </a>
+    </nav>
     <script>
-        const menuButton = document.getElementById("dashboardMenuButton");
-        const sidebar = document.getElementById("dashboardSidebar");
-        const sidebarOverlay = document.getElementById("sidebarOverlay");
-        const sidebarClose = document.querySelector(".sidebar-close");
+        const dashboardSidebar = document.getElementById("dashboardSidebar");
+        const dashboardSidebarOverlay = document.getElementById("dashboardSidebarOverlay");
+        const dashboardMenuToggle = document.querySelector(".dashboard-menu-toggle");
+        const dashboardSidebarClose = document.querySelector(".dashboard-sidebar-close");
 
-        function setSidebar(open) {
-            sidebar.classList.toggle("is-open", open);
-            sidebarOverlay.classList.toggle("is-open", open);
-            document.body.classList.toggle("sidebar-open", open);
-            sidebar.setAttribute("aria-hidden", String(!open));
-            menuButton.setAttribute("aria-expanded", String(open));
+        function setDashboardSidebar(open) {
+            dashboardSidebar.classList.toggle("is-open", open);
+            dashboardSidebarOverlay.classList.toggle("is-open", open);
+            dashboardSidebar.setAttribute("aria-hidden", String(!open));
+            dashboardMenuToggle.setAttribute("aria-expanded", String(open));
+            document.body.classList.toggle("dashboard-sidebar-open", open);
         }
 
-        menuButton.addEventListener("click", () => setSidebar(true));
-        sidebarClose.addEventListener("click", () => setSidebar(false));
-        sidebarOverlay.addEventListener("click", () => setSidebar(false));
+        dashboardMenuToggle.addEventListener("click", () => setDashboardSidebar(true));
+        dashboardSidebarClose.addEventListener("click", () => setDashboardSidebar(false));
+        dashboardSidebarOverlay.addEventListener("click", () => setDashboardSidebar(false));
         document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") setSidebar(false);
+            if (event.key === "Escape") setDashboardSidebar(false);
         });
     </script>
+
+
 </body>
 
 </html>
