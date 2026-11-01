@@ -602,12 +602,14 @@ body.dashboard-sidebar-open {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    display: grid;
     place-items: center;
     overflow: hidden;
     background: #eee6e0;
     color: #f7b36b;
     font-size: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .dashboard-sidebar-header div {

@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.shortcuts import redirect, render
 
-from .models import UserProfile
+from .models import SupportMessage, UserProfile
 
 
 def home(request):
@@ -16,7 +16,18 @@ def home(request):
 
 @login_required(login_url="login")
 def dashboard(request):
-    return render(request, "creataura/dashboard.html")
+    profile = getattr(request.user, "creataura_profile", None)
+    full_name = (
+        profile.full_name.strip()
+        if profile and profile.full_name.strip()
+        else request.user.get_full_name().strip()
+        or request.user.username
+    )
+    return render(
+        request,
+        "creataura/dashboard.html",
+        {"dashboard_full_name": full_name},
+    )
 
 
 @login_required(login_url="login")
@@ -26,13 +37,65 @@ def crypto_exchange(request):
 
 @login_required(login_url="login")
 def support(request):
+    if request.method == "POST":
+        subject = request.POST.get("subject", "").strip()
+        message = request.POST.get("message", "").strip()
+
+        if not subject or not message:
+            messages.error(request, "Please enter both a subject and message.")
+        else:
+            SupportMessage.objects.create(
+                user=request.user,
+                subject=subject,
+                message=message,
+            )
+            messages.success(request, "Your support message has been sent.")
+            return redirect("support")
+
     return render(request, "creataura/support.html")
 
 
 COUNTRIES = [
-    "Nigeria", "United States", "United Kingdom", "Canada", "Australia",
-    "Ghana", "South Africa", "Kenya", "Germany", "France", "India",
-    "United Arab Emirates", "China", "Japan", "Singapore",
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola",
+    "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
+    "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados",
+    "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
+    "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
+    "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
+    "Cameroon", "Canada", "Central African Republic", "Chad", "Chile",
+    "China", "Colombia", "Comoros", "Congo (Democratic Republic)",
+    "Congo (Republic)", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba",
+    "Cyprus", "Czechia", "Denmark", "Djibouti", "Dominica",
+    "Dominican Republic", "Ecuador", "Egypt", "El Salvador",
+    "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
+    "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia",
+    "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea",
+    "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
+    "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland",
+    "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
+    "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
+    "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein",
+    "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia",
+    "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania",
+    "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia",
+    "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia",
+    "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua",
+    "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
+    "Oman", "Pakistan", "Palau", "Palestine", "Panama",
+    "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland",
+    "Portugal", "Qatar", "Romania", "Russia", "Rwanda",
+    "Saint Kitts and Nevis", "Saint Lucia",
+    "Saint Vincent and the Grenadines", "Samoa", "San Marino",
+    "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia",
+    "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia",
+    "Solomon Islands", "Somalia", "South Africa", "South Korea",
+    "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden",
+    "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania",
+    "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
+    "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
+    "United Arab Emirates", "United Kingdom", "United States",
+    "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
+    "Vietnam", "Yemen", "Zambia", "Zimbabwe",
 ]
 
 

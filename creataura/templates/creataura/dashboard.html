@@ -17,12 +17,11 @@
     <div class="dashboard-sidebar-overlay" id="dashboardSidebarOverlay" aria-hidden="true"></div>
     <aside class="dashboard-sidebar" id="dashboardSidebar" aria-label="Dashboard menu" aria-hidden="true">
         <header class="dashboard-sidebar-header">
-            <span class="dashboard-sidebar-avatar">
-                <i class="bi bi-person-fill"></i>
-            </span>
+            <img class="dashboard-sidebar-avatar" src="{% static '/creataura/images/chats.png'%}" widh alt="profile">
+
             <div>
-                <strong>munasom</strong>
-                <small>7853190</small>
+                <strong>{{ dashboard_full_name }}</strong>
+                <small>{{ request.user.username }}</small>
             </div>
             <button type="button" class="dashboard-sidebar-close" aria-label="Close sidebar">
                 <i class="bi bi-x-lg"></i>
@@ -129,7 +128,7 @@
         </div>
     </section>
     <section class="user-welcome">
-        <h2>Welcome, James Clark!</h2>
+        <h2>Welcome, {{ dashboard_full_name }}!</h2>
         <p>Welcome to Creataura with alot of cool features</p>
     </section>
     <section class="withdrawal-roi" aria-label="Withdrawal ROI statistics">

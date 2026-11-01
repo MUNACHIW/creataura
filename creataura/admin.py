@@ -11,6 +11,7 @@ from .models import (
     WithdrawalMethod,
     WithdrawalBTC,
     WithdrawalXRP,
+    SupportMessage,
 )
 
 
@@ -195,3 +196,17 @@ class ReferralBonusAdmin(admin.ModelAdmin):
     )
     list_editable = ("status",)
     readonly_fields = ("date_created",)
+
+
+@admin.register(SupportMessage)
+class SupportMessageAdmin(admin.ModelAdmin):
+    list_display = ("user", "subject", "status", "date_created")
+    list_filter = ("status", "date_created")
+    search_fields = (
+        "user__username",
+        "user__email",
+        "subject",
+        "message",
+    )
+    list_editable = ("status",)
+    readonly_fields = ("user", "subject", "message", "date_created")

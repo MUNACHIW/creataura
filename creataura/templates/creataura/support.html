@@ -24,15 +24,21 @@
                 <a href="mailto:support@creataura.com">support@creataura.com</a>
             </article>
 
-            <form class="support-card support-form">
+            <form class="support-card support-form" method="post" action="{% url 'support' %}">
+                {% csrf_token %}
                 <header>
                     <h2>Get in Touch</h2>
                     <p>Fill the form to contact us</p>
                 </header>
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="{{ message.tags }}" role="alert">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
                 <label for="subject">Subject</label>
-                <input id="subject" name="subject" type="text">
+                <input id="subject" name="subject" type="text" maxlength="200" required>
                 <label for="message">Message</label>
-                <textarea id="message" name="message" rows="5"></textarea>
+                <textarea id="message" name="message" rows="5" required></textarea>
                 <button type="submit">Send</button>
             </form>
 
