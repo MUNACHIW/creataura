@@ -33,7 +33,16 @@ from .models import (
     WithdrawalBTC,
     WithdrawalMethod,
     WithdrawalXRP,
+    Notification,
 )
+
+
+def award_signup_bonus(user):
+    return Bonus.objects.get_or_create(
+        user=user,
+        amount=Decimal("5.00"),
+        plan_narration="SignUp Bonus",
+    )
 
 
 def get_available_balance(user):
@@ -102,6 +111,28 @@ def home(request):
 
 
 @login_required(login_url="login")
+def notifications(request):
+    notification_list = Notification.objects.filter(
+        models.Q(send_to_all=True) | models.Q(recipients=request.user)
+    ).distinct()
+    unread_notifications = notification_list.exclude(read_by=request.user)
+
+    if request.method == "POST":
+        for notification in unread_notifications:
+            notification.read_by.add(request.user)
+        return redirect("notifications")
+
+    return render(
+        request,
+        "creataura/notifications.html",
+        {
+            "notifications": notification_list,
+            "unread_notification_count": unread_notifications.count(),
+        },
+    )
+
+
+@login_required(login_url="login")
 def dashboard(request):
     profile = getattr(request.user, "creataura_profile", None)
     full_name = (
@@ -139,6 +170,10 @@ def dashboard(request):
         status="paid",
     ).aggregate(total=models.Sum("amount"))["total"] or Decimal("0")
     total_balance = get_available_balance(request.user)
+    notifications = Notification.objects.filter(
+        models.Q(send_to_all=True) | models.Q(recipients=request.user)
+    ).distinct()
+    unread_notifications = notifications.exclude(read_by=request.user)
     return render(
         request,
         "creataura/dashboard.html",
@@ -152,6 +187,8 @@ def dashboard(request):
             "total_deposit": approved_deposits,
             "total_referral_bonus": referral_total,
             "total_withdrawals": approved_withdrawal_total,
+            "notifications": unread_notifications[:10],
+            "unread_notification_count": unread_notifications.count(),
         },
     )
 
@@ -1226,6 +1263,7 @@ def register(request, referral_id=None):
         password = request.POST.get("password", "")
         password_again = request.POST.get("password_again", "")
         referral_id = request.POST.get("referral_id", "").strip() or referral_id
+        referral_id = referral_id or ""
 
         if not all([username, email, full_name, phone_number, bitcoin_address, country, password, password_again]):
             messages.error(request, "Please complete all required fields.")
@@ -1253,11 +1291,7 @@ def register(request, referral_id=None):
                         country=country,
                         referral_id=referral_id,
                     )
-                    Bonus.objects.get_or_create(
-                        user=user,
-                        amount=Decimal("5.00"),
-                        plan_narration="SignUp Bonus",
-                    )
+                    award_signup_bonus(user)
                 messages.success(request, "Account created successfully. Please log in.")
                 return redirect("login")
 

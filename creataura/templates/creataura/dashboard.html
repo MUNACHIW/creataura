@@ -96,6 +96,12 @@
                 <img src="{% static '/creataura/images/cropped-creataura-6-48x48.png'%}" alt="">
             </div>
             <div class="profile">
+                <a href="{% url 'notifications' %}" class="dashboard-notification-bell" aria-label="Notifications">
+                    <i class="bi bi-bell"></i>
+                    {% if unread_notification_count %}
+                        <span class="dashboard-notification-badge">{{ unread_notification_count }}</span>
+                    {% endif %}
+                </a>
                 <a href="{% url 'settings' %}">
                     <img src="{% static '/creataura/images/chats.png'%}" alt="profile">
                 </a>
@@ -129,6 +135,20 @@
             </nav>
         </div>
     </section>
+    {% if unread_notification_count and notifications %}
+        {% for notification in notifications %}
+            {% if forloop.first %}
+                <aside class="dashboard-notification-alert" role="status">
+                    <span class="dashboard-notification-alert-icon"><i class="bi bi-bell-fill"></i></span>
+                    <div>
+                        <strong>{{ notification.title }}</strong>
+                        <small>{{ notification.message }}</small>
+                    </div>
+                    <a href="{% url 'notifications' %}" aria-label="Open notifications"><i class="bi bi-chevron-right"></i></a>
+                </aside>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     <section class="user-welcome">
         <h2>Welcome, {{ dashboard_full_name }}!</h2>
         <p>Welcome to Creataura with alot of cool features</p>

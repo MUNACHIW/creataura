@@ -913,3 +913,62 @@ class TransactionHistoryTests(TestCase):
         self.assertContains(response, "$5")
         self.assertContains(response, "Bonus")
         self.assertContains(response, "SignUp Bonus")
+
+
+class SignupBonusTests(TestCase):
+    def test_login_does_not_create_signup_bonus(self):
+        user = User.objects.create_user(
+            username="signup-bonus-user",
+            email="signup-bonus@example.com",
+            password="testpass123",
+        )
+
+        for _ in range(2):
+            self.client.logout()
+            response = self.client.post(
+                reverse("login"),
+                {"email": user.email, "password": "testpass123"},
+            )
+            self.assertEqual(response.status_code, 302)
+
+        self.assertFalse(
+            Bonus.objects.filter(
+                user=user,
+                plan_narration="SignUp Bonus",
+            ).exists()
+        )
+
+    def test_registration_awards_signup_bonus_and_login_does_not_duplicate_it(self):
+        response = self.client.post(
+            reverse("register"),
+            {
+                "username": "new-signup-user",
+                "email": "new-signup@example.com",
+                "full_name": "New Signup User",
+                "phone_number": "+123456789",
+                "bitcoin_address": "new-signup-wallet",
+                "country": "United States",
+                "password": "testpass123",
+                "password_again": "testpass123",
+            },
+        )
+        self.assertRedirects(response, reverse("login"))
+
+        user = User.objects.get(username="new-signup-user")
+        login_response = self.client.post(
+            reverse("login"),
+            {"email": user.email, "password": "testpass123"},
+        )
+        self.assertEqual(login_response.status_code, 302)
+
+        self.assertEqual(
+            Bonus.objects.filter(
+                user=user,
+                amount="5.00",
+                plan_narration="SignUp Bonus",
+            ).count(),
+            1,
+        )
+
+        dashboard = self.client.get(reverse("dashboard"))
+        self.assertContains(dashboard, "$5.00")

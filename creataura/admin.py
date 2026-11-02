@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
 
 from .models import (
     BankAccount,
@@ -16,7 +18,55 @@ from .models import (
     WithdrawalBTC,
     WithdrawalXRP,
     SupportMessage,
+    Notification,
 )
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("title", "send_to_all", "email_sent", "created_at")
+    list_filter = ("send_to_all", "email_sent", "created_at")
+    search_fields = ("title", "message")
+    filter_horizontal = ("recipients",)
+    readonly_fields = ("email_sent", "created_at")
+    fields = (
+        "title",
+        "message",
+        "send_to_all",
+        "recipients",
+        "email_sent",
+        "created_at",
+    )
+
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        notification = form.instance
+        if notification.send_to_all:
+            notification.recipients.set(
+                User.objects.filter(is_active=True)
+            )
+
+        if not notification.email_sent:
+            recipient_users = notification.recipients.select_related()
+            recipient_emails = [
+                user.email for user in recipient_users
+                if user.email and not user.is_staff
+            ]
+            if notification.send_to_all:
+                recipient_emails = [
+                    user.email for user in User.objects.filter(is_active=True)
+                    if user.email and not user.is_staff
+                ]
+            if recipient_emails:
+                send_mail(
+                    notification.title,
+                    notification.message,
+                    None,
+                    recipient_emails,
+                    fail_silently=True,
+                )
+            notification.email_sent = True
+            notification.save(update_fields=["email_sent"])
 
 
 @admin.register(UserProfile)

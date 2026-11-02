@@ -23,6 +23,7 @@ from creataura.views import (
     support, support_submit,
     settings, referrals,
     investments, join_investment,
+    notifications,
     transaction_history, roi_history, kyc, withdrawal, withdrawal_btc, withdrawal_xrp,
     deposit, deposit_payment, withdraw_roi, advanced_account_settings,
 )
@@ -33,6 +34,7 @@ urlpatterns = [
     path("login/", user_login, name="login"),
     path("logout/", user_logout, name="logout"),
     path("dashboard/", dashboard, name="dashboard"),
+    path("notifications/", notifications, name="notifications"),
     path("crypto-exchange/", crypto_exchange, name="crypto_exchange"),
     path("support/", support, name="support"),
     path("support/submit/", support_submit, name="support_submit"),

@@ -497,6 +497,13 @@ class Bonus(models.Model):
         ordering = ["-date_created"]
         verbose_name = "Bonus"
         verbose_name_plural = "Bonuses"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("user", "amount", "plan_narration"),
+                name="unique_signup_bonus_per_user",
+                condition=models.Q(plan_narration="SignUp Bonus"),
+            ),
+        ]
 
     def __str__(self):
         return f"{self.user.username} - {self.amount}"
@@ -605,3 +612,29 @@ class SupportMessage(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.subject}"
+
+
+class Notification(models.Model):
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    recipients = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        related_name="notifications",
+    )
+    send_to_all = models.BooleanField(default=False)
+    read_by = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        related_name="read_notifications",
+    )
+    email_sent = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
+
+    def __str__(self):
+        return self.title
