@@ -1,0 +1,101 @@
+{% extends "creataura/base.html" %}
+{% load static %}
+
+{% block title %}About Us - CreatAura{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'creataura/about.css' %}">
+{% endblock %}
+
+{% block hero_content %}
+<div class="about-hero-content">
+    <span>KNOW MORE</span>
+    <h1>About Us</h1>
+</div>
+{% endblock %}
+
+{% block hero_slides %}
+<div class="about-hero-background" aria-hidden="true"></div>
+{% endblock %}
+
+{% block hero_intro %}{% endblock %}
+
+{% block content %}
+<section class="about-introduction">
+    <div class="about-introduction-copy">
+        <span>CREATAURA GROUP</span>
+        <h2>Where you can<br>relax, enjoy life<br>while investing.</h2>
+        <p>Our carefully curated selection of renewable energy projects allows investors to participate in a sector that not only promises attractive returns but also contributes to environmental well-being.</p>
+    </div>
+
+    <img src="{% static 'creataura/images/aancogroup-21.jpg' %}" alt="Renewable energy investment">
+
+    <div class="about-introduction-copy secondary">
+        <p>At CreatAura Group, we are committed to shaping the future of investment by offering a diverse range of opportunities that empower individuals and organizations to achieve financial growth and sustainability. Our expertise lies in four core areas: Renewable Energy, Forex, Trading, Bonds, and Real Estate.</p>
+    </div>
+</section>
+
+<section class="about-expertise" aria-label="CreatAura expertise">
+    <article>
+        <h3>Expertise and Knowledge</h3>
+        <p>Our team comprises industry experts with deep knowledge in renewable energy, forex trading, bonds, and real estate. This expertise allows us to make informed investment decisions and guide our clients toward optimal choices.</p>
+    </article>
+    <article>
+        <h3>Global Network</h3>
+        <p>Our extensive network spans across industries and geographies, providing us with access to valuable information and partnerships. This global reach enables us to identify emerging trends and seize international investment prospects.</p>
+    </article>
+    <article>
+        <h3>Customized Strategies</h3>
+        <p>We understand that every investor has unique goals and risk appetites. Our approach involves tailoring investment strategies to match individual preferences, ensuring that our clients' financial aspirations are well aligned.</p>
+    </article>
+</section>
+
+<section class="about-story">
+    <h2>The Story Behind Our<br>Success</h2>
+    <div class="about-story-copy">
+        <p>Diversifying across multiple investment sectors is a key strength of ours. By offering opportunities in renewable energy, forex, bonds, and real estate, we empower clients to create a well-rounded and resilient investment portfolio.</p>
+        <p>Our commitment to sustainability aligns with our client's desire to invest in responsible and impactful projects. We prioritize investments that contribute positively to the environment and society.</p>
+        <p>The investment landscape is constantly evolving. We stay ahead of the curve by consistently updating our knowledge, adapting to changing market conditions, and refining our strategies for optimal returns. Diversifying across multiple investment sectors is a key strength of ours.</p>
+        <p>By offering opportunities in renewable energy, forex, bonds, and real estate, we empower clients to create a well-rounded and resilient investment portfolio.</p>
+    </div>
+</section>
+
+<a class="about-video"
+    href="https://www.youtube.com/"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Play CreatAura video on YouTube">
+    <img src="{% static 'creataura/images/aticgroup-investments.jpg' %}" alt="CreatAura investment team meeting">
+    <span class="about-video-play" aria-hidden="true"><i class="bi bi-play-fill"></i></span>
+</a>
+
+<section class="about-testimonials" aria-labelledby="testimonials-heading">
+    <h2 id="testimonials-heading">What Investors Say</h2>
+    <div class="testimonial-grid">
+        <article>
+            <p>"What sets CreatAura Group apart is their ability to offer a comprehensive range of investment solutions. From renewable energy to forex, bonds, and real estate, I appreciate the convenience and expertise they provide for a well-rounded portfolio."</p>
+            <div><span class="testimonial-avatar">D</span><strong>David R</strong></div>
+        </article>
+        <article>
+            <p>"Investing with CreatAura Group allows me to align my financial goals with my ethical values. Their focus on sustainable and responsible investments resonates with me, and I'm proud to be part of their mission."</p>
+            <div><span class="testimonial-avatar">H</span><strong>Hillary Rice</strong></div>
+        </article>
+        <article>
+            <p>"As someone who values technology and innovation, I'm thrilled with CreatAura Group's use of advanced tools in their investment strategies. Their modern approach has translated into favorable outcomes for my investments."</p>
+            <div><span class="testimonial-avatar">J</span><strong>Julia Michelle</strong></div>
+        </article>
+        <article>
+            <p>"Transparency is a big factor for me when it comes to investments. CreatAura Group's commitment to open communication, regular updates, and transparent reporting gives me confidence in their services."</p>
+            <div><span class="testimonial-avatar">J</span><strong>James Dean</strong></div>
+        </article>
+        <article>
+            <p>"I appreciate CreatAura Group's long-term approach to investments. Their emphasis on market trends, thoughtful research, and risk management align with my goal of building sustainable wealth over time."</p>
+            <div><span class="testimonial-avatar">R</span><strong>Rodrigo Alonso</strong></div>
+        </article>
+        <article>
+            <p>"CreatAura Group understands that each investor is unique. Their personalized investment strategies cater to my financial aspirations, making me feel like a valued client rather than just another investor."</p>
+            <div><span class="testimonial-avatar">M</span><strong>Mila Jackson</strong></div>
+        </article>
+    </div>
+</section>
+{% endblock %}

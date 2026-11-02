@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/bootstrap.css' %}">
+    {% block extra_css %}{% endblock %}
     <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
 
@@ -28,7 +29,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto align-items-lg-center site-nav desktop-nav">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %} href="/">Home</a></li>
                         <li class="nav-item dropdown desktop-dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">Sustainability</a>
@@ -40,18 +41,21 @@
                                 <li><a class="dropdown-item" href="#">Oil and Gas</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Loans</a></li>
-                        <li class="nav-item dropdown desktop-dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">Contact</a>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'about' %} active{% endif %}"{% if request.resolver_match.url_name == 'about' %} aria-current="page"{% endif %} href="{% url 'about' %}">About</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'loans' %} active{% endif %}"{% if request.resolver_match.url_name == 'loans' %} aria-current="page"{% endif %} href="{% url 'loans' %}">Loans</a></li>
+                        <li class="nav-item dropdown desktop-dropdown contact-desktop-dropdown">
+                            <a class="nav-link contact-nav-link{% if request.resolver_match.url_name == 'contact' %} active{% endif %}" href="{% url 'contact' %}"{% if request.resolver_match.url_name == 'contact' %} aria-current="page"{% endif %}>Contact</a>
+                            <button class="nav-link contact-dropdown-toggle dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open Contact options">
+                                <span class="visually-hidden">Open Contact options</span>
+                            </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Careers</a></li>
+                                <li><a class="dropdown-item" href="{% url 'careers' %}">Careers</a></li>
                             </ul>
                         </li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Sign Up</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">FAQ</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'faq' %} active{% endif %}"{% if request.resolver_match.url_name == 'faq' %} aria-current="page"{% endif %} href="{% url 'faq' %}">FAQ</a></li>
                         <li class="nav-item dropdown desktop-dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">Privacy and Policy</a>
@@ -61,8 +65,9 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav site-nav mobile-nav">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %} href="/">Home</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'about' %} active{% endif %}"{% if request.resolver_match.url_name == 'about' %} aria-current="page"{% endif %} href="{% url 'about' %}">About</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'loans' %} active{% endif %}"{% if request.resolver_match.url_name == 'loans' %} aria-current="page"{% endif %} href="{% url 'loans' %}">Loans</a></li>
                         <li class="nav-item policy-mobile">
                             <button class="nav-link policy-toggle" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#sustainabilityLinks" aria-expanded="false"
@@ -77,9 +82,9 @@
                                 <li><a class="nav-link" href="#">Oil and Gas</a></li>
                             </ul>
                         </li>
-                        <li class="nav-item"><a class="nav-link" href="#">Careers</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">FAQ</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'careers' %} active{% endif %}"{% if request.resolver_match.url_name == 'careers' %} aria-current="page"{% endif %} href="{% url 'careers' %}">Careers</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'contact' %} active{% endif %}"{% if request.resolver_match.url_name == 'contact' %} aria-current="page"{% endif %} href="{% url 'contact' %}">Contact</a></li>
+                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'faq' %} active{% endif %}"{% if request.resolver_match.url_name == 'faq' %} aria-current="page"{% endif %} href="{% url 'faq' %}">FAQ</a></li>
                         <li class="nav-item policy-mobile">
                             <button class="nav-link policy-toggle" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#privacyPolicyLinks" aria-expanded="false"
@@ -96,18 +101,24 @@
                 </div>
             </div>
         </nav>
+        {% block hero_content %}
         <div class="hero-content">
             <h1>Empowering Growth, Igniting Financial Success</h1>
             <p>Elevate Your Financial Horizon with CreatAura Group</p>
             <a class="hero-cta" href="/register">Get Started</a>
         </div>
+        {% endblock %}
+        {% block hero_slides %}
         <div class="hero-slide hero-slide-one" aria-hidden="true"></div>
         <div class="hero-slide hero-slide-two" aria-hidden="true"></div>
+        {% endblock %}
     </section>
+    {% block hero_intro %}
     <section class="hero-intro-card" aria-labelledby="hero-intro-title">
         <p>Investing in Change, Investing in Sustainability.</p>
         <h2 id="hero-intro-title">CreatAura Leading the Path</h2>
     </section>
+    {% endblock %}
     <main>
         {% block content %}
         {% endblock %}

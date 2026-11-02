@@ -1,0 +1,37 @@
+.investments-page { min-height: 100vh; background: #f2f3f5; }
+.investments-header button { border: 0; background: transparent; color: var(--text); font-size: 20px; justify-self: end; }
+.investments-content { min-height: calc(100vh - 110px - 56px); padding: 26px 14px 90px; background: #fff; }
+.investments-content > h2 { height: 42px; margin: 0 0 22px; border-bottom: 2px solid #7d4050; text-align: center; color: var(--text); font-size: 13px; font-weight: 600; }
+.investment-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.investment-plan-card { min-width: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid #e1e4ea; border-radius: 7px; background: #fff; box-shadow: 0 4px 12px rgba(31,38,68,.04); }
+.investment-plan-body { min-height: 420px; padding: 22px 14px 18px; text-align: center; }
+.investment-plan-icon { display: block; width: 38px; margin: 0 auto 12px; color: transparent; background: linear-gradient(135deg, transparent 25%, #eef0f2 25%, #eef0f2 50%, transparent 50%, transparent 75%, #eef0f2 75%); background-size: 12px 12px; -webkit-text-stroke: 0; font-size: 36px; transform: rotate(25deg); opacity: .85; }
+.investment-plan-card h3 { margin: 12px 0 4px; color: var(--text); font-size: 20px; }
+.investment-plan-price { display: block; margin-bottom: 20px; color: var(--text); font-size: 19px; }
+.investment-plan-details { display: grid; gap: 0; color: #aeb4c0; font-size: 10px; }
+.investment-plan-details span { min-height: 42px; display: flex; align-items: center; justify-content: center; }
+.investment-plan-button { width: calc(100% - 28px); height: 34px; margin: 0 14px 16px; border: 0; border-radius: 6px; background: var(--wine); color: #fff; font-family: inherit; font-size: 11px; font-weight: 600; }
+.investment-plan-button:not(:disabled):hover { background: #2eec67; color: var(--text); }
+.investment-plan-button:disabled { opacity: .65; cursor: not-allowed; }
+.investment-plan-card form { padding-bottom: 14px; }
+.investment-amount-field { display: block; margin: 0 14px 12px; text-align: left; }
+.investment-amount-field span { display: block; margin-bottom: 7px; color: var(--text); font-size: 11px; font-weight: 600; text-align: center; }
+.investment-amount-field input { width: 100%; height: 40px; padding: 0 12px; border: 1px solid #dfe3ea; border-radius: 5px; background: #fff; color: var(--text); font-family: inherit; font-size: 13px; }
+.investment-packages-heading { margin-top: 28px !important; }
+.investment-records { display: grid; gap: 10px; margin-bottom: 24px; }
+.investment-record { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #e1e4ea; border-radius: 7px; background: #fff; }
+.investment-record > div { display: grid; gap: 5px; }
+.investment-record > div:last-child { text-align: right; }
+.investment-record strong { color: var(--text); font-size: 13px; }
+.investment-record span { color: #9da4b1; font-size: 10px; }
+.investment-status { width: fit-content; margin-left: auto; padding: 3px 8px; border-radius: 10px; font-weight: 600; }
+.investment-status-active { background: #e7f7ec; color: #248b48 !important; }
+.investment-status-completed { background: #eee9fa; color: #7054a6 !important; }
+.investment-status-cancelled { background: #fdeaea; color: #b54a4a !important; }
+.investment-record-empty { margin: 0; padding: 24px 12px; border: 1px dashed #dfe3ea; border-radius: 7px; color: #9da4b1; font-size: 12px; text-align: center; }
+html[data-theme="dark"] .investment-amount-field input { background: #161129 !important; border-color: #29254a !important; color: #fff !important; }
+@media (max-width: 700px) { .investment-plans { grid-template-columns: 1fr; } .investment-plan-body { min-height: 390px; } }
+html[data-theme="dark"] .investments-page, html[data-theme="dark"] .investments-content, html[data-theme="dark"] .investment-plan-card, html[data-theme="dark"] .investment-record { background: #030108 !important; color: #fff !important; }
+html[data-theme="dark"] .investment-plan-card, html[data-theme="dark"] .investment-record, html[data-theme="dark"] .investment-record-empty { border-color: #29254a !important; }
+html[data-theme="dark"] .investment-plan-card h3, html[data-theme="dark"] .investment-plan-price, html[data-theme="dark"] .investments-content > h2 { color: #fff !important; }
+html[data-theme="dark"] .investments-header button { color: #fff !important; }

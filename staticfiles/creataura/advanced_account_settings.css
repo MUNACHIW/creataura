@@ -1,0 +1,33 @@
+.advanced-security-page { background: #f2f3f5; }
+.advanced-security-main { min-height: calc(100vh - 56px); }
+.advanced-security-header { height: 74px; }
+.advanced-security-header h1 { grid-column: 2; font-size: 15px; font-weight: 500; }
+.advanced-security-content { padding: 24px 14px 30px; background: #f2f3f5; }
+.security-card { max-width: 820px; margin: 0 auto 18px; padding: 28px 26px; border-radius: 6px; background: #fff; box-shadow: 0 4px 14px rgba(31,38,68,.06); }
+.security-card h2 { margin: 0 0 10px; color: var(--text); font-size: 17px; }
+.security-card p { color: #777f90; font-size: 11px; line-height: 1.7; }
+.two-factor-status { color: var(--text) !important; }
+.two-factor-card form { margin-top: 18px; }
+.security-password { display: grid; max-width: 390px; gap: 7px; margin-top: 16px; color: var(--text); font-size: 10px; }
+.security-password input { height: 42px; padding: 0 12px; border: 1px solid #e0e4ec; border-radius: 5px; color: var(--text); font-family: inherit; }
+.security-card form button { height: 28px; min-width: 66px; margin-top: 8px; border: 0; border-radius: 4px; background: #29bc69; color: #fff; font-family: inherit; font-size: 9px; font-weight: 600; }
+.security-card form .disable-two-factor { background: #5d0820; }
+.browser-sessions-card { padding-bottom: 24px; }
+.browser-session-list { margin-top: 16px; }
+.browser-session-list article { min-height: 52px; display: grid; grid-template-columns: 34px 1fr; align-items: center; }
+.browser-session-list article > i { color: var(--text); font-size: 18px; }
+.browser-session-list article div { display: grid; gap: 2px; }
+.browser-session-list article strong { color: var(--text); font-size: 10px; }
+.browser-session-list article span { color: #777f90; font-size: 9px; }
+.security-card .log-out-sessions { height: 30px; margin-top: 16px; padding: 0 12px; background: #29bc69; }
+.delete-account-card { margin-bottom: 0; }
+.delete-password { width: 100%; height: 42px; margin: 12px 0 8px; padding: 0 12px; border: 1px solid #e0e4ec; border-radius: 5px; color: var(--text); font-family: inherit; font-size: 11px; }
+.security-card .delete-account-button { height: 32px; padding: 0 14px; background: #ff4d65; }
+.advanced-security-messages { max-width: 820px; margin: 0 auto 10px; }
+.advanced-security-messages p { margin: 0; padding: 10px 12px; border-radius: 5px; background: #e9f8ef; color: #16884a; font-size: 10px; }
+.advanced-security-messages p.error { background: #fdebf0; color: #a52b48; }
+.advanced-security-footer { height: 90px; }
+html[data-theme="dark"] .advanced-security-page, html[data-theme="dark"] .advanced-security-content { background: #030108 !important; }
+html[data-theme="dark"] .security-card { background: #161129 !important; }
+html[data-theme="dark"] .security-card h2, html[data-theme="dark"] .two-factor-status, html[data-theme="dark"] .browser-session-list article strong, html[data-theme="dark"] .browser-session-list article > i { color: #fff !important; }
+html[data-theme="dark"] .delete-password { background: #161129 !important; border-color: #29254a !important; color: #fff !important; }

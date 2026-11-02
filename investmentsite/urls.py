@@ -16,10 +16,13 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.conf import settings as django_settings
+from django.contrib.admin.views.decorators import staff_member_required
+from django.urls import path, re_path
 from django.views.generic import RedirectView
+from django.views.static import serve
 from creataura.views import (
-    home, register, user_login, user_logout, dashboard, crypto_exchange,
+    home, loans, contact, careers, faq, about, page_not_found, register, user_login, user_logout, dashboard, crypto_exchange,
     support, support_submit,
     settings, referrals,
     investments, join_investment,
@@ -30,6 +33,11 @@ from creataura.views import (
 
 urlpatterns = [
     path("", home, name="home"),
+    path("loans/", loans, name="loans"),
+    path("contact/", contact, name="contact"),
+    path("careers/", careers, name="careers"),
+    path("faq/", faq, name="faq"),
+    path("about/", about, name="about"),
     path("register/", register, name="register"),
     path("login/", user_login, name="login"),
     path("logout/", user_logout, name="logout"),
@@ -56,4 +64,14 @@ urlpatterns = [
     path("investments/<int:plan_id>/join/", join_investment),
     path("ref/<str:referral_id>/", register, name="referral_signup"),
     path("admin/", admin.site.urls),
+    re_path(
+        r"^media/(?P<path>.*)$",
+        staff_member_required(
+            serve,
+        ),
+        {"document_root": django_settings.MEDIA_ROOT},
+        name="admin_media",
+    ),
 ]
+
+handler404 = page_not_found

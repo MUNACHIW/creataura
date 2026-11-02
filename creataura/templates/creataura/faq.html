@@ -1,0 +1,85 @@
+{% extends "creataura/base.html" %}
+{% load static %}
+
+{% block title %}FAQ - CreatAura{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'creataura/faq.css' %}">
+{% endblock %}
+
+{% block hero_content %}
+<div class="faq-hero-content">
+    <h1>FAQ</h1>
+</div>
+{% endblock %}
+
+{% block hero_slides %}
+<div class="faq-hero-background" aria-hidden="true"></div>
+{% endblock %}
+
+{% block hero_intro %}{% endblock %}
+
+{% block content %}
+<section class="faq-section" aria-labelledby="faq-heading">
+    <h2 id="faq-heading">Frequently Asked Questions</h2>
+
+    <div class="faq-grid">
+        <div class="faq-column">
+            <details open>
+                <summary>What types of renewable energy projects does CreatAura Group invest in?</summary>
+                <p>We specialize in a variety of renewable energy projects, including solar, wind, hydroelectric, and biomass. Our focus is on sustainable initiatives that contribute to a cleaner and greener future.</p>
+            </details>
+            <details>
+                <summary>How does investing in renewable energy benefit me?</summary>
+                <p>Renewable energy investments can offer long-term income potential while supporting sustainable projects and responsible economic growth.</p>
+            </details>
+            <details>
+                <summary>What level of involvement will I have in the renewable energy projects?</summary>
+                <p>Your involvement depends on the investment plan you choose. Our team provides updates, reports, and performance information throughout the investment period.</p>
+            </details>
+        </div>
+
+        <div class="faq-column">
+            <details open>
+                <summary>What aspects of the oil and gas industry does CreatAura focus on?</summary>
+                <p>CreatAura is involved in various aspects of the oil and gas sector, including exploration, production, refining, and distribution. We aim to identify opportunities that balance potential returns with responsible resource management.</p>
+            </details>
+            <details>
+                <summary>How can I stay informed about the performance of my oil and gas investments?</summary>
+                <p>Investors receive account updates and performance information through their dashboard and official company communications.</p>
+            </details>
+            <details>
+                <summary>What is the minimum investment amount to get started with CreatAura?</summary>
+                <p>The minimum investment amount depends on the selected plan. Available options and requirements are shown clearly when joining an investment plan.</p>
+            </details>
+        </div>
+    </div>
+
+    <div class="faq-centered-column">
+        <details>
+            <summary>How can I get started with investing in Atic group</summary>
+            <p>Create an account, complete verification where required, choose an available investment plan, and follow the on-screen funding instructions.</p>
+        </details>
+        <details>
+            <summary>Is Cryptocurrency a registered and regulated investment firm?</summary>
+            <p>Always review the applicable company disclosures, regulatory status, and investment terms before participating.</p>
+        </details>
+        <details>
+            <summary>How can I track the performance of my investments with Groupatic?</summary>
+            <p>Track balances, profits, and transactions from your CreatAura dashboard and investment history.</p>
+        </details>
+        <details>
+            <summary>What cryptocurrencies does Atic Group offer for investment?</summary>
+            <p>Available crypto investment and exchange options are listed in your account dashboard.</p>
+        </details>
+        <details>
+            <summary>How does investing in cryptocurrency work?</summary>
+            <p>Choose an approved cryptocurrency option, review its terms, fund the investment, and monitor the position through your dashboard.</p>
+        </details>
+        <details>
+            <summary>Is cryptocurrency investment secure with Atic group?</summary>
+            <p>Use strong account security, enable available protection features, and only invest through the official platform and verified payment channels.</p>
+        </details>
+    </div>
+</section>
+{% endblock %}

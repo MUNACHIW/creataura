@@ -1,0 +1,58 @@
+{% extends "creataura/base.html" %}
+{% load static %}
+
+{% block title %}Career - CreatAura{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'creataura/careers.css' %}">
+{% endblock %}
+
+{% block hero_content %}
+<div class="careers-hero-content">
+    <h1>CAREER</h1>
+    <p>EMPLOYMENT</p>
+</div>
+{% endblock %}
+
+{% block hero_slides %}
+<div class="careers-hero-background" aria-hidden="true"></div>
+{% endblock %}
+
+{% block hero_intro %}{% endblock %}
+
+{% block content %}
+<section class="careers-opportunities" aria-label="Career opportunities">
+    <article class="career-card">
+        <img src="{% static 'creataura/images/quixcredit-reits-3.jpg' %}" alt="Marketing team opportunity">
+        <h2>Marketing</h2>
+        <a href="{% url 'contact' %}" class="career-status available">Apply Here</a>
+    </article>
+    <article class="career-card">
+        <img src="{% static 'creataura/images/aticgroup-investments.jpg' %}" alt="Audit team opportunity">
+        <h2>Audit</h2>
+        <a href="{% url 'contact' %}" class="career-status">Not Available</a>
+    </article>
+    <article class="career-card">
+        <img src="{% static 'creataura/images/aticgroup.jpg' %}" alt="Content creation opportunity">
+        <h2>Content Creation</h2>
+        <a href="{% url 'contact' %}" class="career-status">Not Available</a>
+    </article>
+</section>
+
+<section class="careers-teamwork">
+    <div class="careers-teamwork-copy">
+        <h2>TEAMWORK MAKES THE<br>DREAM WORK</h2>
+        <p>Just as successful investments require collaboration, our team thrives on synergy and open dialogue. We embrace diverse talent to build colleagues who share your passion and drive, creating an environment where your ideas are valued and your contributions are celebrated.</p>
+    </div>
+    <img src="{% static 'creataura/images/atc.jpg' %}" alt="CreatAura team working together">
+</section>
+
+<section class="careers-contact">
+    <div class="careers-contact-overlay"></div>
+    <div class="careers-contact-content">
+        <h2>TALK TO US</h2>
+        <p>Have any questions? We are always open to talk about your business, new projects, creative opportunities and how we can help you.</p>
+        <a href="{% url 'contact' %}" class="careers-contact-button">GET IN TOUCH</a>
+    </div>
+</section>
+{% endblock %}

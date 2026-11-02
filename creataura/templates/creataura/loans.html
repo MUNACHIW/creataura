@@ -1,0 +1,80 @@
+{% extends "creataura/base.html" %}
+{% load static %}
+
+{% block title %}Loan Aid - CreatAura{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'creataura/loans.css' %}">
+{% endblock %}
+
+{% block hero_content %}
+<div class="loans-hero-content">
+    <h1>CREATAURA</h1>
+    <p>LOAN AID</p>
+    <a href="/register">EXPLORE</a>
+</div>
+{% endblock %}
+
+{% block hero_slides %}
+<div class="loans-hero-background" aria-hidden="true"></div>
+{% endblock %}
+
+{% block hero_intro %}{% endblock %}
+
+{% block content %}
+<section class="loan-about" id="loan-about">
+    <div class="loan-about-copy">
+        <h2>ABOUT OUR LOAN PLAN</h2>
+        <p>At CreatAura Group Loans, we are committed to fostering enduring connections with our clients, offering
+            steadfast loan solutions accompanied by exceptional customer service.</p>
+        <p>Irrespective of whether your credit score is excellent or you're working with a less-than-perfect history,
+            our aim is to guide you towards the ideal loan that aligns with your unique requirements.</p>
+        <p>Embark on your journey towards financial milestones by delving into our diverse loan options, all available
+            through our secure online platform. With CreatAura Group Loans as your dependable lending companion, you can
+            confidently navigate your financial voyage, taking those crucial steps with assurance and ease. Your
+            financial aspirations start with CreatAura Group Loans.</p>
+    </div>
+    <img src="{% static 'creataura/images/app.png' %}" alt="CreatAura loan planning">
+</section>
+
+<section class="loan-features" aria-label="Loan benefits">
+    <article>
+        <img src="{% static 'creataura/images/quixcredit-reits-3.jpg' %}" alt="Flexible loan options">
+        <div>
+            <h3>Flexible Loan Options</h3>
+            <p>We offer a variety of loan products tailored to meet different financial requirements. From short-term
+                personal loans to long-term business loans, our flexible loan options provide you with the freedom to
+                choose the loan term and amount that best suits your needs.</p>
+        </div>
+    </article>
+    <article>
+        <img src="{% static 'creataura/images/aticgroup.jpg' %}" alt="Quick approval process">
+        <div>
+            <h3>Quick Approval and Disbursement</h3>
+            <p>We understand the importance of timely financial assistance. Our efficient loan processing ensures fast
+                approval and prompt disbursement of funds once your loan is approved. Get the financial support you need
+                when you need it.</p>
+        </div>
+    </article>
+    <article>
+        <img src="{% static 'creataura/images/therock.png' %}" alt="Simple online application">
+        <div>
+            <h3>Simple Online Application Process</h3>
+            <p>Our user-friendly online application allows you to apply for a loan from the comfort of your home or
+                office. With just a few simple steps, you can complete your application and submit it for our
+                consideration.</p>
+        </div>
+    </article>
+</section>
+
+<section class="loan-contact">
+    <div class="loan-contact-overlay"></div>
+    <div>
+        <h2>TALK TO US</h2>
+        <p>Apply for a loan today and experience the convenience and reliability of CreatAura Loans.</p>
+        <a href="{% url 'support' %}" class="loan-contact-button">GET IN TOUCH</a>
+    </div>
+</section>
+
+
+{% endblock %}

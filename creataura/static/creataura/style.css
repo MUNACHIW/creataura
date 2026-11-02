@@ -158,6 +158,28 @@ main {
     transform: rotate(180deg);
 }
 
+.hero-slider .contact-desktop-dropdown {
+    display: flex;
+    align-items: center;
+}
+
+.hero-slider .contact-nav-link {
+    padding-right: 0.15rem !important;
+}
+
+.hero-slider .contact-dropdown-toggle {
+    width: 1.1rem;
+    margin: 0;
+    padding: 0.8rem 0 !important;
+    border: 0;
+    background: transparent;
+    color: pink;
+}
+
+.hero-slider .contact-dropdown-toggle::after {
+    margin-left: 0 !important;
+}
+
 .hero-slider .desktop-dropdown .dropdown-menu {
     min-width: max-content;
     margin-top: 0.75rem;

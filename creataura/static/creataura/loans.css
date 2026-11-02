@@ -1,0 +1,207 @@
+:root {
+    --loan-green: #2fbd4f;
+    --loan-red: #c44f43;
+    --loan-blue: #171a54;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    color: var(--loan-blue);
+    background: #fff;
+    font-family: "Poppins", sans-serif;
+}
+
+a { text-decoration: none; }
+
+.hero-slider {
+    height: 440px;
+    min-height: 440px;
+    overflow: hidden;
+}
+
+.loans-hero-background {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    background: url("images/atc.jpg") center 45% / cover no-repeat;
+}
+
+.loans-hero-content {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -38%);
+    color: #fff;
+    text-align: center;
+}
+
+.loans-hero-content h1 {
+    margin: 0;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 8px;
+}
+
+.loans-hero-content p {
+    margin: 13px 0 19px;
+    font-size: 20px;
+    letter-spacing: 7px;
+}
+
+.loans-hero-content a,
+.loan-contact-button {
+    display: inline-block;
+    min-width: 82px;
+    padding: 9px 14px;
+    border-radius: 2px;
+    background: var(--loan-green);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.loan-about {
+    width: 100%;
+    max-width: 1180px;
+    min-height: 300px;
+    margin: 0 auto;
+    padding: 34px 70px 26px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 35px;
+}
+
+.loan-about-copy h2 {
+    margin: 0 0 18px;
+    color: var(--loan-blue);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.loan-about-copy p {
+    margin: 0 0 12px;
+    color: #777f91;
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.loan-about > img {
+    width: 100%;
+    height: 205px;
+    object-fit: cover;
+}
+
+.loan-features {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 42px 70px 56px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px;
+}
+
+.loan-features img {
+    width: 100%;
+    height: 194px;
+    object-fit: cover;
+}
+
+.loan-features h3 {
+    margin: 14px 0 8px;
+    color: #111;
+    font-size: 14px;
+    line-height: 1.25;
+}
+
+.loan-features p {
+    margin: 0;
+    color: #777f91;
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.loan-contact {
+    position: relative;
+    height: 260px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    text-align: center;
+    color: #fff;
+    background: url("images/therock.png") center 35% / cover no-repeat;
+}
+
+.loan-contact-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(23, 26, 84, 0.72);
+}
+
+.loan-contact > div:last-child {
+    position: relative;
+    z-index: 2;
+}
+
+.loan-contact h2 {
+    margin: 0 0 16px;
+    color: var(--loan-red);
+    font-size: 26px;
+    letter-spacing: 6px;
+}
+
+.loan-contact p {
+    margin: 0 0 24px;
+    font-size: 10px;
+}
+
+.loan-contact-button { min-width: 120px; }
+
+
+
+@media (max-width: 991px) {
+    .hero-slider {
+        height: 430px;
+        min-height: 430px;
+    }
+
+    .loan-about {
+        grid-template-columns: 1fr;
+        padding: 42px 20px 28px;
+    }
+
+    .loan-features {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 48px 20px 56px;
+    }
+}
+
+@media (max-width: 575px) {
+    .hero-slider {
+        height: 390px;
+        min-height: 390px;
+    }
+
+    .loans-hero-content h1 {
+        font-size: 34px;
+        letter-spacing: 5px;
+    }
+
+    .loans-hero-content p {
+        font-size: 17px;
+        letter-spacing: 5px;
+    }
+
+    .loan-features {
+        grid-template-columns: 1fr;
+        gap: 48px;
+    }
+
+    .loan-features img { height: 230px; }
+    .loan-contact { height: 300px; padding: 0 20px; }
+}

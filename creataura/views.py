@@ -110,6 +110,30 @@ def home(request):
     return render(request, "creataura/index.html")
 
 
+def loans(request):
+    return render(request, "creataura/loans.html")
+
+
+def contact(request):
+    return render(request, "creataura/contact.html")
+
+
+def careers(request):
+    return render(request, "creataura/careers.html")
+
+
+def faq(request):
+    return render(request, "creataura/faq.html")
+
+
+def about(request):
+    return render(request, "creataura/about.html")
+
+
+def page_not_found(request, exception=None):
+    return render(request, "creataura/404.html", status=404)
+
+
 @login_required(login_url="login")
 def notifications(request):
     notification_list = Notification.objects.filter(

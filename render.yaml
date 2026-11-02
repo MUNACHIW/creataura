@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: creataura
+    runtime: python
+    buildCommand: bash build.sh
+    startCommand: gunicorn investmentsite.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: true
+      - key: PYTHON_VERSION
+        value: 3.12.9

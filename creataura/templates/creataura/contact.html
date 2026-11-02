@@ -1,0 +1,71 @@
+{% extends "creataura/base.html" %}
+{% load static %}
+
+{% block title %}Contact - CreatAura{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'creataura/contact.css' %}">
+{% endblock %}
+
+{% block hero_content %}{% endblock %}
+{% block hero_slides %}{% endblock %}
+{% block hero_intro %}{% endblock %}
+
+{% block content %}
+<section class="contact-page" aria-label="Contact CreatAura">
+    <div class="contact-map">
+        <iframe
+            title="CreatAura location map"
+            src="https://maps.google.com/maps?q=1422%20S%20Parker%20Rd%20Unit%20140%2C%20Denver%2C%20CO%2080231&amp;t=&amp;z=14&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+    </div>
+
+    <div class="contact-details">
+        <h1>Contact</h1>
+        <p class="contact-intro">
+            CreatAura Group, we value your inquiries, feedback, and engagement.
+            Whether you're seeking information about our investment services, have
+            questions about our offerings, or simply want to connect with our team,
+            we're here to assist you.
+        </p>
+
+        <address>
+            <div class="contact-detail">
+                <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+                <div>
+                    <strong>Address</strong>
+                    <span>1422 S Parker Rd Unit 140, Denver, CO 80231</span>
+                </div>
+            </div>
+
+            <div class="contact-detail">
+                <i class="bi bi-telephone-fill" aria-hidden="true"></i>
+                <div>
+                    <strong>Phone</strong>
+                    <a href="tel:+447441449174">+44 7441449174</a>
+                </div>
+            </div>
+
+            <div class="contact-detail">
+                <i class="bi bi-telephone-fill" aria-hidden="true"></i>
+                <div>
+                    <strong>Phone</strong>
+                    <a href="tel:+15135368695">+1(513) 536-8695</a>
+                </div>
+            </div>
+
+            <div class="contact-detail">
+                <i class="bi bi-envelope-fill" aria-hidden="true"></i>
+                <div>
+                    <strong>Email</strong>
+                    <a href="mailto:support@creataura.com">support@creataura.com</a>
+                </div>
+            </div>
+        </address>
+
+        <p class="contact-subscribe">Subscribe and listen on major platform</p>
+    </div>
+</section>
+{% endblock %}
