@@ -1,0 +1,33 @@
+.transactions-page { padding-bottom: 56px; background: #f2f3f5; }
+.transactions-main { min-height: calc(100vh - 56px); }
+.transactions-header { height: 52px; }
+.transactions-header h1 { grid-column: 2; font-size: 15px; }
+.transactions-content { min-height: 420px; padding: 0; background: transparent; }
+.transaction-tabs { height: 56px; display: grid; grid-template-columns: repeat(3, 1fr); margin: 20px 30px 14px; background: #fff; border-radius: 5px 5px 0 0; box-shadow: 0 4px 14px rgba(31,38,68,.05); }
+.transaction-tabs button { border: 0; background: transparent; color: #a7adba; font-family: inherit; font-size: 11px; cursor: pointer; }
+.transaction-tabs button.active { margin: 6px; border-radius: 5px; background: #f4f5f7; color: var(--text); box-shadow: 0 1px 3px rgba(31,38,68,.06); }
+.transaction-table-card { margin: 0 30px 22px; min-height: 180px; padding: 12px 14px 16px; border-radius: 6px; background: #fff; box-shadow: 0 4px 14px rgba(31,38,68,.05); }
+.transaction-table-card[hidden] { display: none; }
+.transaction-table-card h2 { margin: 2px 0 10px; color: var(--text); font-size: 12px; }
+.transaction-table-wrap { overflow-x: auto; }
+.transaction-table-wrap table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.transaction-table-wrap th { height: 30px; padding: 0 8px 8px; color: var(--text); font-size: 9px; text-align: left; }
+.transaction-table-wrap td { padding: 14px 8px; border-top: 1px solid #f0f1f4; color: #777d90; font-size: 10px; }
+.transaction-empty { color: #a7adba !important; text-align: center; }
+.transaction-status { display: inline-block; padding: 3px 7px; border-radius: 10px; font-weight: 600; }
+.status-pending { background: #fff3d7; color: #b2802c; }
+.status-approved, .status-active { background: #e7f7ec; color: #248b48; }
+.status-rejected, .status-cancelled { background: #fdeaea; color: #b54a4a; }
+.status-completed { background: #eee9fa; color: #7054a6; }
+.transactions-footer { height: 90px; }
+html[data-theme="dark"] .transactions-page, html[data-theme="dark"] .transactions-content { background: #030108 !important; color: #fff !important; }
+html[data-theme="dark"] .transactions-header, html[data-theme="dark"] .transactions-footer, html[data-theme="dark"] .transaction-tabs, html[data-theme="dark"] .transaction-table-card { background: #161129 !important; color: #fff !important; }
+html[data-theme="dark"] .transaction-tabs button.active { background: #1d1940 !important; color: #fff !important; }
+html[data-theme="dark"] .transaction-table-card h2, html[data-theme="dark"] .transaction-table-wrap th { color: #fff !important; }
+html[data-theme="dark"] .transaction-table-wrap td { border-top-color: #29254a !important; }
+@media (max-width: 700px) {
+    .transactions-content { min-height: calc(100vh - 198px); }
+    .transaction-tabs { margin: 16px 16px 10px; }
+    .transaction-table-card { margin: 0 16px 12px; }
+    .transaction-table-wrap table { min-width: 560px; }
+}

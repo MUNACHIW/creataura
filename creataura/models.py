@@ -16,6 +16,10 @@ class UserProfile(models.Model):
     bitcoin_address = models.CharField(max_length=150)
     country = models.CharField(max_length=100)
     referral_id = models.CharField(max_length=100, blank=True)
+    email_withdrawal_otp = models.BooleanField(default=True)
+    email_profit_notification = models.BooleanField(default=True)
+    email_plan_expiry_notification = models.BooleanField(default=True)
+    two_factor_enabled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.full_name
@@ -83,6 +87,151 @@ class InvestmentPlan(models.Model):
         return self.name
 
 
+class UserInvestment(models.Model):
+    STATUS_CHOICES = (
+        ("active", "Active"),
+        ("completed", "Completed"),
+        ("cancelled", "Cancelled"),
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="investments",
+    )
+    plan = models.ForeignKey(
+        InvestmentPlan,
+        on_delete=models.PROTECT,
+        related_name="user_investments",
+    )
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="active",
+    )
+    date_created = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["-date_created"]
+        verbose_name = "User investment"
+        verbose_name_plural = "User investments"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.plan.name}"
+
+
+class KYCVerification(models.Model):
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("verified", "Verified"),
+        ("rejected", "Rejected"),
+    )
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="kyc_verification",
+    )
+    passport_photo = models.ImageField(upload_to="kyc/passports/")
+    identity_photo = models.ImageField(upload_to="kyc/identity/")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending",
+    )
+    date_created = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-date_created"]
+        verbose_name = "KYC verification"
+        verbose_name_plural = "KYC verifications"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.status.title()}"
+
+
+class ProfitRecord(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profit_records",
+    )
+    investment = models.ForeignKey(
+        UserInvestment,
+        on_delete=models.SET_NULL,
+        related_name="profit_records",
+        null=True,
+        blank=True,
+    )
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
+    )
+    narration = models.CharField(max_length=255, default="ROI Profit")
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-date_created"]
+        verbose_name = "Profit record"
+        verbose_name_plural = "Profit records"
+
+    def __str__(self):
+        return f"{self.user.username} - ${self.amount}"
+
+
+class CryptoExchange(models.Model):
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("completed", "Completed"),
+        ("rejected", "Rejected"),
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="crypto_exchanges",
+    )
+    from_asset = models.CharField(max_length=20)
+    to_asset = models.CharField(max_length=20)
+    from_amount = models.DecimalField(max_digits=12, decimal_places=8)
+    to_amount = models.DecimalField(max_digits=12, decimal_places=8)
+    exchange_rate = models.DecimalField(
+        max_digits=20,
+        decimal_places=8,
+        default=Decimal("0"),
+    )
+    commission = models.DecimalField(
+        max_digits=12,
+        decimal_places=8,
+        default=Decimal("0"),
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="completed",
+    )
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-date_created"]
+        verbose_name = "Crypto exchange"
+        verbose_name_plural = "Crypto exchanges"
+
+    def __str__(self):
+        return (
+            f"{self.user.username} - {self.from_amount} "
+            f"{self.from_asset.upper()} to {self.to_asset.upper()}"
+        )
+
+
 class Deposit(models.Model):
     PAYMENT_MODES = (
         ("bitcoin", "Bitcoin"),
@@ -116,6 +265,13 @@ class Deposit(models.Model):
         choices=STATUS_CHOICES,
         default="pending",
     )
+    network_type = models.CharField(max_length=50, blank=True)
+    wallet_address = models.CharField(max_length=255, blank=True)
+    proof_of_payment = models.FileField(
+        upload_to="payment_proofs/",
+        blank=True,
+        null=True,
+    )
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -125,6 +281,27 @@ class Deposit(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.amount}"
+
+
+class DepositWallet(models.Model):
+    CRYPTO_CHOICES = (
+        ("bitcoin", "Bitcoin"),
+        ("ethereum", "Ethereum"),
+        ("xrp", "XRP"),
+    )
+    crypto = models.CharField(max_length=20, choices=CRYPTO_CHOICES, unique=True)
+    wallet_address = models.CharField(max_length=255)
+    network_type = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["crypto"]
+        verbose_name = "Deposit wallet"
+        verbose_name_plural = "Deposit wallets"
+
+    def __str__(self):
+        return f"{self.get_crypto_display()} - {self.wallet_address}"
 
 
 class Payment(models.Model):
@@ -239,6 +416,11 @@ class WithdrawalBTC(models.Model):
         choices=STATUS_CHOICES,
         default="pending",
     )
+    source = models.CharField(
+        max_length=20,
+        choices=(("balance", "Balance"), ("roi", "ROI")),
+        default="balance",
+    )
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -281,6 +463,11 @@ class WithdrawalXRP(models.Model):
         choices=STATUS_CHOICES,
         default="pending",
     )
+    source = models.CharField(
+        max_length=20,
+        choices=(("balance", "Balance"), ("roi", "ROI")),
+        default="balance",
+    )
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -316,6 +503,13 @@ class Bonus(models.Model):
 
 
 class BankAccount(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="withdrawal_account",
+        null=True,
+        blank=True,
+    )
     bank_name = models.CharField(max_length=150, blank=True)
     account_name = models.CharField(max_length=150, blank=True)
     account_number = models.CharField(max_length=100, blank=True)

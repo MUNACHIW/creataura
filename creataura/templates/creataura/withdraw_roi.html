@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Createaura | Withdraw ROI</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/withdraw_roi.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+</head>
+<body class="settings-body withdraw-roi-page">
+    <main class="settings-page withdraw-roi-main">
+        <header class="settings-header withdraw-roi-header">
+            <a href="{% url 'dashboard' %}" aria-label="Back"><i class="bi bi-chevron-left"></i></a>
+            <h1>Withdraw ROI</h1>
+        </header>
+
+        {% if messages %}
+        <div class="withdraw-roi-messages" aria-live="polite">
+            {% for message in messages %}
+            <p class="{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <section class="withdraw-roi-content">
+            <article class="roi-balance-card">
+                <div><span>Available ROI</span><strong>${{ available_roi|floatformat:2 }}</strong></div>
+                <div><span>Total earned</span><strong>${{ total_profit|floatformat:2 }}</strong></div>
+            </article>
+
+            {% if available_roi > 0 %}
+            <form method="post" class="roi-withdraw-form">
+                {% csrf_token %}
+                <h2>Withdrawal details</h2>
+                <label>
+                    <span>Payment method</span>
+                    <select name="payment_mode" id="roiPaymentMode" required>
+                        <option value="">Select method</option>
+                        <option value="bitcoin">Bitcoin</option>
+                        <option value="xrp">XRP</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Amount</span>
+                    <input type="number" name="amount" min="0.01" max="{{ available_roi }}" step="0.01" placeholder="$0.00" required>
+                </label>
+                <label id="bitcoinAddressRow">
+                    <span>Bitcoin address</span>
+                    <input type="text" value="{{ bitcoin_address }}" readonly placeholder="Add in Settings">
+                </label>
+                <label id="xrpAddressRow" hidden>
+                    <span>XRP address</span>
+                    <input type="text" name="xrp_address" placeholder="Enter XRP wallet address">
+                </label>
+                <button type="submit">Submit ROI Withdrawal</button>
+            </form>
+            {% else %}
+            <article class="roi-empty-state">
+                <i class="bi bi-wallet2"></i>
+                <strong>Nothing to withdraw at the moment!</strong>
+                <span>Your completed ROI earnings will appear here.</span>
+            </article>
+            {% endif %}
+
+            <section class="roi-withdraw-history">
+                <h2>ROI withdrawal requests</h2>
+                {% for withdrawal in roi_withdrawals %}
+                <article>
+                    <div>
+                        <strong>{{ withdrawal.cryptocoin }}</strong>
+                        <span>{{ withdrawal.date_created|date:"M j, Y g:i A" }}</span>
+                    </div>
+                    <strong>${{ withdrawal.amount|floatformat:2 }}</strong>
+                    <span class="roi-status status-{{ withdrawal.status }}">{{ withdrawal.status|title }}</span>
+                </article>
+                {% empty %}
+                <p>No ROI withdrawal requests found.</p>
+                {% endfor %}
+            </section>
+        </section>
+    </main>
+
+    <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+    </nav>
+
+    <script>
+        const mode = document.getElementById("roiPaymentMode");
+        if (mode) {
+            mode.addEventListener("change", () => {
+                document.getElementById("bitcoinAddressRow").hidden = mode.value !== "bitcoin";
+                document.getElementById("xrpAddressRow").hidden = mode.value !== "xrp";
+            });
+        }
+    </script>
+</body>
+</html>

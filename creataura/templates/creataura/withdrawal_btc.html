@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Createaura | Bitcoin Withdrawal</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/withdrawal.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+</head>
+<body>
+    <main class="withdrawal-page btc-withdrawal-page">
+        <header class="withdrawal-header">
+            <a href="{% url 'withdrawal' %}" class="back-button" aria-label="Back to withdrawal methods"><i class="bi bi-chevron-left"></i></a>
+            <h1>Withdrawal</h1>
+            <a href="{% url 'dashboard' %}" class="btc-home-link">Home</a>
+        </header>
+
+        {% if messages %}
+            <div class="withdrawal-messages btc-page-messages" aria-live="polite">
+                {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
+            </div>
+        {% endif %}
+
+        <section class="btc-request-content">
+            <div class="btc-request-heading">
+                <h1>Request for Withdrawal</h1>
+                <form method="post" action="{% url 'withdrawal_btc' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="request_otp">
+                    <button type="submit" class="request-otp-badge">Request OTP</button>
+                </form>
+            </div>
+
+            <article class="btc-request-card">
+                <div class="btc-payment-method">Your Payment Method is Bitcoin</div>
+                <form method="post" action="{% url 'withdrawal_btc' %}" class="btc-request-form">
+                    {% csrf_token %}
+                    <label>
+                        <span>Enter Amount to withdraw</span>
+                        <input type="number" name="amount" min="{{ minimum_amount }}" max="{{ maximum_amount }}" step="0.01" placeholder="Enter Amount" required>
+                    </label>
+                    <label>
+                        <span>Enter OTP</span>
+                        <input type="text" name="otpcode" maxlength="10" autocomplete="one-time-code" placeholder="Enter Code" required>
+                    </label>
+                    {% if bitcoin_address %}
+                        <p class="bitcoin-withdrawal-address">{{ bitcoin_address }}</p>
+                    {% endif %}
+                    <p class="otp-help">OTP will be sent to your email when you request</p>
+                    <button type="submit" class="btc-complete-request">Complete Request</button>
+                </form>
+            </article>
+        </section>
+    </main>
+
+    <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+    </nav>
+    <footer class="withdrawal-footer">
+        <strong>&copy; Copyright © Creataura 2026. All Rights Reserved.</strong>
+        <span>Creataura Financial Institutions.</span>
+    </footer>
+</body>
+</html>

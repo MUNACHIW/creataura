@@ -3,9 +3,13 @@ from django.contrib import admin
 from .models import (
     BankAccount,
     Bonus,
+    CryptoExchange,
     Deposit,
-    InvestmentPlan,
+    DepositWallet,
+    InvestmentPlan, UserInvestment,
+    KYCVerification,
     Payment,
+    ProfitRecord,
     ReferralBonus,
     UserProfile,
     WithdrawalMethod,
@@ -49,6 +53,14 @@ class InvestmentPlanAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
 
 
+@admin.register(UserInvestment)
+class UserInvestmentAdmin(admin.ModelAdmin):
+    list_display = ("user", "plan", "amount", "status", "date_created", "expires_at")
+    list_filter = ("status", "date_created", "plan")
+    search_fields = ("user__username", "user__email", "plan__name")
+    readonly_fields = ("date_created",)
+
+
 @admin.register(Deposit)
 class DepositAdmin(admin.ModelAdmin):
     list_display = ("user", "amount", "payment_mode", "status", "date_created")
@@ -60,6 +72,31 @@ class DepositAdmin(admin.ModelAdmin):
         "user__last_name",
     )
     list_editable = ("status",)
+    readonly_fields = ("date_created",)
+
+
+@admin.register(DepositWallet)
+class DepositWalletAdmin(admin.ModelAdmin):
+    list_display = ("crypto", "wallet_address", "network_type", "is_active", "updated_at")
+    list_filter = ("crypto", "is_active")
+    search_fields = ("wallet_address",)
+    list_editable = ("is_active",)
+    readonly_fields = ("updated_at",)
+
+
+@admin.register(CryptoExchange)
+class CryptoExchangeAdmin(admin.ModelAdmin):
+    list_display = (
+        "user",
+        "from_asset",
+        "from_amount",
+        "to_asset",
+        "to_amount",
+        "status",
+        "date_created",
+    )
+    list_filter = ("status", "from_asset", "to_asset", "date_created")
+    search_fields = ("user__username", "user__email")
     readonly_fields = ("date_created",)
 
 
@@ -110,9 +147,10 @@ class WithdrawalBTCAdmin(admin.ModelAdmin):
         "otpcode",
         "charges",
         "status",
+        "source",
         "date_created",
     )
-    list_filter = ("status", "cryptocoin", "date_created")
+    list_filter = ("status", "source", "cryptocoin", "date_created")
     search_fields = ("user__username", "user__email", "cryptocoin", "otpcode")
     list_editable = ("status",)
     readonly_fields = ("date_created",)
@@ -128,9 +166,10 @@ class WithdrawalXRPAdmin(admin.ModelAdmin):
         "xrp_address",
         "charges",
         "status",
+        "source",
         "date_created",
     )
-    list_filter = ("status", "cryptocoin", "date_created")
+    list_filter = ("status", "source", "cryptocoin", "date_created")
     search_fields = (
         "user__username",
         "user__email",
@@ -152,6 +191,23 @@ class BonusAdmin(admin.ModelAdmin):
         "plan_narration",
     )
     readonly_fields = ("date_created",)
+
+
+@admin.register(ProfitRecord)
+class ProfitRecordAdmin(admin.ModelAdmin):
+    list_display = ("user", "amount", "narration", "investment", "date_created")
+    list_filter = ("date_created",)
+    search_fields = ("user__username", "user__email", "narration")
+    readonly_fields = ("date_created",)
+
+
+@admin.register(KYCVerification)
+class KYCVerificationAdmin(admin.ModelAdmin):
+    list_display = ("user", "status", "passport_photo", "identity_photo", "date_created")
+    list_filter = ("status", "date_created")
+    search_fields = ("user__username", "user__email")
+    list_editable = ("status",)
+    readonly_fields = ("date_created", "updated_at")
 
 
 @admin.register(BankAccount)

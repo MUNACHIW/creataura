@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Createaura | Settings</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+</head>
+<body class="settings-body">
+    <main class="settings-page">
+        <header class="settings-header">
+            <a href="{% url 'dashboard' %}" aria-label="Back"><i class="bi bi-chevron-left"></i></a>
+            <h1>My Profile</h1>
+            <a href="{% url 'dashboard' %}">Home</a>
+        </header>
+
+        <section class="theme-setting">
+            <span>Theme</span>
+            <div>
+                <strong>Dark Mode</strong>
+                <label class="settings-switch" aria-label="Toggle dark mode">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span></span>
+                </label>
+            </div>
+        </section>
+
+        <section class="settings-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="settings-message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+
+            <nav class="settings-tabs" aria-label="Profile settings sections">
+                <button type="button" class="active" data-settings-tab="personal" aria-selected="true">Personal Settings</button>
+                <button type="button" data-settings-tab="withdrawals" aria-selected="false">Withdrawals Settings</button>
+                <button type="button" data-settings-tab="security" aria-selected="false">Password/Security</button>
+                <button type="button" data-settings-tab="other" aria-selected="false">Other Settings</button>
+            </nav>
+
+            <form class="settings-form-card settings-panel" data-settings-panel="personal" method="post" action="{% url 'settings' %}">
+                {% csrf_token %}
+                <label class="settings-field">
+                    <span>Fullname</span>
+                    <input type="text" name="full_name" value="{{ profile.full_name }}" required>
+                </label>
+                <label class="settings-field">
+                    <span>Email</span>
+                    <input type="email" name="email" value="{{ request.user.email }}" required>
+                </label>
+                <label class="settings-field">
+                    <span>Phone Number</span>
+                    <input type="text" name="phone_number" value="{{ profile.phone_number }}" required>
+                </label>
+                <label class="settings-field">
+                    <span>Date of Birth</span>
+                    <input type="date" name="date_of_birth">
+                </label>
+                <label class="settings-field">
+                    <span>Nationality</span>
+                    <select name="nationality" aria-label="Nationality">
+                        <option value="">Select nationality</option>
+                        <option>United States</option>
+                        <option>United Kingdom</option>
+                        <option>Nigeria</option>
+                        <option>Canada</option>
+                        <option>Other</option>
+                    </select>
+                </label>
+                <label class="settings-field">
+                    <span>Full Address</span>
+                    <input type="text" name="full_address" value="{{ profile.country }}" required>
+                </label>
+                <button class="settings-submit" type="submit">Update Profile</button>
+            </form>
+            <form class="settings-form-card withdrawal-settings settings-panel" data-settings-panel="withdrawals" method="post" action="{% url 'settings' %}" hidden>
+                {% csrf_token %}
+                <input type="hidden" name="settings_action" value="withdrawals">
+
+                <div class="withdrawal-section">
+                    <h2>Bank Account</h2>
+                    <label class="settings-field">
+                        <span>Bank Name</span>
+                        <input type="text" name="bank_name" value="{{ withdrawal_account.bank_name }}" placeholder="Enter bank name">
+                    </label>
+                    <label class="settings-field">
+                        <span>Account Name</span>
+                        <input type="text" name="account_name" value="{{ withdrawal_account.account_name }}" placeholder="Enter Account name">
+                    </label>
+                    <label class="settings-field">
+                        <span>Account Number</span>
+                        <input type="text" name="account_number" value="{{ withdrawal_account.account_number }}" placeholder="Enter Account Number">
+                    </label>
+                    <label class="settings-field">
+                        <span>Swift Code</span>
+                        <input type="text" name="swift_code" value="{{ withdrawal_account.swift_code }}" placeholder="Enter Swift Code">
+                    </label>
+                </div>
+
+                <div class="withdrawal-section cryptocurrency-section">
+                    <h2>Cryptocurrency</h2>
+                    <label class="settings-field">
+                        <span>Bitcoin</span>
+                        <input type="text" value="{{ profile.bitcoin_address }}" placeholder="Enter Bitcoin Address" readonly>
+                    </label>
+                    <p class="withdrawal-help">Your Bitcoin Address from signup</p>
+                    <label class="settings-field">
+                        <span>Ethereum</span>
+                        <input type="text" name="ethereum_address" value="{{ withdrawal_account.ethereum_address }}" placeholder="Enter Ethereum Address">
+                    </label>
+                    <p class="withdrawal-help">Enter your Ethereum Address that will be used to withdraw your funds</p>
+                    <label class="settings-field">
+                        <span>Litecoin</span>
+                        <input type="text" name="litecoin_address" value="{{ withdrawal_account.litecoin_address }}" placeholder="Enter Litecoin Address">
+                    </label>
+                    <p class="withdrawal-help">Enter your Litecoin Address that will be used to withdraw your funds</p>
+                </div>
+
+                <button class="settings-submit" type="submit">Save</button>
+            </form>
+            <form class="settings-form-card security-settings settings-panel" data-settings-panel="security" method="post" action="{% url 'settings' %}" hidden>
+                {% csrf_token %}
+                <input type="hidden" name="settings_action" value="password">
+                <label class="settings-field">
+                    <span>Old Password</span>
+                    <input type="password" name="old_password" autocomplete="current-password" required>
+                </label>
+                <label class="settings-field">
+                    <span>New Password</span>
+                    <input type="password" name="new_password" autocomplete="new-password" required>
+                </label>
+                <label class="settings-field">
+                    <span>Confirm New Password</span>
+                    <input type="password" name="confirm_password" autocomplete="new-password" required>
+                </label>
+                <button class="settings-submit" type="submit">Update Password</button>
+                <a class="advanced-account-settings" href="{% url 'advanced_account_settings' %}">Advance Account Settings <i class="bi bi-arrow-right"></i></a>
+            </form>
+            <form class="settings-form-card other-settings settings-panel" data-settings-panel="other" method="post" action="{% url 'settings' %}" hidden>
+                {% csrf_token %}
+                <input type="hidden" name="settings_action" value="other">
+                <fieldset class="other-setting-field">
+                    <legend>Send confirmation OTP to my email when withdrawing my funds.</legend>
+                    <label><input type="radio" name="email_withdrawal_otp" value="yes" {% if profile.email_withdrawal_otp %}checked{% endif %}> <span>Yes</span></label>
+                    <label><input type="radio" name="email_withdrawal_otp" value="no" {% if not profile.email_withdrawal_otp %}checked{% endif %}> <span>No</span></label>
+                </fieldset>
+                <fieldset class="other-setting-field">
+                    <legend>Send me email when I get profit.</legend>
+                    <label><input type="radio" name="email_profit_notification" value="yes" {% if profile.email_profit_notification %}checked{% endif %}> <span>Yes</span></label>
+                    <label><input type="radio" name="email_profit_notification" value="no" {% if not profile.email_profit_notification %}checked{% endif %}> <span>No</span></label>
+                </fieldset>
+                <fieldset class="other-setting-field">
+                    <legend>Send me email when my investment plan expires.</legend>
+                    <label><input type="radio" name="email_plan_expiry_notification" value="yes" {% if profile.email_plan_expiry_notification %}checked{% endif %}> <span>Yes</span></label>
+                    <label><input type="radio" name="email_plan_expiry_notification" value="no" {% if not profile.email_plan_expiry_notification %}checked{% endif %}> <span>No</span></label>
+                </fieldset>
+                <button class="settings-submit" type="submit">Save</button>
+            </form>
+        </section>
+    </main>
+
+    <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+    </nav>
+    <script>
+        document.querySelectorAll("[data-settings-tab]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const tabName = button.dataset.settingsTab;
+                document.querySelectorAll("[data-settings-tab]").forEach((tab) => {
+                    tab.classList.toggle("active", tab === button);
+                    tab.setAttribute("aria-selected", String(tab === button));
+                });
+                document.querySelectorAll("[data-settings-panel]").forEach((panel) => {
+                    panel.hidden = panel.dataset.settingsPanel !== tabName;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

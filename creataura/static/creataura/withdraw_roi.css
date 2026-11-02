@@ -1,0 +1,36 @@
+.withdraw-roi-page { background: #f2f3f5; }
+.withdraw-roi-main { min-height: calc(100vh - 56px); }
+.withdraw-roi-header { height: 52px; }
+.withdraw-roi-header h1 { grid-column: 2; font-size: 15px; }
+.withdraw-roi-messages { position: fixed; top: 0; left: 0; right: 0; z-index: 1100; padding: 0 8px; }
+.withdraw-roi-messages p { min-height: 48px; margin: 0; display: flex; align-items: center; padding: 0 14px; background: #29b67b; color: #fff; border-radius: 0 0 8px 8px; font-size: 11px; }
+.withdraw-roi-messages .error { background: #29b67b; }
+.withdraw-roi-content { padding: 16px 10px 70px; }
+.roi-balance-card { min-height: 86px; display: grid; grid-template-columns: 1fr 1fr; border-radius: 8px; background: #fff; box-shadow: 0 4px 14px rgba(31,38,68,.06); }
+.roi-balance-card div { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 16px; }
+.roi-balance-card div + div { border-left: 1px solid #edf0f4; text-align: right; }
+.roi-balance-card span { color: #9aa1b2; font-size: 10px; }
+.roi-balance-card strong { color: #29bf69; font-size: 20px; }
+.roi-withdraw-form { display: grid; gap: 12px; margin-top: 12px; padding: 16px; border-radius: 8px; background: #fff; }
+.roi-withdraw-form h2, .roi-withdraw-history h2 { margin: 0; color: var(--text); font-size: 13px; }
+.roi-withdraw-form label { display: grid; gap: 7px; color: var(--text); font-size: 10px; }
+.roi-withdraw-form select, .roi-withdraw-form input { width: 100%; height: 42px; border: 1px solid #e0e4ec; border-radius: 6px; padding: 0 10px; background: transparent; color: var(--text); font-family: inherit; }
+.roi-withdraw-form button { height: 44px; border: 0; border-radius: 6px; background: #4a080d; color: #fff; font-family: inherit; font-size: 12px; }
+.roi-empty-state { min-height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; border-radius: 8px; background: #fff; text-align: center; }
+.roi-empty-state i { color: #9aa1b2; font-size: 42px; }
+.roi-empty-state strong { color: var(--text); font-size: 13px; }
+.roi-empty-state span { color: #9aa1b2; font-size: 10px; }
+.roi-withdraw-history { margin-top: 12px; }
+.roi-withdraw-history > article { min-height: 64px; display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: center; gap: 10px; margin-top: 8px; padding: 10px 12px; border-radius: 7px; background: #fff; }
+.roi-withdraw-history article div { display: grid; gap: 4px; }
+.roi-withdraw-history article strong { color: var(--text); font-size: 11px; }
+.roi-withdraw-history article span { color: #9aa1b2; font-size: 9px; }
+.roi-withdraw-history > p { color: #9aa1b2; font-size: 10px; text-align: center; }
+.roi-status { padding: 5px 8px; border-radius: 20px; }
+.status-pending { background: #fff1c7; color: #a87500 !important; }
+.status-approved { background: #dff7e9; color: #16884a !important; }
+.status-rejected { background: #fde6ec; color: #bd3155 !important; }
+html[data-theme="dark"] .withdraw-roi-page, html[data-theme="dark"] .withdraw-roi-content { background: #030108 !important; }
+html[data-theme="dark"] .roi-balance-card, html[data-theme="dark"] .roi-withdraw-form, html[data-theme="dark"] .roi-empty-state, html[data-theme="dark"] .roi-withdraw-history > article { background: #161129 !important; }
+html[data-theme="dark"] .roi-balance-card div + div { border-color: #2a2538; }
+html[data-theme="dark"] .roi-withdraw-form h2, html[data-theme="dark"] .roi-withdraw-history h2, html[data-theme="dark"] .roi-withdraw-form label, html[data-theme="dark"] .roi-withdraw-history article strong, html[data-theme="dark"] .roi-empty-state strong { color: #fff !important; }

@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/support.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
 </head>
 <body>
     <main class="support-page">
@@ -24,7 +26,7 @@
                 <a href="mailto:support@creataura.com">support@creataura.com</a>
             </article>
 
-            <form class="support-card support-form" method="post" action="{% url 'support' %}">
+            <form class="support-card support-form" method="post" action="{% url 'support_submit' %}">
                 {% csrf_token %}
                 <header>
                     <h2>Get in Touch</h2>
@@ -36,9 +38,15 @@
                     {% endfor %}
                 {% endif %}
                 <label for="subject">Subject</label>
-                <input id="subject" name="subject" type="text" maxlength="200" required>
+                {{ support_form.subject }}
+                {% for error in support_form.subject.errors %}
+                    <p class="error" role="alert">{{ error }}</p>
+                {% endfor %}
                 <label for="message">Message</label>
-                <textarea id="message" name="message" rows="5" required></textarea>
+                {{ support_form.message }}
+                {% for error in support_form.message.errors %}
+                    <p class="error" role="alert">{{ error }}</p>
+                {% endfor %}
                 <button type="submit">Send</button>
             </form>
 
@@ -68,10 +76,10 @@
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
         <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="#"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
         <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="#"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'support' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
 </body>
 </html>

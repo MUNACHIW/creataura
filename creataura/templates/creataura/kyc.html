@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Createaura | Account Verification</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/kyc.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+</head>
+<body class="settings-body kyc-page">
+    <main class="settings-page kyc-main">
+        <header class="kyc-page-header">
+            <strong>Account Verification</strong>
+        </header>
+        <section class="kyc-content">
+            <p class="kyc-notice">KYC verification - Upload documents below to get verified.</p>
+            <header class="kyc-section-header">
+                <a href="{% url 'dashboard' %}" aria-label="Back"><i class="bi bi-chevron-left"></i></a>
+                <h1>Verify Your Account</h1>
+                <a href="{% url 'dashboard' %}">Home</a>
+            </header>
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="kyc-message {{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+            <form method="post" enctype="multipart/form-data" class="kyc-form">
+                {% csrf_token %}
+                {% if kyc_verification %}
+                    <p class="kyc-status status-{{ kyc_verification.status }}">
+                        {{ kyc_verification.status|title }}
+                    </p>
+                {% endif %}
+                <label class="kyc-upload-card">
+                    <input type="file" name="identity_photo" accept="image/*" required>
+                    <span class="kyc-upload-icon"><i class="bi bi-arrow-up"></i></span>
+                    <strong>Upload a Photo</strong>
+                </label>
+                <label class="kyc-field-label" for="passport-photo">Passport photograph</label>
+                <label class="kyc-upload-card kyc-passport-card">
+                    <input id="passport-photo" type="file" name="passport_photo" accept="image/*" required>
+                    <span class="kyc-upload-icon"><i class="bi bi-arrow-up"></i></span>
+                    <strong>Upload a Photo</strong>
+                </label>
+                <button class="kyc-submit" type="submit">Submit documents</button>
+            </form>
+        </section>
+        <footer class="settings-footer kyc-footer">
+            <strong>&copy; Copyright &copy; CreatAura 2026. All Rights Reserved.</strong>
+            <span>CreatAura Financial Institutions.</span>
+        </footer>
+    </main>
+    <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+    </nav>
+</body>
+</html>

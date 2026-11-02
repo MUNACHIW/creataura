@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/crypto_exchange.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
 </head>
 <body>
     <main class="exchange-page">
@@ -17,11 +19,19 @@
             <button class="refresh-button" type="button" aria-label="Refresh balances"><i class="bi bi-arrow-clockwise"></i></button>
         </header>
 
+        {% if messages %}
+            <div class="exchange-messages" aria-live="polite">
+                {% for message in messages %}
+                    <p class="{{ message.tags }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <section class="wallet-list" aria-label="Crypto balances">
             <article class="wallet-row">
                 <span class="coin-icon usd">$</span>
                 <div><small>Type</small><strong>Account Balance</strong></div>
-                <b>$5.00</b>
+                <b>${{ account_balance|floatformat:2 }}</b>
             </article>
             <article class="wallet-row">
                 <img src="{% static 'creataura/images/bitcoin.png' %}" alt="">
@@ -65,12 +75,27 @@
             </article>
         </section>
 
-        <section class="exchange-form" aria-label="Exchange form">
+        <form class="exchange-form" id="exchange-form" method="post" aria-label="Exchange form">
+            {% csrf_token %}
             <label class="exchange-field">
-                <span class="field-heading"><span>From</span><small>Balance : 0 bnb</small></span>
+                <span class="field-heading"><span>From</span><small id="fromBalance">Balance : 0 bnb</small></span>
                 <span class="field-input">
-                    <input id="fromAmount" type="number" min="0" step="any" placeholder="Enter amount of bnb">
-                    <span class="asset-select"><b>BNB</b><i class="bi bi-chevron-down"></i></span>
+                    <input id="fromAmount" name="from_amount" type="number" min="0" step="any" placeholder="Enter amount of bnb" required>
+                    <span class="asset-select">
+                        <select id="fromAsset" name="from_asset" aria-label="Asset to exchange from">
+                            <option value="usd">USD</option>
+                            <option value="btc">BTC</option>
+                            <option value="eth">ETH</option>
+                            <option value="ltc">LTC</option>
+                            <option value="link">LINK</option>
+                            <option value="bnb" selected>BNB</option>
+                            <option value="ada">ADA</option>
+                            <option value="aave">AAVE</option>
+                            <option value="usdt">USDT</option>
+                            <option value="bch">BCH</option>
+                            <option value="xlm">XLM</option>
+                        </select>
+                    </span>
                 </span>
             </label>
             <button class="swap-button" id="swapButton" type="button" aria-label="Swap currencies"><i class="bi bi-arrow-down-up"></i></button>
@@ -78,11 +103,25 @@
                 <span class="field-heading"><span>To</span><small>Balance : null usd</small></span>
                 <span class="field-input">
                     <input id="toAmount" type="number" min="0" step="any" placeholder="Quantity of usd" readonly>
-                    <span class="asset-select"><b>USD</b><i class="bi bi-chevron-down"></i></span>
+                    <span class="asset-select">
+                        <select id="toAsset" name="to_asset" aria-label="Asset to receive">
+                            <option value="usd" selected>USD</option>
+                            <option value="btc">BTC</option>
+                            <option value="eth">ETH</option>
+                            <option value="ltc">LTC</option>
+                            <option value="link">LINK</option>
+                            <option value="bnb">BNB</option>
+                            <option value="ada">ADA</option>
+                            <option value="aave">AAVE</option>
+                            <option value="usdt">USDT</option>
+                            <option value="bch">BCH</option>
+                            <option value="xlm">XLM</option>
+                        </select>
+                    </span>
                 </span>
             </label>
             <p class="commission">Commission rate : 2%</p>
-        </section>
+        </form>
 
         <section class="market-card" aria-label="BNB market chart">
             <div class="tradingview-widget-container">
@@ -110,7 +149,7 @@
             </div>
         </section>
 
-        <button class="exchange-submit" type="button">Exchange</button>
+        <button class="exchange-submit" type="submit" form="exchange-form">Exchange</button>
         <footer class="exchange-footer">
             <strong>&copy; Copyright © Creataura 2026. All Rights Reserved.</strong>
             <span>Creataura Financial Institutions</span>
@@ -119,29 +158,48 @@
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
         <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="#"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
         <a class="fixed-nav-item fixed-nav-active" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="#"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="#"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
 
     <script>
         const fromAmount = document.getElementById("fromAmount");
         const toAmount = document.getElementById("toAmount");
         const swapButton = document.getElementById("swapButton");
-        fromAmount.addEventListener("input", () => {
+        const fromAsset = document.getElementById("fromAsset");
+        const toAsset = document.getElementById("toAsset");
+        const accountBalance = Number("{{ account_balance }}");
+        const rates = {usd: 1, btc: 97000, eth: 3500, ltc: 100, link: 25, bnb: 710.58, ada: 0.5, aave: 300, usdt: 1, bch: 500, xlm: 0.1};
+        const balances = {
+            usd: accountBalance,
+            btc: Number("{{ asset_balances.btc }}"), eth: Number("{{ asset_balances.eth }}"),
+            ltc: Number("{{ asset_balances.ltc }}"), link: Number("{{ asset_balances.link }}"),
+            bnb: Number("{{ asset_balances.bnb }}"), ada: Number("{{ asset_balances.ada }}"),
+            aave: Number("{{ asset_balances.aave }}"), usdt: Number("{{ asset_balances.usdt }}"),
+            bch: Number("{{ asset_balances.bch }}"), xlm: Number("{{ asset_balances.xlm }}")
+        };
+        function updateConversion() {
             const value = Number(fromAmount.value || 0);
-            toAmount.value = value > 0 ? (value * 710.58 * 0.98).toFixed(2) : "";
-        });
-        document.querySelectorAll(".timeframes button").forEach((button) => {
-            button.addEventListener("click", () => {
-                document.querySelector(".timeframes .active")?.classList.remove("active");
-                button.classList.add("active");
-            });
-        });
+            const grossUsd = value * rates[fromAsset.value];
+            const received = value > 0 ? (grossUsd * 0.98) / rates[toAsset.value] : 0;
+            toAmount.value = received ? received.toFixed(8).replace(/\.?0+$/, "") : "";
+            fromAmount.placeholder = `Enter amount of ${fromAsset.value}`;
+            document.getElementById("fromBalance").textContent =
+                `Balance : ${balances[fromAsset.value].toFixed(8).replace(/\.?0+$/, "")} ${fromAsset.value}`;
+        }
+        fromAmount.addEventListener("input", updateConversion);
+        fromAsset.addEventListener("change", updateConversion);
+        toAsset.addEventListener("change", updateConversion);
         swapButton.addEventListener("click", () => {
+            const previousFrom = fromAsset.value;
+            fromAsset.value = toAsset.value;
+            toAsset.value = previousFrom;
             swapButton.classList.toggle("rotated");
+            updateConversion();
         });
+        updateConversion();
     </script>
 </body>
 </html>

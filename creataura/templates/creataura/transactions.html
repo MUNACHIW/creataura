@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Createaura | Transactions</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/transactions.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+</head>
+<body class="settings-body transactions-page">
+    <main class="settings-page transactions-main">
+        <header class="settings-header transactions-header">
+            <a href="{% url 'dashboard' %}" aria-label="Back"><i class="bi bi-chevron-left"></i></a>
+            <h1>Transactions on your account</h1>
+        </header>
+
+        <section class="transactions-content">
+            <div class="transaction-tabs" role="tablist" aria-label="Transaction categories">
+                <button type="button" class="active" data-transaction-tab="deposits">Deposits</button>
+                <button type="button" data-transaction-tab="withdrawals">Withdrawals</button>
+                <button type="button" data-transaction-tab="others">Others</button>
+            </div>
+
+            <section class="transaction-table-card" data-transaction-panel="deposits">
+                <h2>Deposit Table</h2>
+                <div class="transaction-table-wrap">
+                    <table>
+                        <thead><tr><th>Amount</th><th>Payment mode</th><th>Status</th><th>Date Created</th></tr></thead>
+                        <tbody>
+                        {% for transaction in deposits %}
+                            <tr><td>${{ transaction.amount|floatformat:2 }}</td><td>{{ transaction.get_payment_mode_display }}</td><td><span class="transaction-status status-{{ transaction.status }}">{{ transaction.status|title }}</span></td><td>{{ transaction.date_created|date:"M j, Y, g:i A" }}</td></tr>
+                        {% empty %}
+                            <tr><td class="transaction-empty" colspan="4">No transactions found.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="transaction-table-card" data-transaction-panel="withdrawals" hidden>
+                <h2>Withdrawal Table</h2>
+                <div class="transaction-table-wrap">
+                    <table>
+                        <thead><tr><th>Amount requested</th><th>Amount + charges</th><th>Receiving mode</th><th>Status</th><th>Date Created</th></tr></thead>
+                        <tbody>
+                        {% for transaction in withdrawals %}
+                            <tr><td>${{ transaction.amount|floatformat:2 }}</td><td>${{ transaction.amount_with_charges|floatformat:2 }}</td><td>{{ transaction.receiving_mode }}</td><td><span class="transaction-status status-{{ transaction.status }}">{{ transaction.status|title }}</span></td><td>{{ transaction.date_created|date:"M j, Y, g:i A" }}</td></tr>
+                        {% empty %}
+                            <tr><td class="transaction-empty" colspan="5">No transactions found.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="transaction-table-card" data-transaction-panel="others" hidden>
+                <h2>Other Transactions</h2>
+                <div class="transaction-table-wrap">
+                    <table>
+                        <thead><tr><th>Amount</th><th>Type</th><th>Plan/Narration</th><th>Date Created</th></tr></thead>
+                        <tbody>
+                        {% for transaction in other_transactions %}
+                            <tr><td>${{ transaction.amount|floatformat:0 }}</td><td>{{ transaction.type }}</td><td>{{ transaction.plan_narration }}</td><td>{{ transaction.date_created|date:"D, M j, Y g:i A" }}</td></tr>
+                        {% empty %}
+                            <tr><td class="transaction-empty" colspan="4">No transactions found.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+
+        <footer class="settings-footer transactions-footer">
+            <strong>&copy; Copyright &copy; CreatAura 2026. All Rights Reserved.</strong>
+            <span>CreatAura Financial Institutions.</span>
+        </footer>
+    </main>
+
+    <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+    </nav>
+    <script>
+        const tabButtons = document.querySelectorAll("[data-transaction-tab]");
+        const tabPanels = document.querySelectorAll("[data-transaction-panel]");
+        const initialTab = new URLSearchParams(window.location.search).get("tab") || "deposits";
+
+        function selectTransactionTab(tabName) {
+            tabButtons.forEach((tab) => tab.classList.toggle("active", tab.dataset.transactionTab === tabName));
+            tabPanels.forEach((panel) => {
+                panel.hidden = panel.dataset.transactionPanel !== tabName;
+            });
+        }
+
+        selectTransactionTab(initialTab);
+        tabButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                selectTransactionTab(button.dataset.transactionTab);
+            });
+        });
+    </script>
+</body>
+</html>
