@@ -99,7 +99,7 @@
                 <a href="{% url 'notifications' %}" class="dashboard-notification-bell" aria-label="Notifications">
                     <i class="bi bi-bell"></i>
                     {% if unread_notification_count %}
-                        <span class="dashboard-notification-badge">{{ unread_notification_count }}</span>
+                    <span class="dashboard-notification-badge">{{ unread_notification_count }}</span>
                     {% endif %}
                 </a>
                 <a href="{% url 'settings' %}">
@@ -136,18 +136,18 @@
         </div>
     </section>
     {% if unread_notification_count and notifications %}
-        {% for notification in notifications %}
-            {% if forloop.first %}
-                <aside class="dashboard-notification-alert" role="status">
-                    <span class="dashboard-notification-alert-icon"><i class="bi bi-bell-fill"></i></span>
-                    <div>
-                        <strong>{{ notification.title }}</strong>
-                        <small>{{ notification.message }}</small>
-                    </div>
-                    <a href="{% url 'notifications' %}" aria-label="Open notifications"><i class="bi bi-chevron-right"></i></a>
-                </aside>
-            {% endif %}
-        {% endfor %}
+    {% for notification in notifications %}
+    {% if forloop.first %}
+    <aside class="dashboard-notification-alert" role="status">
+        <span class="dashboard-notification-alert-icon"><i class="bi bi-bell-fill"></i></span>
+        <div>
+            <strong>{{ notification.title }}</strong>
+            <small>{{ notification.message }}</small>
+        </div>
+        <a href="{% url 'notifications' %}" aria-label="Open notifications"><i class="bi bi-chevron-right"></i></a>
+    </aside>
+    {% endif %}
+    {% endfor %}
     {% endif %}
     <section class="user-welcome">
         <h2>Welcome, {{ dashboard_full_name }}!</h2>
