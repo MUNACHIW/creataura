@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "creataura",
 ]
 UNFOLD = {
-    "SITE_TITLE": "CreatAura Admin",
+    "SITE_TITLE": "CapitalNext Admin",
     "SITE_HEADER": "Dashboard",
     "THEME": "light",  # or "dark"
     "SHOW_COUNTS": True,  # show object counts in sidebar

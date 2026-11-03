@@ -1,0 +1,218 @@
+.hero-slider {
+    height: 300px;
+    min-height: 300px;
+    overflow: hidden;
+}
+
+.hero-slider::after {
+    z-index: 1;
+    background: rgba(18, 25, 38, 0.44);
+}
+
+.careers-hero-background {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    background: url("images/therock.png") center 46% / cover no-repeat;
+}
+
+.careers-hero-content {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    color: #fff;
+    text-align: center;
+}
+
+.careers-hero-content h1 {
+    margin: 0;
+    font-size: 38px;
+    line-height: 1;
+    letter-spacing: 7px;
+}
+
+.careers-hero-content p {
+    margin: 12px 0 0;
+    font-size: 21px;
+    line-height: 1;
+    letter-spacing: 9px;
+}
+
+.careers-opportunities {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 58px 70px 68px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+}
+
+.career-card img {
+    width: 100%;
+    height: 248px;
+    display: block;
+    object-fit: cover;
+}
+
+.career-card h2 {
+    margin: 15px 0 10px;
+    color: #111;
+    font-size: 16px;
+    line-height: 1.2;
+}
+
+.career-status {
+    min-width: 96px;
+    display: inline-block;
+    padding: 7px 10px;
+    border-radius: 2px;
+    background: #6fca82;
+    color: #fff;
+    font-size: 10px;
+    text-align: center;
+}
+
+.career-status.available {
+    background: #38a74c;
+}
+
+.careers-teamwork {
+    width: 100%;
+    max-width: 1180px;
+    min-height: 290px;
+    margin: 0 auto;
+    padding: 38px 70px 68px;
+    display: grid;
+    grid-template-columns: 48% 52%;
+    align-items: center;
+}
+
+.careers-teamwork-copy {
+    padding-right: 42px;
+}
+
+.careers-teamwork-copy h2 {
+    margin: 0 0 20px;
+    color: #111;
+    font-size: 28px;
+    line-height: 1.15;
+}
+
+.careers-teamwork-copy p {
+    margin: 0;
+    color: #777f91;
+    font-size: 11px;
+    line-height: 1.75;
+}
+
+.careers-teamwork > img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+}
+
+.careers-contact {
+    position: relative;
+    height: 260px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: #fff;
+    text-align: center;
+    background: url("images/therock.png") center 58% / cover no-repeat;
+}
+
+.careers-contact-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(20, 22, 48, 0.72);
+}
+
+.careers-contact-content {
+    position: relative;
+    z-index: 2;
+    max-width: 620px;
+    padding: 0 20px;
+}
+
+.careers-contact h2 {
+    margin: 0 0 14px;
+    font-size: 26px;
+    letter-spacing: 5px;
+}
+
+.careers-contact p {
+    margin: 0 0 22px;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.careers-contact-button {
+    min-width: 120px;
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 2px;
+    background: #38a74c;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+@media (max-width: 991px) {
+    .hero-slider {
+        height: 260px;
+        min-height: 260px;
+    }
+
+    .careers-opportunities {
+        padding: 48px 20px 56px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .careers-teamwork {
+        grid-template-columns: 1fr;
+        padding: 38px 20px 56px;
+    }
+
+    .careers-teamwork-copy {
+        padding-right: 0;
+        padding-bottom: 30px;
+    }
+}
+
+@media (max-width: 575px) {
+    .hero-slider {
+        height: 220px;
+        min-height: 220px;
+    }
+
+    .careers-hero-content h1 {
+        font-size: 32px;
+        letter-spacing: 5px;
+    }
+
+    .careers-hero-content p {
+        font-size: 16px;
+        letter-spacing: 7px;
+    }
+
+    .careers-opportunities {
+        grid-template-columns: 1fr;
+    }
+
+    .career-card img {
+        height: 230px;
+    }
+
+    .careers-teamwork-copy h2 {
+        font-size: 24px;
+    }
+
+    .careers-teamwork > img {
+        height: 220px;
+    }
+}
