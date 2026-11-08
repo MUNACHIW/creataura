@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Home - Creataura{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css'%}">
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/bootstrap.css' %}">
@@ -17,10 +17,10 @@
 <body>
 
     <section class="hero-slider" aria-label="Creataura featured backgrounds">
-        <nav class="navbar navbar-expand-lg  site-navbar">
+        <nav class="navbar navbar-expand-lg site-navbar">
             <div class="container-fluid px-3 px-lg-4">
                 <a class="navbar-brand site-logo" href="/" aria-label="CreatAura home">
-                    <img src="{% static 'creataura/images/cropped-creataura-6-48x48.png'%}" alt="CreatAura">
+                    <img src="{% static 'creataura/images/cropped-creataura-6-48x48.png' %}" alt="CreatAura">
                 </a>
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
@@ -28,6 +28,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
+
+                    <!-- Desktop menu -->
                     <ul class="navbar-nav ms-auto align-items-lg-center site-nav desktop-nav">
                         <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %} href="/">Home</a></li>
                         <li class="nav-item dropdown desktop-dropdown">
@@ -64,6 +66,8 @@
                             </ul>
                         </li>
                     </ul>
+
+                    <!-- Mobile menu -->
                     <ul class="navbar-nav site-nav mobile-nav">
                         <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %} href="/">Home</a></li>
                         <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'about' %} active{% endif %}"{% if request.resolver_match.url_name == 'about' %} aria-current="page"{% endif %} href="{% url 'about' %}">About</a></li>
@@ -105,7 +109,7 @@
         <div class="hero-content">
             <h1>Empowering Growth, Igniting Financial Success</h1>
             <p>Elevate Your Financial Horizon with CreatAura Group</p>
-            <a class="hero-cta" href="/register">Get Started</a>
+            <a class="hero-cta" href="{% url 'register' %}">Get Started</a>
         </div>
         {% endblock %}
         {% block hero_slides %}
@@ -124,13 +128,17 @@
         {% endblock %}
     </main>
 
-    <footer class="bg-light text-gray text-center  py-5">
+    <footer class="bg-light text-gray text-center py-5">
         <div class="container">
             <p class="mb-0">&copy; {% now "Y" %} CreatAura. All rights reserved.</p>
         </div>
     </footer>
 
-    <script src="{%static '/creataura/bootstrap.bundle.js'%}"></script>
+    <script src="{% static 'creataura/bootstrap.bundle.js' %}"></script>
+    <script>window.$zoho = window.$zoho || {}; $zoho.salesiq = $zoho.salesiq || { ready: function () { } }</script>
+    <script id="zsiqscript"
+        src="https://salesiq.zohopublic.com/widget?wc=siq08f644c2ecb722af1db9f8e015fceae5f81bbcb68af28421cfa26d8bdde6f25f"
+        defer></script>
 </body>
 
 </html>
