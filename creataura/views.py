@@ -1583,6 +1583,11 @@ def register(request, referral_id=None):
                     "Account created! We've sent a verification link to your email.",
                 )
                 return redirect("verify_email")
+    return render(
+        request,
+        "creataura/register.html",
+        {"countries": COUNTRIES, "initial_referral_id": referral_id or ""},
+    )
 
 
 from django.utils.http import url_has_allowed_host_and_scheme
