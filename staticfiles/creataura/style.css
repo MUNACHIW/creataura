@@ -1,3 +1,6 @@
+/* =========================================================
+   BASE
+   ========================================================= */
 html,
 body {
     min-height: 100%;
@@ -5,19 +8,32 @@ body {
 
 body {
     font-family: "Poppins", sans-serif !important;
+    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 main {
     width: 100%;
 }
 
+/* =========================================================
+   HERO + NAVBAR
+   ========================================================= */
 .hero-slider {
     position: relative;
     width: 100%;
     min-height: 100svh;
-    overflow: hidden;
+    overflow: visible;
     isolation: isolate;
     background: #111;
+}
+
+/* Slides live in their own clipped wrapper so menus can overflow the hero */
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
 }
 
 .hero-slide {
@@ -68,37 +84,6 @@ main {
     min-height: 68px;
 }
 
-.hero-intro-card {
-    position: relative;
-    z-index: 10;
-    width: calc(100% - clamp(48px, 10vw, 160px));
-    max-width: 1320px;
-    margin: -70px auto -105px;
-    box-sizing: border-box;
-    padding: 58px 52px 46px;
-    border-radius: 10px;
-    background: #fff;
-    box-shadow: 0 12px 32px rgba(13, 18, 38, 0.08);
-}
-
-.hero-intro-card p {
-    margin: 0 0 10px;
-    color: #111b3b;
-    font-family: "Poppins", sans-serif;
-    font-size: 14px;
-    line-height: 1.4;
-    font-weight: 700;
-}
-
-.hero-intro-card h2 {
-    margin: 0;
-    color: #111111;
-    font-family: "Poppins", sans-serif;
-    font-size: 30px;
-    line-height: 1.15;
-    font-weight: bold;
-}
-
 .hero-slider .site-logo {
     margin-right: 1rem;
     padding-left: 70px;
@@ -120,20 +105,21 @@ main {
     color: pink;
     font-family: sans-serif;
     font-size: 16px;
-    font-weight: Lighter;
+    font-weight: 300;
     line-height: 1;
     padding: 0.8rem 0.55rem;
     letter-spacing: 0.02em;
     white-space: nowrap;
 }
 
-.hero-slider .site-nav .nav-link.active {
+.hero-slider .site-nav .nav-link.active,
+.hero-slider .site-nav .nav-link.dropdown-toggle.active {
     color: #c44f43;
 }
 
 .hero-slider .site-nav .nav-link:hover,
 .hero-slider .site-nav .nav-link:focus {
-    color:pink;
+    color: pink;
 }
 
 .hero-slider .site-nav .bi-chevron-down {
@@ -198,7 +184,9 @@ main {
 }
 
 .hero-slider .desktop-dropdown .dropdown-item:hover,
-.hero-slider .desktop-dropdown .dropdown-item:focus {
+.hero-slider .desktop-dropdown .dropdown-item:focus,
+.hero-slider .desktop-dropdown .dropdown-item.active,
+.hero-slider .desktop-dropdown .dropdown-item:active {
     color: #c44f43;
     background: #fff;
 }
@@ -207,12 +195,28 @@ main {
     box-shadow: none;
 }
 
+/* Logout button inside the nav should look like a link */
+.nav-logout-form {
+    margin: 0;
+}
+
+.nav-logout-form .nav-link {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.hero-slider .mobile-nav {
+    display: none !important;
+}
+
+/* Hero text */
 .hero-content {
     position: absolute;
     z-index: 3;
     left: clamp(24px, 4vw, 72px);
     bottom: clamp(82px, 18vh, 180px);
-    width:90%;
+    width: 90%;
     color: #fff;
 }
 
@@ -220,8 +224,8 @@ main {
     margin: 0 0 14px;
     font-size: 40px;
     line-height: 1.12;
-    width:100%;
-    font-weight:bold;
+    width: 100%;
+    font-weight: bold;
 }
 
 .hero-content p {
@@ -234,21 +238,83 @@ main {
     display: inline-block;
     min-width: 150px;
     padding: 10px 24px;
-    border:none;
+    border: none;
     border-radius: 4px;
     background: #2D080A;
     color: #fff;
     text-align: center;
     text-decoration: none;
+    transition: background-color 0.2s ease;
 }
 
-.hero-slider .mobile-nav {
-    display: none !important;
+.hero-cta:hover,
+.hero-cta:focus {
+    background: #470617;
+    color: #fff;
 }
 
+/* Intro card that overlaps the hero */
+.hero-intro-card {
+    position: relative;
+    z-index: 10;
+    width: calc(100% - clamp(48px, 10vw, 160px));
+    max-width: 1320px;
+    margin: -70px auto -105px;
+    box-sizing: border-box;
+    padding: 58px 52px 46px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 12px 32px rgba(13, 18, 38, 0.08);
+}
+
+.hero-intro-card p {
+    margin: 0 0 10px;
+    color: #111b3b;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 700;
+}
+
+.hero-intro-card h2 {
+    margin: 0;
+    color: #111111;
+    font-family: "Poppins", sans-serif;
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: bold;
+}
+
+/* Laptops: the menu has more items now, so tighten it */
+@media (min-width: 992px) and (max-width: 1399.98px) {
+    .hero-slider .site-logo {
+        padding-left: 0;
+    }
+
+    .hero-slider .site-nav {
+        padding-left: 0;
+        padding-right: 0;
+        column-gap: 0;
+    }
+
+    .hero-slider .site-nav .nav-link {
+        font-size: 14px;
+        padding: 0.8rem 0.45rem;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .hero-slider .site-nav .nav-link {
+        font-size: 13px;
+        padding: 0.8rem 0.3rem;
+    }
+}
+
+/* Tablets and phones */
 @media (max-width: 991.98px) {
     .hero-slider {
         min-height: 620px;
+        z-index: 20; /* keeps the open menu above the intro card */
     }
 
     .hero-slider .site-navbar,
@@ -270,13 +336,14 @@ main {
         z-index: 6;
         top: 62px;
         left: 0;
-        width: 100vw;
-        max-width: 100vw;
+        width: 100%;
         box-sizing: border-box;
         max-height: calc(100vh - 62px);
+        max-height: calc(100dvh - 62px);
         overflow-y: auto;
         padding: 0.5rem 20px 1.25rem;
         background: #fff;
+        box-shadow: 0 14px 24px rgba(0, 0, 0, 0.18);
     }
 
     .hero-slider .desktop-nav {
@@ -304,7 +371,18 @@ main {
     }
 
     .hero-slider .site-nav .nav-link.active {
+        color: #c44f43;
+        font-weight: 600;
+    }
+
+    .hero-slider .site-nav .nav-link:hover,
+    .hero-slider .site-nav .nav-link:focus {
         color: #17204d;
+    }
+
+    .nav-logout-form .nav-link {
+        width: 100%;
+        text-align: left;
     }
 
     .hero-slider .policy-toggle {
@@ -338,11 +416,6 @@ main {
         padding-top: 0.35rem;
         padding-bottom: 0.55rem;
         font-size: 15px;
-    }
-
-    .hero-slider .site-nav .nav-link:hover,
-    .hero-slider .site-nav .nav-link:focus {
-        color: #17204d;
     }
 
     .hero-slider .navbar-toggler {
@@ -388,6 +461,7 @@ main {
     .hero-content {
         left: 24px;
         right: 24px;
+        width: auto;
         bottom: 108px;
         max-width: 520px;
     }
@@ -408,6 +482,32 @@ main {
         padding: 12px 18px;
         font-size: 14px;
     }
+
+    .hero-intro-card {
+        width: 100%;
+        max-width: none;
+        min-height: 150px;
+        margin: 0;
+        padding: 52px 24px 48px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .hero-intro-card p {
+        margin-bottom: 7px;
+        font-size: 12px;
+    }
+
+    .hero-intro-card h2 {
+        font-size: 28px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 575.98px) {
+    .hero-content h1 {
+        font-size: 26px;
+    }
 }
 
 @keyframes heroFadeOne {
@@ -415,18 +515,22 @@ main {
         opacity: 1;
         transform: scale(1.02);
     }
+
     42% {
         opacity: 1;
         transform: scale(1.09);
     }
+
     50% {
         opacity: 0;
         transform: scale(1.12);
     }
+
     92% {
         opacity: 0;
         transform: scale(1.02);
     }
+
     100% {
         opacity: 1;
         transform: scale(1.02);
@@ -438,24 +542,41 @@ main {
         opacity: 0;
         transform: scale(1.12);
     }
+
     42% {
         opacity: 0;
         transform: scale(1.02);
     }
+
     50% {
         opacity: 1;
         transform: scale(1.02);
     }
+
     92% {
         opacity: 1;
         transform: scale(1.09);
     }
+
     100% {
         opacity: 0;
         transform: scale(1.12);
     }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .hero-slide-one {
+        animation: none;
+    }
+
+    .hero-slide-two {
+        display: none;
+    }
+}
+
+/* =========================================================
+   HOME PAGE SECTIONS
+   ========================================================= */
 .secondsection {
     width: 100%;
     min-height: 620px;
@@ -703,72 +824,78 @@ main {
 .innovation-inner h2 {
     margin: 0 0 54px;
     max-width: 1120px;
-    color: #fff;
+    color: #d9dce7;
     font-family: "Poppins", sans-serif;
     font-size: clamp(38px, 3.25vw, 48px);
     line-height: 1.22;
-    color:#d9dce7
 }
 
 .innovation-inner p {
     max-width: 1120px;
     margin: 0;
     color: rgba(255, 255, 255, 0.86);
-    font-family:sans-serif;
+    font-family: sans-serif;
     font-size: 17px;
     line-height: 1.8;
 }
+
 .Empower {
     background: linear-gradient(to bottom, black 30%, #0C0101 70%);
-    width:100%;
+    width: 100%;
     display: flex;
-    align-items:center;
+    align-items: center;
     justify-content: center;
     padding: 80px clamp(24px, 7vw, 86px);
     box-sizing: border-box;
 }
-.Empower .holder{
+
+.Empower .holder {
     width: 100%;
     max-width: 1180px;
     height: auto;
     border-left: 1px solid white;
-    border-right:1px solid white;
+    border-right: 1px solid white;
     border-bottom: 1px solid white;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50px;
-    color:white;
+    color: white;
     padding: 24px;
 }
-.Empower .holder img{
-    width:50%;
+
+.Empower .holder img {
+    width: 50%;
     margin-right: 36px;
 }
-.Empower .holder .subsec2{
-    width:38%;
+
+.Empower .holder .subsec2 {
+    width: 38%;
     padding-right: 24px;
-    
 }
-.Empower .holder .subsec2 h3{
-    font-weight:bold;
+
+.Empower .holder .subsec2 h3 {
+    font-weight: bold;
     font-size: 40px;
 }
-.Empower .holder .subsec2 p{
-    margin-top:30px;
+
+.Empower .holder .subsec2 p {
+    margin-top: 30px;
     line-height: 1.75;
 }
-.reshaping{
-    display:flex;
+
+.reshaping {
+    display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0;
-    background:black;
-    color:whitesmoke;
+    background: black;
+    color: whitesmoke;
     box-sizing: border-box;
     min-height: 480px;
 }
-.reshaping .subsec-1{
+
+.reshaping .subsec-1 {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -778,7 +905,8 @@ main {
     padding: clamp(32px, 5vw, 64px);
     box-sizing: border-box;
 }
-.reshaping > img{
+
+.reshaping > img {
     width: 50%;
     height: 480px;
     max-width: 100%;
@@ -787,24 +915,71 @@ main {
     display: block;
     border-radius: 0;
 }
-.reshaping .subsec-1 h1{
-     font-weight: bold;
-     width: 85%;
-     font-size: clamp(30px, 3vw, 40px);
-     line-height: 1.15;
+
+.reshaping .subsec-1 h1 {
+    font-weight: bold;
+    width: 85%;
+    font-size: clamp(30px, 3vw, 40px);
+    line-height: 1.15;
 }
-.reshaping .subsec-1 p{
+
+.reshaping .subsec-1 p {
     width: 85%;
     line-height: 1.7;
     font-size: 17px;
 }
 
+.redefine {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 80px clamp(24px, 7vw, 86px) 96px;
+    background: #000;
+    color: #fff;
+}
 
+.redefine h2 {
+    margin: 0 0 48px;
+    color: gainsboro;
+    font-family: "Poppins", sans-serif;
+    font-size: clamp(34px, 3vw, 44px);
+    line-height: 1.15;
+    font-weight: 700;
+}
 
+.redefine .subsec {
+    max-width: 1180px;
+    display: grid;
+    grid-template-columns: minmax(0, 44%) minmax(0, 48%);
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(32px, 5vw, 72px);
+    margin: 0 auto 72px;
+}
+
+.redefine .subsec:last-child {
+    margin-bottom: 0;
+}
+
+.redefine .subsec img {
+    width: 100%;
+    max-width: 420px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.redefine .subsec p {
+    margin: 0;
+    color: gainsboro;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.75;
+}
+
+/* Home sections: tablets and phones */
 @media (max-width: 991.98px) {
     .Empower {
-        padding: 0px 24px;
-        padding-bottom: 24px;
+        padding: 0 24px 24px;
     }
 
     .Empower .holder {
@@ -939,12 +1114,37 @@ main {
         font-size: 15px;
         line-height: 1.7;
     }
+
+    .redefine {
+        padding: 56px 24px 64px;
+    }
+
+    .redefine h2 {
+        margin-bottom: 32px;
+        font-size: 34px;
+    }
+
+    .redefine .subsec {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-bottom: 48px;
+    }
+
+    .redefine .subsec img {
+        max-width: 420px;
+        height: clamp(260px, 55vw, 420px);
+    }
+
+    .redefine .subsec p {
+        font-size: 16px;
+        line-height: 1.7;
+    }
 }
 
+/* Home sections: small phones */
 @media (max-width: 575.98px) {
     .Empower {
-        padding: 0px 16px;
-        padding-bottom: 16px;
+        padding: 0 16px 16px;
     }
 
     .Empower .holder {
@@ -987,116 +1187,7 @@ main {
     .reshaping .subsec-1 p {
         font-size: 15px;
     }
-}
 
-@media (max-width: 991.98px) {
-    .hero-intro-card {
-        position: relative;
-        z-index: 10;
-        width: 100%;
-        max-width: none;
-        min-height: 150px;
-        margin: 0;
-        padding: 52px 24px 48px;
-        border-radius: 0;
-        box-shadow: none;
-    }
-
-    .hero-intro-card p {
-        margin-bottom: 7px;
-        font-size: 12px;
-    }
-
-    .hero-intro-card h2 {
-        font-size: 28px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .hero-slide-one {
-        animation: none;
-    }
-
-    .hero-slide-two {
-        display: none;
-    }
-}
-
-.redefine {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 80px clamp(24px, 7vw, 86px) 96px;
-    background: #000;
-    color: #fff;
-}
-
-.redefine h2 {
-    margin: 0 0 48px;
-    color: gainsboro;
-    font-family: "Poppins", sans-serif;
-    font-size: clamp(34px, 3vw, 44px);
-    line-height: 1.15;
-    font-weight: 700;
-}
-
-.redefine .subsec {
-    max-width: 1180px;
-    display: grid;
-    grid-template-columns: minmax(0, 44%) minmax(0, 48%);
-    align-items: center;
-    justify-content: space-between;
-    gap: clamp(32px, 5vw, 72px);
-    margin: 0 auto 72px;
-}
-
-.redefine .subsec:last-child {
-    margin-bottom: 0;
-}
-
-.redefine .subsec img {
-    width: 100%;
-    max-width: 420px;
-    height: 300px;
-    object-fit: cover;
-    border-radius: 20px;
-}
-
-.redefine .subsec p {
-    margin: 0;
-    color: gainsboro;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 17px;
-    line-height: 1.75;
-}
-
-@media (max-width: 991.98px) {
-    .redefine {
-        padding: 56px 24px 64px;
-    }
-
-    .redefine h2 {
-        margin-bottom: 32px;
-        font-size: 34px;
-    }
-
-    .redefine .subsec {
-        grid-template-columns: 1fr;
-        gap: 24px;
-        margin-bottom: 48px;
-    }
-
-    .redefine .subsec img {
-        max-width: 420px;
-        height: clamp(260px, 55vw, 420px);
-    }
-
-    .redefine .subsec p {
-        font-size: 16px;
-        line-height: 1.7;
-    }
-}
-
-@media (max-width: 575.98px) {
     .redefine {
         padding: 48px 16px 56px;
     }
@@ -1120,7 +1211,9 @@ main {
     }
 }
 
-/* Registration and login pages */
+/* =========================================================
+   AUTH PAGES (register, login, verify, forgot, reset)
+   ========================================================= */
 .auth-body {
     min-height: 100vh;
     margin: 0;
@@ -1193,8 +1286,19 @@ main {
     margin: 4px 0;
 }
 
+.auth-messages a {
+    color: inherit;
+    font-weight: 700;
+}
+
 .auth-form {
     width: 100%;
+}
+
+.auth-form > p {
+    color: #27344a;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 .theme-label {
@@ -1295,7 +1399,6 @@ main {
     color: #27344a;
     font-size: 12px;
     font-weight: 700;
-
 }
 
 .auth-fields label:last-child {
@@ -1343,10 +1446,18 @@ main {
     cursor: pointer;
 }
 
-.auth-submit:hover {
-    background:green;
+/* Lets <a class="auth-submit"> look the same as the button */
+a.auth-submit {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }
 
+.auth-submit:hover {
+    background: green;
+}
 
 .auth-footer {
     min-height: 76px;
@@ -1435,16 +1546,24 @@ main {
     color: #9a8dbb;
 }
 
+/* Auth dark mode */
 .auth-body.auth-dark {
     background: #030108;
     color: #fff;
 }
 
+.auth-dark .auth-back,
 .auth-dark .auth-top-link,
 .auth-dark .auth-heading h1,
 .auth-dark .auth-heading p,
-.auth-dark .auth-footer {
+.auth-dark .auth-footer,
+.auth-dark .theme-label,
+.auth-dark .auth-form > p {
     color: #fff;
+}
+
+.auth-dark .auth-messages {
+    color: #f3b4c2;
 }
 
 .auth-dark .theme-row,
@@ -1527,4 +1646,267 @@ main {
     }
 }
 
-/* U
+/* =========================================================
+   SECTOR & POLICY PAGES
+   ========================================================= */
+.hero-slider.hero-short {
+    min-height: 72svh;
+}
+
+.hero-slider.hero-short .hero-slide {
+    animation: none;
+    transform: none;
+    inset: 0;
+    opacity: 1;
+}
+
+/* Keeps the hero text clear of the overlapping intro card */
+.hero-slider.hero-short .hero-content {
+    bottom: clamp(120px, 22vh, 200px);
+}
+
+.sector-eyebrow {
+    margin: 0 0 10px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.16em;
+    color: #f0c9c4;
+}
+
+.sector-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(32px, 5vw, 72px);
+    box-sizing: border-box;
+    padding: 170px clamp(24px, 7vw, 86px) 80px;
+    background: #fff;
+}
+
+.sector-overview-text h4 {
+    margin: 0 0 20px;
+    color: #111b3b;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+}
+
+.sector-overview-text h2 {
+    margin: 0 0 24px;
+    color: #111;
+    font-size: clamp(30px, 3vw, 42px);
+    line-height: 1.18;
+    font-weight: 700;
+}
+
+.sector-overview-text p {
+    margin: 0 0 16px;
+    color: #6c747f;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+.sector-overview > img {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.sector-highlights {
+    padding: 80px clamp(24px, 7vw, 86px);
+    background: #000;
+    color: #fff;
+}
+
+.sector-highlights h2,
+.sector-steps h2 {
+    margin: 0 0 40px;
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 700;
+}
+
+.sector-highlights h2 {
+    color: gainsboro;
+}
+
+.sector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    max-width: 1180px;
+}
+
+.sector-card {
+    padding: 28px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    background: linear-gradient(to bottom, #0c0101, #000);
+}
+
+.sector-card i {
+    display: block;
+    margin-bottom: 14px;
+    color: #c44f43;
+    font-size: 30px;
+}
+
+.sector-card h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.sector-card p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.sector-steps {
+    padding: 80px clamp(24px, 7vw, 86px);
+    background: #fff;
+}
+
+.sector-steps h2 {
+    color: #111;
+}
+
+.sector-steps ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 900px;
+    display: grid;
+    gap: 28px;
+}
+
+.sector-steps li {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.sector-steps li > span {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #470617;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.sector-steps h3 {
+    margin: 4px 0 6px;
+    color: #111b3b;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.sector-steps p {
+    margin: 0;
+    color: #6c747f;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+.sector-risk {
+    margin: 0 clamp(24px, 7vw, 86px) 80px;
+    padding: 28px 32px;
+    border-left: 4px solid #c44f43;
+    border-radius: 8px;
+    background: #fbf3f2;
+}
+
+.sector-risk h3 {
+    margin: 0 0 10px;
+    color: #470617;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.sector-risk p {
+    margin: 0;
+    color: #4a3f3f;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.sector-cta {
+    padding: 72px 24px;
+    text-align: center;
+    background: #f4f4f6;
+}
+
+.sector-cta h2 {
+    margin: 0 0 12px;
+    color: #111;
+    font-size: clamp(26px, 3vw, 36px);
+    font-weight: 700;
+}
+
+.sector-cta p {
+    margin: 0 0 28px;
+    color: #6c747f;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 17px;
+}
+
+@media (max-width: 991.98px) {
+    .hero-slider.hero-short {
+        min-height: 520px;
+    }
+
+    .hero-slider.hero-short .hero-content {
+        bottom: 64px;
+    }
+
+    .sector-overview {
+        grid-template-columns: 1fr;
+        padding: 64px 24px 56px;
+    }
+
+    .sector-overview > img {
+        height: 280px;
+    }
+
+    .sector-highlights,
+    .sector-steps {
+        padding: 56px 24px;
+    }
+
+    .sector-risk {
+        margin: 0 24px 56px;
+        padding: 22px 20px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-slider.hero-short {
+        min-height: 560px;
+    }
+
+    .sector-steps li {
+        grid-template-columns: 44px 1fr;
+        gap: 14px;
+    }
+
+    .sector-steps li > span {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+
+    .sector-card {
+        padding: 22px 18px;
+    }
+}

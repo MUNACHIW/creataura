@@ -1,0 +1,66 @@
+<ul class="navbar-nav site-nav mobile-nav">
+    {% for item in nav_items %}
+    {% if item.split %}
+    <li class="nav-item">
+        <a class="nav-link{{ item.on }}" href="{{ item.url }}">
+            {{ item.label }}
+        </a>
+    </li>
+    {% for child in item.children %}
+    <li class="nav-item">
+        <a class="nav-link{{ child.on }}" href="{{ child.url }}">
+            {{ child.label }}
+        </a>
+    </li>
+    {% endfor %}
+    {% elif item.children %}
+    <li class="nav-item policy-mobile">
+        <button class="nav-link policy-toggle" type="button" data-bs-toggle="collapse"
+            data-bs-target="#{{ item.dom_id }}" aria-expanded="false" aria-controls="{{ item.dom_id }}">
+            {{ item.label }}
+            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+        </button>
+        <ul class="collapse policy-submenu" id="{{ item.dom_id }}">
+            {% for child in item.children %}
+            <li>
+                <a class="nav-link{{ child.on }}" href="{{ child.url }}">
+                    {{ child.label }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link{{ item.on }}" href="{{ item.url }}">
+            {{ item.label }}
+        </a>
+    </li>
+    {% endif %}
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+        <a class="nav-link{{ nav_dashboard.on }}" href="{{ nav_dashboard.url }}">
+            Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <form method="post" action="{% url 'logout' %}" class="nav-logout-form">
+            {% csrf_token %}
+            <button type="submit" class="nav-link">Logout</button>
+        </form>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link{{ nav_register.on }}" href="{{ nav_register.url }}">
+            Sign Up
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{{ nav_login.on }}" href="{{ nav_login.url }}">
+            Login
+        </a>
+    </li>
+    {% endif %}
+</ul>

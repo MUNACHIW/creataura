@@ -1686,6 +1686,29 @@ def _get_user_from_uid(uidb64):
 # ---------- Email verification ----------
 
 
+def cryptocurrency(request):
+    return render(request, "creataura/cryptocurrency.html")
+
+
+def renewable_energy(request):
+    return render(request, "creataura/renewableenergy.html")
+
+
+def stocks_etfs(request):
+    return render(request, "creataura/stocksetfs.html")
+
+
+def real_estate(request):
+    return render(request, "creataura/realestate.html")
+
+
+def oil_gas(request):
+    return render(request, "creataura/oilandgas.html")
+
+
+def foreign_investor_protection(request):
+    return render(request, "creataura/foreigninvestorprotection.html")
+
 @login_required
 def verify_email(request):
     if is_email_verified(request.user):

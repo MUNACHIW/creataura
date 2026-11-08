@@ -23,14 +23,20 @@ from django.views.generic import RedirectView
 from django.views.static import serve
 from creataura import views
 from creataura.views import (
+    cryptocurrency,
+    foreign_investor_protection,
     home,
     loans,
     contact,
     careers,
     faq,
     about,
+    oil_gas,
     page_not_found,
+    real_estate,
     register,
+    renewable_energy,
+    stocks_etfs,
     user_login,
     user_logout,
     dashboard,
@@ -85,6 +91,13 @@ urlpatterns = [
     path("transactions/", transaction_history, name="transaction_history"),
     path("profit-record/", roi_history, name="profit_record"),
     path("kyc/", kyc, name="kyc"),
+        # Sectors & policy
+    path("sustainability/cryptocurrency/", cryptocurrency, name="cryptocurrency"),
+    path("sustainability/renewable-energy/", renewable_energy, name="renewable_energy"),
+    path("sustainability/stocks-etfs/", stocks_etfs, name="stocks_etfs"),
+    path("sustainability/real-estate/", real_estate, name="real_estate"),
+    path("sustainability/oil-and-gas/", oil_gas, name="oil_gas"),
+    path("foreign-investor-protection/", foreign_investor_protection, name="foreign_investor_protection"),
     path("invest/", investments, name="invest"),
     path("investments/", RedirectView.as_view(pattern_name="invest", permanent=False)),
     path("invest/<int:plan_id>/join/", join_investment, name="join_investment"),
@@ -110,6 +123,7 @@ urlpatterns = [
         {"document_root": django_settings.MEDIA_ROOT},
         name="admin_media",
     ),
+    
 ]
 
 handler404 = page_not_found

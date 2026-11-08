@@ -1,0 +1,60 @@
+{% extends "creataura/base.html" %}
+{% load static %}
+
+{% block title %}{% block page_title %}{% endblock %} - Creataura{% endblock %}
+
+{% block hero_class %}hero-short{% endblock %}
+
+{% block hero_content %}
+<div class="hero-content">
+    <p class="sector-eyebrow">{% block eyebrow %}{% endblock %}</p>
+    <h1>{% block hero_title %}{% endblock %}</h1>
+    <p>{% block hero_text %}{% endblock %}</p>
+    <a class="hero-cta" href="{% url 'register' %}">Get Started</a>
+</div>
+{% endblock %}
+
+{% block hero_slides %}
+<div class="hero-slide"
+    style="background-image:url('{% block hero_image %}{% static 'creataura/images/creataura-1.jpg' %}{% endblock %}')"
+    aria-hidden="true"></div>
+{% endblock %}
+
+{% block hero_intro %}
+<section class="hero-intro-card" aria-labelledby="hero-intro-title">
+    <p>{% block intro_label %}{% endblock %}</p>
+    <h2 id="hero-intro-title">{% block intro_title %}{% endblock %}</h2>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="sector-overview">
+    <div class="sector-overview-text">
+        <h4>{% block overview_label %}OVERVIEW{% endblock %}</h4>
+        <h2>{% block overview_title %}{% endblock %}</h2>
+        {% block overview_text %}{% endblock %}
+    </div>
+    <img src="{% block overview_image %}{% static 'creataura/images/atc.jpg' %}{% endblock %}" alt="">
+</section>
+
+<section class="sector-highlights">
+    <h2>{% block highlights_title %}What we focus on{% endblock %}</h2>
+    <div class="sector-grid">{% block highlights %}{% endblock %}</div>
+</section>
+
+<section class="sector-steps">
+    <h2>{% block steps_title %}How it works{% endblock %}</h2>
+    <ol>{% block steps %}{% endblock %}</ol>
+</section>
+
+<section class="sector-risk">
+    <h3>{% block risk_title %}Risk disclosure{% endblock %}</h3>
+    {% block risk %}{% endblock %}
+</section>
+
+<section class="sector-cta">
+    <h2>{% block cta_title %}Ready to get started?{% endblock %}</h2>
+    <p>{% block cta_text %}Create a free account and explore what CreatAura offers.{% endblock %}</p>
+    <a class="hero-cta" href="{% url 'register' %}">Create an Account</a>
+</section>
+{% endblock %}

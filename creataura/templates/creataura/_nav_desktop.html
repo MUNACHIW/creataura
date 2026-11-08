@@ -1,0 +1,71 @@
+<ul class="navbar-nav ms-auto align-items-lg-center site-nav desktop-nav">
+    {% for item in nav_items %}
+    {% if item.split %}
+    <li class="nav-item dropdown desktop-dropdown contact-desktop-dropdown">
+        <a class="nav-link contact-nav-link{{ item.on }}" href="{{ item.url }}">
+            {{ item.label }}
+        </a>
+        <button class="nav-link contact-dropdown-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown"
+            aria-expanded="false" aria-label="Open Contact options">
+            <span class="visually-hidden">Open Contact options</span>
+        </button>
+        <ul class="dropdown-menu">
+            {% for child in item.children %}
+            <li>
+                <a class="dropdown-item{{ child.on }}" href="{{ child.url }}">
+                    {{ child.label }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% elif item.children %}
+    <li class="nav-item dropdown desktop-dropdown">
+        <a class="nav-link dropdown-toggle{{ item.on }}" href="#" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            {{ item.label }}
+        </a>
+        <ul class="dropdown-menu{{ item.menu_end }}">
+            {% for child in item.children %}
+            <li>
+                <a class="dropdown-item{{ child.on }}" href="{{ child.url }}">
+                    {{ child.label }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link{{ item.on }}" href="{{ item.url }}">
+            {{ item.label }}
+        </a>
+    </li>
+    {% endif %}
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+    <li class="nav-item">
+        <a class="nav-link{{ nav_dashboard.on }}" href="{{ nav_dashboard.url }}">
+            Dashboard
+        </a>
+    </li>
+    <li class="nav-item">
+        <form method="post" action="{% url 'logout' %}" class="nav-logout-form">
+            {% csrf_token %}
+            <button type="submit" class="nav-link">Logout</button>
+        </form>
+    </li>
+    {% else %}
+    <li class="nav-item">
+        <a class="nav-link{{ nav_register.on }}" href="{{ nav_register.url }}">
+            Sign Up
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{{ nav_login.on }}" href="{{ nav_login.url }}">
+            Login
+        </a>
+    </li>
+    {% endif %}
+</ul>

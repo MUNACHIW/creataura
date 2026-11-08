@@ -16,10 +16,17 @@
 
 <body>
 
-    <section class="hero-slider" aria-label="Creataura featured backgrounds">
+    <section class="hero-slider {% block hero_class %}{% endblock %}" aria-label="Creataura featured backgrounds">
+        <div class="hero-bg" aria-hidden="true">
+            {% block hero_slides %}
+            <div class="hero-slide hero-slide-one"></div>
+            <div class="hero-slide hero-slide-two"></div>
+            {% endblock %}
+        </div>
+
         <nav class="navbar navbar-expand-lg site-navbar">
             <div class="container-fluid px-3 px-lg-4">
-                <a class="navbar-brand site-logo" href="/" aria-label="CreatAura home">
+                <a class="navbar-brand site-logo" href="{% url 'home' %}" aria-label="CreatAura home">
                     <img src="{% static 'creataura/images/cropped-creataura-6-48x48.png' %}" alt="CreatAura">
                 </a>
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
@@ -28,101 +35,32 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-
-                    <!-- Desktop menu -->
-                    <ul class="navbar-nav ms-auto align-items-lg-center site-nav desktop-nav">
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %} href="/">Home</a></li>
-                        <li class="nav-item dropdown desktop-dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">Sustainability</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Cryptocurrency</a></li>
-                                <li><a class="dropdown-item" href="#">Renewable Energy</a></li>
-                                <li><a class="dropdown-item" href="#">Stocks &amp; ETFs</a></li>
-                                <li><a class="dropdown-item" href="#">Real Estate</a></li>
-                                <li><a class="dropdown-item" href="#">Oil and Gas</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'about' %} active{% endif %}"{% if request.resolver_match.url_name == 'about' %} aria-current="page"{% endif %} href="{% url 'about' %}">About</a></li>
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'loans' %} active{% endif %}"{% if request.resolver_match.url_name == 'loans' %} aria-current="page"{% endif %} href="{% url 'loans' %}">Loans</a></li>
-                        <li class="nav-item dropdown desktop-dropdown contact-desktop-dropdown">
-                            <a class="nav-link contact-nav-link{% if request.resolver_match.url_name == 'contact' %} active{% endif %}" href="{% url 'contact' %}"{% if request.resolver_match.url_name == 'contact' %} aria-current="page"{% endif %}>Contact</a>
-                            <button class="nav-link contact-dropdown-toggle dropdown-toggle" type="button"
-                                data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open Contact options">
-                                <span class="visually-hidden">Open Contact options</span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'careers' %}">Careers</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Sign Up</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'faq' %} active{% endif %}"{% if request.resolver_match.url_name == 'faq' %} aria-current="page"{% endif %} href="{% url 'faq' %}">FAQ</a></li>
-                        <li class="nav-item dropdown desktop-dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">Privacy and Policy</a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#">Foreign Investor Protection</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-
-                    <!-- Mobile menu -->
-                    <ul class="navbar-nav site-nav mobile-nav">
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'home' %} active{% endif %}"{% if request.resolver_match.url_name == 'home' %} aria-current="page"{% endif %} href="/">Home</a></li>
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'about' %} active{% endif %}"{% if request.resolver_match.url_name == 'about' %} aria-current="page"{% endif %} href="{% url 'about' %}">About</a></li>
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'loans' %} active{% endif %}"{% if request.resolver_match.url_name == 'loans' %} aria-current="page"{% endif %} href="{% url 'loans' %}">Loans</a></li>
-                        <li class="nav-item policy-mobile">
-                            <button class="nav-link policy-toggle" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#sustainabilityLinks" aria-expanded="false"
-                                aria-controls="sustainabilityLinks">
-                                Sustainability <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                            </button>
-                            <ul class="collapse policy-submenu" id="sustainabilityLinks">
-                                <li><a class="nav-link" href="#">Cryptocurrency</a></li>
-                                <li><a class="nav-link" href="#">Renewable Energy</a></li>
-                                <li><a class="nav-link" href="#">Stocks &amp; ETFs</a></li>
-                                <li><a class="nav-link" href="#">Real Estate</a></li>
-                                <li><a class="nav-link" href="#">Oil and Gas</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'careers' %} active{% endif %}"{% if request.resolver_match.url_name == 'careers' %} aria-current="page"{% endif %} href="{% url 'careers' %}">Careers</a></li>
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'contact' %} active{% endif %}"{% if request.resolver_match.url_name == 'contact' %} aria-current="page"{% endif %} href="{% url 'contact' %}">Contact</a></li>
-                        <li class="nav-item"><a class="nav-link{% if request.resolver_match.url_name == 'faq' %} active{% endif %}"{% if request.resolver_match.url_name == 'faq' %} aria-current="page"{% endif %} href="{% url 'faq' %}">FAQ</a></li>
-                        <li class="nav-item policy-mobile">
-                            <button class="nav-link policy-toggle" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#privacyPolicyLinks" aria-expanded="false"
-                                aria-controls="privacyPolicyLinks">
-                                Privacy and Policy <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                            </button>
-                            <ul class="collapse policy-submenu" id="privacyPolicyLinks">
-                                <li><a class="nav-link" href="#">Foreign Investor Protection</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Sign Up</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                    </ul>
+                    {% include "creataura/_nav_desktop.html" %}
+                    {% include "creataura/_nav_mobile.html" %}
                 </div>
             </div>
         </nav>
+
         {% block hero_content %}
         <div class="hero-content">
             <h1>Empowering Growth, Igniting Financial Success</h1>
             <p>Elevate Your Financial Horizon with CreatAura Group</p>
+            {% if user.is_authenticated %}
+            <a class="hero-cta" href="{% url 'dashboard' %}">Go to Dashboard</a>
+            {% else %}
             <a class="hero-cta" href="{% url 'register' %}">Get Started</a>
+            {% endif %}
         </div>
         {% endblock %}
-        {% block hero_slides %}
-        <div class="hero-slide hero-slide-one" aria-hidden="true"></div>
-        <div class="hero-slide hero-slide-two" aria-hidden="true"></div>
-        {% endblock %}
     </section>
+
     {% block hero_intro %}
     <section class="hero-intro-card" aria-labelledby="hero-intro-title">
         <p>Investing in Change, Investing in Sustainability.</p>
         <h2 id="hero-intro-title">CreatAura Leading the Path</h2>
     </section>
     {% endblock %}
+
     <main>
         {% block content %}
         {% endblock %}
@@ -135,6 +73,7 @@
     </footer>
 
     <script src="{% static 'creataura/bootstrap.bundle.js' %}"></script>
+    {% block extra_js %}{% endblock %}
     <script>window.$zoho = window.$zoho || {}; $zoho.salesiq = $zoho.salesiq || { ready: function () { } }</script>
     <script id="zsiqscript"
         src="https://salesiq.zohopublic.com/widget?wc=siq08f644c2ecb722af1db9f8e015fceae5f81bbcb68af28421cfa26d8bdde6f25f"
