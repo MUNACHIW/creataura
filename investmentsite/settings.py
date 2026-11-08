@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    "actstream",
     "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -48,6 +49,12 @@ UNFOLD = {
     "THEME": "light",  # or "dark"
     "SHOW_COUNTS": True,  # show object counts in sidebar
 }
+import os
+
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+# Must be an address on a domain you've verified in Resend (SPF/DKIM DNS records)
+DEFAULT_FROM_EMAIL = "Capitalnext <no-reply@capitalnext.org>"
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24
 
 
 MIDDLEWARE = [
@@ -58,6 +65,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "creataura.verification.EmailVerificationMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "creataura.middleware.Custom404Middleware",
 ]

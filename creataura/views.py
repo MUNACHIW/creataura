@@ -14,6 +14,8 @@ from decimal import Decimal, InvalidOperation
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
+from actstream import action
+
 
 from .forms import SupportMessageForm
 
@@ -35,6 +37,18 @@ from .models import (
     WithdrawalXRP,
     Notification,
 )
+from django.contrib.auth.tokens import default_token_generator
+from django.core.cache import cache
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode, url_has_allowed_host_and_scheme
+
+
+from .verification import (
+    email_verification_token,
+    is_email_verified,
+    send_password_reset_email,
+    send_verification_email,
+)
 
 
 def award_signup_bonus(user):
@@ -46,12 +60,12 @@ def award_signup_bonus(user):
 
 
 def get_available_balance(user):
-    approved_deposits = Deposit.objects.filter(
-        user=user, status="approved"
-    ).aggregate(total=models.Sum("amount"))["total"] or Decimal("0")
-    bonuses = Bonus.objects.filter(user=user).aggregate(
+    approved_deposits = Deposit.objects.filter(user=user, status="approved").aggregate(
         total=models.Sum("amount")
     )["total"] or Decimal("0")
+    bonuses = Bonus.objects.filter(user=user).aggregate(total=models.Sum("amount"))[
+        "total"
+    ] or Decimal("0")
     profits = ProfitRecord.objects.filter(user=user).aggregate(
         total=models.Sum("amount")
     )["total"] or Decimal("0")
@@ -74,7 +88,8 @@ def get_available_balance(user):
     ).aggregate(total=models.Sum("amount"))["total"] or Decimal("0")
 
     completed_exchanges = CryptoExchange.objects.filter(
-        user=user, status="completed",
+        user=user,
+        status="completed",
     )
     usd_spent = sum(
         (
@@ -146,6 +161,8 @@ def notifications(request):
             notification.read_by.add(request.user)
         return redirect("notifications")
 
+    action.send(request.user, verb="viewed Notifications  ")
+
     return render(
         request,
         "creataura/notifications.html",
@@ -162,8 +179,7 @@ def dashboard(request):
     full_name = (
         profile.full_name.strip()
         if profile and profile.full_name.strip()
-        else request.user.get_full_name().strip()
-        or request.user.username
+        else request.user.get_full_name().strip() or request.user.username
     )
     investments = UserInvestment.objects.filter(user=request.user)
     total_bonus = sum(
@@ -186,7 +202,11 @@ def dashboard(request):
         status="approved",
     )
     approved_withdrawal_total = sum(
-        (record.amount + record.charges for record in list(approved_btc_withdrawals) + list(approved_xrp_withdrawals)),
+        (
+            record.amount + record.charges
+            for record in list(approved_btc_withdrawals)
+            + list(approved_xrp_withdrawals)
+        ),
         Decimal("0"),
     )
     referral_total = ReferralBonus.objects.filter(
@@ -198,6 +218,7 @@ def dashboard(request):
         models.Q(send_to_all=True) | models.Q(recipients=request.user)
     ).distinct()
     unread_notifications = notifications.exclude(read_by=request.user)
+    action.send(request.user, verb="viewed dashboard")
     return render(
         request,
         "creataura/dashboard.html",
@@ -220,8 +241,17 @@ def dashboard(request):
 @login_required(login_url="login")
 def crypto_exchange(request):
     assets = (
-        "usd", "btc", "eth", "ltc", "link",
-        "bnb", "ada", "aave", "usdt", "bch", "xlm",
+        "usd",
+        "btc",
+        "eth",
+        "ltc",
+        "link",
+        "bnb",
+        "ada",
+        "aave",
+        "usdt",
+        "bch",
+        "xlm",
     )
     rates = {
         "usd": Decimal("1"),
@@ -290,7 +320,9 @@ def crypto_exchange(request):
             messages.error(request, "Enter a valid amount.")
         elif from_asset == "usd" and from_amount > account_balance:
             messages.error(request, "Insufficient account balance.")
-        elif from_asset != "usd" and from_amount > asset_balances.get(from_asset, Decimal("0")):
+        elif from_asset != "usd" and from_amount > asset_balances.get(
+            from_asset, Decimal("0")
+        ):
             messages.error(request, f"Insufficient {labels[from_asset]} balance.")
         else:
             exchange_rate = rates[to_asset] / rates[from_asset]
@@ -313,6 +345,7 @@ def crypto_exchange(request):
                 f"{to_amount.quantize(Decimal('0.00000001'))} {labels[to_asset]}.",
             )
         return redirect("crypto_exchange")
+    action.send(request.user, verb="viewed cryptoexchange")
 
     return render(
         request,
@@ -348,6 +381,7 @@ def kyc(request):
                     identity_photo=identity_photo,
                 )
             messages.success(request, "Your documents were submitted successfully.")
+        action.send(request.user, verb="viewed kyc")
     return render(
         request,
         "creataura/kyc.html",
@@ -358,7 +392,10 @@ def kyc(request):
 @login_required(login_url="login")
 def roi_history(request):
     records = ProfitRecord.objects.filter(user=request.user)
-    total_profit = records.aggregate(total=models.Sum("amount"))["total"] or Decimal("0")
+    total_profit = records.aggregate(total=models.Sum("amount"))["total"] or Decimal(
+        "0"
+    )
+    action.send(request.user, verb="viewed ROI")
     return render(
         request,
         "creataura/roi_history.html",
@@ -448,7 +485,7 @@ def withdraw_roi(request):
     roi_withdrawals.sort(key=lambda record: record.date_created, reverse=True)
     if request.method == "GET" and available_roi <= 0:
         messages.error(request, "Nothing to withdraw at the moment!")
-
+    action.send(request.user, verb="viewed withdraw roi")
     return render(
         request,
         "creataura/withdraw_roi.html",
@@ -512,7 +549,8 @@ def withdrawal(request):
                 for item in methods
                 if str(
                     item["method_type"] if isinstance(item, dict) else item.method_type
-                ).lower() == method_type
+                ).lower()
+                == method_type
             ),
             None,
         )
@@ -521,10 +559,24 @@ def withdrawal(request):
         except (InvalidOperation, AttributeError):
             amount = Decimal("0")
 
-        minimum = method["minimum_amount"] if isinstance(method, dict) else method.minimum_amount
-        maximum = method["maximum_amount"] if isinstance(method, dict) else method.maximum_amount
-        charge_type = method["charge_type"] if isinstance(method, dict) else method.charge_type
-        charge_amount = method["charge_amount"] if isinstance(method, dict) else method.charge_amount
+        minimum = (
+            method["minimum_amount"]
+            if isinstance(method, dict)
+            else method.minimum_amount
+        )
+        maximum = (
+            method["maximum_amount"]
+            if isinstance(method, dict)
+            else method.maximum_amount
+        )
+        charge_type = (
+            method["charge_type"] if isinstance(method, dict) else method.charge_type
+        )
+        charge_amount = (
+            method["charge_amount"]
+            if isinstance(method, dict)
+            else method.charge_amount
+        )
         charges = (
             amount * charge_amount / Decimal("100")
             if "percentage" in charge_type.lower()
@@ -545,7 +597,9 @@ def withdrawal(request):
             if method_type == "bitcoin":
                 profile = getattr(request.user, "creataura_profile", None)
                 if not profile or not profile.bitcoin_address.strip():
-                    messages.error(request, "Add your Bitcoin address in withdrawal settings.")
+                    messages.error(
+                        request, "Add your Bitcoin address in withdrawal settings."
+                    )
                     return redirect("settings")
                 WithdrawalBTC.objects.create(
                     user=request.user,
@@ -573,6 +627,7 @@ def withdrawal(request):
         return redirect("withdrawal")
 
     profile = getattr(request.user, "creataura_profile", None)
+    action.send(request.user, verb="viewed withdrawal")
     return render(
         request,
         "creataura/withdrawal.html",
@@ -640,7 +695,9 @@ def withdrawal_btc(request):
             messages.error(request, "The withdrawal OTP is incorrect.")
         else:
             if not profile or not profile.bitcoin_address.strip():
-                messages.error(request, "Add your Bitcoin address in withdrawal settings.")
+                messages.error(
+                    request, "Add your Bitcoin address in withdrawal settings."
+                )
                 return redirect("settings")
             WithdrawalBTC.objects.create(
                 user=request.user,
@@ -684,11 +741,7 @@ def withdrawal_xrp(request):
         if request.POST.get("action") == "request_otp":
             otp = secrets.token_hex(3).upper()
             request.session["xrp_withdrawal_otp"] = otp
-            if (
-                profile
-                and profile.email_withdrawal_otp
-                and request.user.email
-            ):
+            if profile and profile.email_withdrawal_otp and request.user.email:
                 send_mail(
                     "Createaura XRP Withdrawal OTP",
                     f"Your XRP withdrawal OTP is {otp}.",
@@ -768,6 +821,7 @@ def deposit(request):
             request.session["deposit_amount"] = str(amount)
             request.session["deposit_mode"] = payment_mode
             return redirect("deposit_payment", payment_mode=payment_mode)
+    action.send(request.user, verb="viewed deposit")
 
     return render(
         request,
@@ -890,6 +944,7 @@ def transaction_history(request):
         key=lambda record: record["date_created"],
         reverse=True,
     )
+    action.send(request.user, verb="viewed transaction history")
     return render(
         request,
         "creataura/transactions.html",
@@ -943,6 +998,7 @@ def investments(request):
                 "duration_days": 60,
             },
         ]
+    action.send(request.user, verb="viewed investment plans ")
     return render(
         request,
         "creataura/investments.html",
@@ -971,10 +1027,14 @@ def join_investment(request, plan_id):
         messages.error(request, "Enter a valid investment amount.")
         return redirect("invest")
     if amount < plan.minimum_deposit:
-        messages.error(request, f"The minimum investment amount is ${plan.minimum_deposit}.")
+        messages.error(
+            request, f"The minimum investment amount is ${plan.minimum_deposit}."
+        )
         return redirect("invest")
     if amount > plan.maximum_deposit:
-        messages.error(request, f"The maximum investment amount is ${plan.maximum_deposit}.")
+        messages.error(
+            request, f"The maximum investment amount is ${plan.maximum_deposit}."
+        )
         return redirect("invest")
     with transaction.atomic():
         available_balance = get_available_balance(request.user)
@@ -997,9 +1057,11 @@ def referrals(request):
     referral_id = request.user.username
     referral_link = request.build_absolute_uri(f"/ref/{referral_id}/")
 
-    referred_profiles = UserProfile.objects.select_related("user").filter(
-        referral_id__iexact=referral_id
-    ).order_by("-user__date_joined")
+    referred_profiles = (
+        UserProfile.objects.select_related("user")
+        .filter(referral_id__iexact=referral_id)
+        .order_by("-user__date_joined")
+    )
 
     referred_users = [
         {
@@ -1012,12 +1074,14 @@ def referrals(request):
 
     referrer = None
     if profile and profile.referral_id:
-        referrer_profile = UserProfile.objects.select_related("user").filter(
-            user__username__iexact=profile.referral_id
-        ).first()
+        referrer_profile = (
+            UserProfile.objects.select_related("user")
+            .filter(user__username__iexact=profile.referral_id)
+            .first()
+        )
         if referrer_profile:
             referrer = referrer_profile.user
-
+    action.send(request.user, verb="viewed referal page")
     return render(
         request,
         "creataura/referrals.html",
@@ -1033,6 +1097,7 @@ def referrals(request):
 
 @login_required(login_url="login")
 def support(request):
+    action.send(request.user, verb="viewed support")
     return render(
         request,
         "creataura/support.html",
@@ -1047,11 +1112,19 @@ def settings(request):
         if request.POST.get("settings_action") == "withdrawals":
             withdrawal_account, _ = BankAccount.objects.get_or_create(user=request.user)
             withdrawal_account.bank_name = request.POST.get("bank_name", "").strip()
-            withdrawal_account.account_name = request.POST.get("account_name", "").strip()
-            withdrawal_account.account_number = request.POST.get("account_number", "").strip()
+            withdrawal_account.account_name = request.POST.get(
+                "account_name", ""
+            ).strip()
+            withdrawal_account.account_number = request.POST.get(
+                "account_number", ""
+            ).strip()
             withdrawal_account.swift_code = request.POST.get("swift_code", "").strip()
-            withdrawal_account.ethereum_address = request.POST.get("ethereum_address", "").strip()
-            withdrawal_account.litecoin_address = request.POST.get("litecoin_address", "").strip()
+            withdrawal_account.ethereum_address = request.POST.get(
+                "ethereum_address", ""
+            ).strip()
+            withdrawal_account.litecoin_address = request.POST.get(
+                "litecoin_address", ""
+            ).strip()
             withdrawal_account.save()
             messages.success(request, "Withdrawal settings saved successfully.")
         elif request.POST.get("settings_action") == "password":
@@ -1084,9 +1157,15 @@ def settings(request):
                     bitcoin_address="",
                     country="",
                 )
-            profile.email_withdrawal_otp = request.POST.get("email_withdrawal_otp") == "yes"
-            profile.email_profit_notification = request.POST.get("email_profit_notification") == "yes"
-            profile.email_plan_expiry_notification = request.POST.get("email_plan_expiry_notification") == "yes"
+            profile.email_withdrawal_otp = (
+                request.POST.get("email_withdrawal_otp") == "yes"
+            )
+            profile.email_profit_notification = (
+                request.POST.get("email_profit_notification") == "yes"
+            )
+            profile.email_plan_expiry_notification = (
+                request.POST.get("email_plan_expiry_notification") == "yes"
+            )
             profile.save(
                 update_fields=[
                     "email_withdrawal_otp",
@@ -1117,7 +1196,7 @@ def settings(request):
         return redirect("settings")
 
     withdrawal_account = getattr(request.user, "withdrawal_account", None)
-
+    action.send(request.user, verb="viewed settings")
     return render(
         request,
         "creataura/settings.html",
@@ -1153,9 +1232,13 @@ def advanced_account_settings(request):
                 profile.two_factor_enabled = not profile.two_factor_enabled
                 profile.save(update_fields=["two_factor_enabled"])
                 if profile.two_factor_enabled:
-                    messages.success(request, "Two factor authentication has been enabled.")
+                    messages.success(
+                        request, "Two factor authentication has been enabled."
+                    )
                 else:
-                    messages.success(request, "Two factor authentication has been disabled.")
+                    messages.success(
+                        request, "Two factor authentication has been disabled."
+                    )
             return redirect("advanced_account_settings")
 
         if action == "logout_other_sessions":
@@ -1188,7 +1271,9 @@ def advanced_account_settings(request):
 
     current_key = request.session.session_key
     browser_sessions = []
-    for session in Session.objects.filter(expire_date__gte=timezone.now()).order_by("-expire_date"):
+    for session in Session.objects.filter(expire_date__gte=timezone.now()).order_by(
+        "-expire_date"
+    ):
         data = session.get_decoded()
         if str(data.get("_auth_user_id")) != str(request.user.pk):
             continue
@@ -1196,7 +1281,11 @@ def advanced_account_settings(request):
             {
                 "is_current": session.session_key == current_key,
                 "expire_date": session.expire_date,
-                "ip_address": request.META.get("REMOTE_ADDR", "") if session.session_key == current_key else "",
+                "ip_address": (
+                    request.META.get("REMOTE_ADDR", "")
+                    if session.session_key == current_key
+                    else ""
+                ),
             }
         )
 
@@ -1220,7 +1309,7 @@ def support_submit(request):
         support_message.save()
         messages.success(request, "Your support message has been sent.")
         return redirect("support")
-
+    action.send(request.user, verb="viewed support")
     return render(
         request,
         "creataura/support.html",
@@ -1230,46 +1319,202 @@ def support_submit(request):
 
 
 COUNTRIES = [
-    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola",
-    "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
-    "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados",
-    "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
-    "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei",
-    "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
-    "Cameroon", "Canada", "Central African Republic", "Chad", "Chile",
-    "China", "Colombia", "Comoros", "Congo (Democratic Republic)",
-    "Congo (Republic)", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba",
-    "Cyprus", "Czechia", "Denmark", "Djibouti", "Dominica",
-    "Dominican Republic", "Ecuador", "Egypt", "El Salvador",
-    "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
-    "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia",
-    "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea",
-    "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
-    "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland",
-    "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan",
-    "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
-    "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein",
-    "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia",
-    "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania",
-    "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia",
-    "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia",
-    "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua",
-    "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
-    "Oman", "Pakistan", "Palau", "Palestine", "Panama",
-    "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland",
-    "Portugal", "Qatar", "Romania", "Russia", "Rwanda",
-    "Saint Kitts and Nevis", "Saint Lucia",
-    "Saint Vincent and the Grenadines", "Samoa", "San Marino",
-    "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia",
-    "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia",
-    "Solomon Islands", "Somalia", "South Africa", "South Korea",
-    "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden",
-    "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania",
-    "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
-    "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine",
-    "United Arab Emirates", "United Kingdom", "United States",
-    "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela",
-    "Vietnam", "Yemen", "Zambia", "Zimbabwe",
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    "Belize",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Brunei",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cabo Verde",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Comoros",
+    "Congo (Democratic Republic)",
+    "Congo (Republic)",
+    "Costa Rica",
+    "Cote d'Ivoire",
+    "Croatia",
+    "Cuba",
+    "Cyprus",
+    "Czechia",
+    "Denmark",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Equatorial Guinea",
+    "Eritrea",
+    "Estonia",
+    "Eswatini",
+    "Ethiopia",
+    "Fiji",
+    "Finland",
+    "France",
+    "Gabon",
+    "Gambia",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Grenada",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Guyana",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kiribati",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Libya",
+    "Liechtenstein",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Marshall Islands",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Micronesia",
+    "Moldova",
+    "Monaco",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Myanmar",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "North Korea",
+    "North Macedonia",
+    "Norway",
+    "Oman",
+    "Pakistan",
+    "Palau",
+    "Palestine",
+    "Panama",
+    "Papua New Guinea",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome and Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "South Korea",
+    "South Sudan",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad and Tobago",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Tuvalu",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "United Kingdom",
+    "United States",
+    "Uruguay",
+    "Uzbekistan",
+    "Vanuatu",
+    "Vatican City",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe",
 ]
 
 
@@ -1289,7 +1534,18 @@ def register(request, referral_id=None):
         referral_id = request.POST.get("referral_id", "").strip() or referral_id
         referral_id = referral_id or ""
 
-        if not all([username, email, full_name, phone_number, bitcoin_address, country, password, password_again]):
+        if not all(
+            [
+                username,
+                email,
+                full_name,
+                phone_number,
+                bitcoin_address,
+                country,
+                password,
+                password_again,
+            ]
+        ):
             messages.error(request, "Please complete all required fields.")
         elif password != password_again:
             messages.error(request, "Passwords do not match.")
@@ -1316,14 +1572,41 @@ def register(request, referral_id=None):
                         referral_id=referral_id,
                     )
                     award_signup_bonus(user)
-                messages.success(request, "Account created successfully. Please log in.")
-                return redirect("login")
 
-    return render(
-        request,
-        "creataura/register.html",
-        {"countries": COUNTRIES, "initial_referral_id": referral_id or ""},
-    )
+                login(
+                    request, user, backend="django.contrib.auth.backends.ModelBackend"
+                )
+                request.session.set_expiry(12 * 60 * 60)
+                send_verification_email(request, user)
+                messages.success(
+                    request,
+                    "Account created! We've sent a verification link to your email.",
+                )
+                return redirect("verify_email")
+
+
+from django.utils.http import url_has_allowed_host_and_scheme
+
+MAX_LOGIN_ATTEMPTS = 5
+LOCKOUT_SECONDS = 15 * 60
+
+
+def _client_ip(request):
+    # If you're behind a proxy/load balancer (Nginx, Cloudflare, etc.),
+    # make sure REMOTE_ADDR is set correctly there, or read the trusted
+    # forwarded header instead.
+    return request.META.get("REMOTE_ADDR", "unknown")
+
+
+def _safe_next_url(request):
+    next_url = request.POST.get("next") or request.GET.get("next") or ""
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return "dashboard"
 
 
 def user_login(request):
@@ -1333,22 +1616,167 @@ def user_login(request):
     if request.method == "POST":
         email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password", "")
-        user = User.objects.filter(email=email).first()
+
+        # Throttle per email + IP so one attacker can't lock out a real user
+        # from everywhere, and can't hammer a single account either.
+        throttle_key = f"login-fail:{_client_ip(request)}:{email}"
+        attempts = cache.get(throttle_key, 0)
+
+        if attempts >= MAX_LOGIN_ATTEMPTS:
+            messages.error(
+                request,
+                "Too many failed attempts. Please try again in 15 minutes "
+                "or reset your password.",
+            )
+            return render(request, "creataura/login.html")
+
+        if not email or not password:
+            messages.error(request, "Please enter your email and password.")
+            return render(request, "creataura/login.html")
+
+        user = User.objects.filter(email__iexact=email).first()
         authenticated_user = authenticate(
             request,
             username=user.username if user else email,
             password=password,
         )
+
         if authenticated_user is not None:
+            cache.delete(throttle_key)
             login(request, authenticated_user)
+
             if request.POST.get("remember"):
                 request.session.set_expiry(14 * 24 * 60 * 60)
             else:
                 request.session.set_expiry(12 * 60 * 60)
-            return redirect(request.GET.get("next") or "dashboard")
+
+            if not is_email_verified(authenticated_user):
+                messages.warning(
+                    request, "Please verify your email to access your account."
+                )
+                return redirect("verify_email")
+
+            return redirect(_safe_next_url(request))
+
+        # Failed attempt: count it (add() sets the timeout only on first failure)
+        cache.add(throttle_key, 0, timeout=LOCKOUT_SECONDS)
+        try:
+            cache.incr(throttle_key)
+        except ValueError:
+            cache.set(throttle_key, 1, timeout=LOCKOUT_SECONDS)
+
+        # Same message for wrong email, wrong password, or inactive account
         messages.error(request, "Invalid email or password.")
 
     return render(request, "creataura/login.html")
+
+
+def _get_user_from_uid(uidb64):
+    try:
+        return User.objects.get(pk=force_str(urlsafe_base64_decode(uidb64)))
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return None
+
+
+# ---------- Email verification ----------
+
+
+@login_required
+def verify_email(request):
+    if is_email_verified(request.user):
+        messages.info(request, "Your email is already verified.")
+        return redirect("dashboard")
+    return render(request, "creataura/verify_email.html", {"email": request.user.email})
+
+
+@login_required
+@require_POST
+def resend_verification(request):
+    if is_email_verified(request.user):
+        return redirect("dashboard")
+
+    # 60s cooldown per user (cache.add is atomic)
+    if not cache.add(f"verify-resend:{request.user.pk}", 1, timeout=60):
+        messages.error(request, "Please wait a minute before requesting another email.")
+        return redirect("verify_email")
+
+    if send_verification_email(request, request.user):
+        messages.success(request, "Verification email sent. Check your inbox.")
+    else:
+        messages.error(request, "We couldn't send the email. Please try again shortly.")
+    return redirect("verify_email")
+
+
+def verify_email_confirm(request, uidb64, token):
+    user = _get_user_from_uid(uidb64)
+
+    if user is not None and is_email_verified(user):
+        messages.info(request, "Your email is already verified.")
+    elif user is not None and email_verification_token.check_token(user, token):
+        UserProfile.objects.filter(user=user).update(
+            email_verified=True, email_verified_at=timezone.now()
+        )
+        messages.success(request, "Email verified successfully.")
+    else:
+        messages.error(request, "This verification link is invalid or has expired.")
+        return redirect("verify_email" if request.user.is_authenticated else "login")
+
+    return redirect("dashboard" if request.user.is_authenticated else "login")
+
+
+# ---------- Forgot / reset password ----------
+
+
+def forgot_password(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+
+    if request.method == "POST":
+        email = request.POST.get("email", "").strip().lower()
+        user = User.objects.filter(email=email, is_active=True).first()
+
+        if user and user.has_usable_password():
+            # Silent 60s cooldown so the form can't be used to spam an inbox
+            if cache.add(f"pwreset:{user.pk}", 1, timeout=60):
+                send_password_reset_email(request, user)
+
+        # Same message whether or not the account exists (prevents email enumeration)
+        messages.success(
+            request,
+            "If an account exists for that email, we've sent a reset link.",
+        )
+        return redirect("forgot_password")
+
+    return render(request, "creataura/forgot_password.html")
+
+
+def reset_password(request, uidb64, token):
+    user = _get_user_from_uid(uidb64)
+    if user is None or not default_token_generator.check_token(user, token):
+        return render(request, "creataura/reset_password.html", {"valid": False})
+
+    if request.method == "POST":
+        password = request.POST.get("password", "")
+        password_again = request.POST.get("password_again", "")
+
+        if not password or password != password_again:
+            messages.error(request, "Passwords do not match.")
+        else:
+            try:
+                validate_password(password, user)
+            except ValidationError as exc:
+                messages.error(request, " ".join(exc.messages))
+            else:
+                user.set_password(password)
+                user.save()
+                # They proved control of the inbox, so count it as verified too
+                UserProfile.objects.filter(user=user, email_verified=False).update(
+                    email_verified=True, email_verified_at=timezone.now()
+                )
+                messages.success(request, "Password updated. Please log in.")
+                return redirect("login")
+
+    return render(request, "creataura/reset_password.html", {"valid": True})
 
 
 def user_logout(request):

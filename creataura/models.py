@@ -20,6 +20,8 @@ class UserProfile(models.Model):
     email_profit_notification = models.BooleanField(default=True)
     email_plan_expiry_notification = models.BooleanField(default=True)
     two_factor_enabled = models.BooleanField(default=False)
+    email_verified = models.BooleanField(default=False)
+    email_verified_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.full_name
@@ -581,7 +583,9 @@ class ReferralBonus(models.Model):
         verbose_name_plural = "Referral bonuses"
 
     def __str__(self):
-        return f"{self.referrer.username} - {self.referred_user.username} - {self.amount}"
+        return (
+            f"{self.referrer.username} - {self.referred_user.username} - {self.amount}"
+        )
 
 
 class SupportMessage(models.Model):

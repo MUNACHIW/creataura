@@ -1,0 +1,7 @@
+{{ heading }}
+
+{{ intro }}
+
+{{ button_text }}: {{ url }}
+
+{{ outro }}

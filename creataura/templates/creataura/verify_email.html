@@ -1,0 +1,16 @@
+{% extends "creataura/auth_base.html" %}
+{% block title %}Verify Email{% endblock %}
+{% block back_url %}{% url 'logout' %}{% endblock %}
+{% block top_link %}<a href="{% url 'logout' %}" class="auth-top-link">Log out</a>{% endblock %}
+{% block heading %}Verify your email{% endblock %}
+{% block subheading %}We sent a link to {{ email }}{% endblock %}
+{% block content %}
+<form method="post" action="{% url 'resend_verification' %}" class="auth-form">
+    {% csrf_token %}
+    <p style="text-align:center;margin-bottom:16px;">
+        Open the email and click the verification link to access your dashboard.
+        Can't find it? Check your spam folder, or request a new one.
+    </p>
+    <button type="submit" class="auth-submit">Resend Verification Email</button>
+</form>
+{% endblock %}

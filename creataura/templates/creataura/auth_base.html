@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - Creataura</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
+</head>
+
+<body class="auth-body">
+    <header class="auth-header">
+        <a href="{% block back_url %}{% url 'login' %}{% endblock %}" class="auth-back" aria-label="Back"><i
+                class="bi bi-chevron-left"></i></a>
+        {% block top_link %}<a href="{% url 'login' %}" class="auth-top-link">Login</a>{% endblock %}
+    </header>
+    <main class="auth-main auth-login-main">
+        <div class="auth-heading">
+            <h1>{% block heading %}{% endblock %}</h1>
+            <p>{% block subheading %}{% endblock %}</p>
+        </div>
+        {% if messages %}
+        <div class="auth-messages">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="auth-footer">&copy; Copyright {% now "Y" %} &nbsp; CreatAura &nbsp; All Rights Reserved.</footer>
+    <script src="{% static 'creataura/auth.js' %}"></script>
+</body>
+
+</html>
