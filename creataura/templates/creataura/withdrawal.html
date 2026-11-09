@@ -1,53 +1,60 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | Request for Withdrawal</title>
+    <title>Capitalnext | Request for Withdrawal</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/withdrawal.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
+
 <body>
     <main class="withdrawal-page">
         <header class="withdrawal-header">
-            <a href="{% url 'dashboard' %}" class="back-button" aria-label="Back to dashboard"><i class="bi bi-chevron-left"></i></a>
+            <a href="{% url 'dashboard' %}" class="back-button" aria-label="Back to dashboard"><i
+                    class="bi bi-chevron-left"></i></a>
             <h1>Request for Withdrawal</h1>
-            <a href="{% url 'transaction_history' %}?tab=withdrawals" class="withdrawal-plus" aria-label="View withdrawal history"><i class="bi bi-plus"></i></a>
+            <a href="{% url 'transaction_history' %}?tab=withdrawals" class="withdrawal-plus"
+                aria-label="View withdrawal history"><i class="bi bi-plus"></i></a>
         </header>
 
         <div class="withdrawal-section-title">Request for Withdrawal</div>
         {% if messages %}
-            <div class="withdrawal-messages" aria-live="polite">
-                {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
-            </div>
+        <div class="withdrawal-messages" aria-live="polite">
+            {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
+        </div>
         {% endif %}
 
         <section class="withdrawal-methods" aria-label="Withdrawal methods">
             {% for method in withdrawal_methods %}
-                <article class="withdrawal-card">
-                    <span class="method-icon coin-{{ method.method_type|lower }}">
-                        {% if method.method_type == "Bitcoin" %}
-                            <i class="bi bi-currency-bitcoin"></i>
-                        {% else %}
-                            <span>X</span>
-                        {% endif %}
-                    </span>
-                    <h2>{{ method.method_type }}</h2>
-                    <p>Minimum Amount: ${{ method.minimum_amount }}</p>
-                    <p>Maximum Amount: ${{ method.maximum_amount }}</p>
-                    <p>Charge Type: {{ method.charge_type|lower }}</p>
-                    <p>Charge Amount: {{ method.charge_amount }}{% if method.charge_type|lower != "fixed" %}%{% endif %}</p>
-                    <p>Duration: {{ method.duration }}</p>
+            <article class="withdrawal-card">
+                <span class="method-icon coin-{{ method.method_type|lower }}">
                     {% if method.method_type == "Bitcoin" %}
-                        <a class="request-withdrawal withdrawal-card-link" href="{% url 'withdrawal_btc' %}">+Request Withdrawal</a>
+                    <i class="bi bi-currency-bitcoin"></i>
                     {% else %}
-                        <a class="request-withdrawal withdrawal-card-link" href="{% url 'withdrawal_xrp' %}">+Request Withdrawal</a>
+                    <span>X</span>
                     {% endif %}
-                </article>
+                </span>
+                <h2>{{ method.method_type }}</h2>
+                <p>Minimum Amount: ${{ method.minimum_amount }}</p>
+                <p>Maximum Amount: ${{ method.maximum_amount }}</p>
+                <p>Charge Type: {{ method.charge_type|lower }}</p>
+                <p>Charge Amount: {{ method.charge_amount }}{% if method.charge_type|lower != "fixed" %}%{% endif %}</p>
+                <p>Duration: {{ method.duration }}</p>
+                {% if method.method_type == "Bitcoin" %}
+                <a class="request-withdrawal withdrawal-card-link" href="{% url 'withdrawal_btc' %}">+Request
+                    Withdrawal</a>
+                {% else %}
+                <a class="request-withdrawal withdrawal-card-link" href="{% url 'withdrawal_xrp' %}">+Request
+                    Withdrawal</a>
+                {% endif %}
+            </article>
             {% endfor %}
         </section>
 
@@ -62,13 +69,14 @@
                 <input type="hidden" id="methodType" name="method_type" value="">
                 <label>
                     <span>Amount</span>
-                    <input id="withdrawalAmount" type="number" name="amount" min="0" step="0.01" placeholder="Enter amount" required>
+                    <input id="withdrawalAmount" type="number" name="amount" min="0" step="0.01"
+                        placeholder="Enter amount" required>
                 </label>
                 {% if bitcoin_address %}
-                    <label id="bitcoinAddressField">
-                        <span>Bitcoin Address</span>
-                        <input type="text" value="{{ bitcoin_address }}" readonly>
-                    </label>
+                <label id="bitcoinAddressField">
+                    <span>Bitcoin Address</span>
+                    <input type="text" value="{{ bitcoin_address }}" readonly>
+                </label>
                 {% endif %}
                 <label id="xrpAddressField" hidden>
                     <span>XRP Address</span>
@@ -84,16 +92,21 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
 
     <footer class="withdrawal-footer">
-        <strong>&copy; Copyright © Creataura 2026. All Rights Reserved.</strong>
-        <span>Creataura Financial Institutions.</span>
+        <strong>&copy; Copyright © Capitalnext 2026. All Rights Reserved.</strong>
+        <span>Capitalnext Financial Institutions.</span>
     </footer>
     <script>
         const card = document.getElementById("withdrawalFormCard");
@@ -120,4 +133,5 @@
         });
     </script>
 </body>
+
 </html>

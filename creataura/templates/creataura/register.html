@@ -5,10 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Creataura</title>
+    <title>Register - Capitalnext</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
 
 <body class="auth-body">
@@ -50,12 +51,13 @@
                 <label>Password<input type="password" name="password" placeholder="Your password" required></label>
                 <label>Password Again<input type="password" name="password_again" placeholder="Type password again"
                         required></label>
-                <label>Referral ID<input type="text" name="referral_id" value="{{ initial_referral_id }}" placeholder="optional referral id"></label>
+                <label>Referral ID<input type="text" name="referral_id" value="{{ initial_referral_id }}"
+                        placeholder="optional referral id"></label>
             </div>
             <button type="submit" class="auth-submit">Register</button>
         </form>
     </main>
-    <footer class="auth-footer">&copy; Copyright {% now "Y" %} &nbsp; CreatAura &nbsp; All Rights Reserved.</footer>
+    <footer class="auth-footer">&copy; Copyright {% now "Y" %} &nbsp; Capitalnext &nbsp; All Rights Reserved.</footer>
     <script src="{% static 'creataura/auth.js' %}"></script>
 </body>
 

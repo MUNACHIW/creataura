@@ -1,17 +1,20 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | Your ROI history</title>
+    <title>Capitalnext | Your ROI history</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/roi_history.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
+
 <body class="settings-body roi-history-page">
     <main class="settings-page roi-history-main">
         <header class="settings-header roi-history-header">
@@ -25,29 +28,29 @@
                 <strong>${{ total_profit|floatformat:2 }}</strong>
             </div>
             {% for record in roi_records %}
-                <article class="roi-record">
-                    <span class="roi-record-icon"><i class="bi bi-currency-dollar"></i></span>
-                    <div class="roi-record-details">
-                        <strong>{{ record.narration }}</strong>
-                        <span>{% if record.investment %}{{ record.investment.plan.name }}{% else %}Type{% endif %}</span>
-                    </div>
-                    <div class="roi-record-meta">
-                        <strong>+ ${{ record.amount|floatformat:2 }}</strong>
-                        <span>{{ record.date_created|date:"D, M j, Y g:i A" }}</span>
-                    </div>
-                </article>
+            <article class="roi-record">
+                <span class="roi-record-icon"><i class="bi bi-currency-dollar"></i></span>
+                <div class="roi-record-details">
+                    <strong>{{ record.narration }}</strong>
+                    <span>{% if record.investment %}{{ record.investment.plan.name }}{% else %}Type{% endif %}</span>
+                </div>
+                <div class="roi-record-meta">
+                    <strong>+ ${{ record.amount|floatformat:2 }}</strong>
+                    <span>{{ record.date_created|date:"D, M j, Y g:i A" }}</span>
+                </div>
+            </article>
             {% empty %}
-                <article class="roi-record roi-record-empty">
-                    <span class="roi-record-icon"><i class="bi bi-currency-dollar"></i></span>
-                    <div class="roi-record-details">
-                        <strong>No transaction found</strong>
-                        <span>Type</span>
-                    </div>
-                    <div class="roi-record-meta">
-                        <strong>+ $</strong>
-                        <span>{{ current_date|default:"" }}</span>
-                    </div>
-                </article>
+            <article class="roi-record roi-record-empty">
+                <span class="roi-record-icon"><i class="bi bi-currency-dollar"></i></span>
+                <div class="roi-record-details">
+                    <strong>No transaction found</strong>
+                    <span>Type</span>
+                </div>
+                <div class="roi-record-meta">
+                    <strong>+ $</strong>
+                    <span>{{ current_date|default:"" }}</span>
+                </div>
+            </article>
             {% endfor %}
         </section>
 
@@ -58,11 +61,17 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
 </body>
+
 </html>

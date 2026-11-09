@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Home - Creataura{% endblock %}</title>
+    <title>{% block title %}Home - Capitalnext{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
@@ -16,7 +16,7 @@
 
 <body>
 
-    <section class="hero-slider {% block hero_class %}{% endblock %}" aria-label="Creataura featured backgrounds">
+    <section class="hero-slider {% block hero_class %}{% endblock %}" aria-label="Capitalnext featured backgrounds">
         <div class="hero-bg" aria-hidden="true">
             {% block hero_slides %}
             <div class="hero-slide hero-slide-one"></div>
@@ -26,8 +26,9 @@
 
         <nav class="navbar navbar-expand-lg site-navbar">
             <div class="container-fluid px-3 px-lg-4">
-                <a class="navbar-brand site-logo" href="{% url 'home' %}" aria-label="CreatAura home">
-                    <img src="{% static 'creataura/images/cropped-creataura-6-48x48.png' %}" alt="CreatAura">
+                <a class="navbar-brand site-logo" href="{% url 'home' %}" aria-label="Capitalnext home">
+                    <img src="{% static 'creataura/images/cropped-creataura-6-48x48.png' %}" alt="Capitalnext logo"
+                        width="48" height="48   ">
                 </a>
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
@@ -57,7 +58,7 @@
     {% block hero_intro %}
     <section class="hero-intro-card" aria-labelledby="hero-intro-title">
         <p>Investing in Change, Investing in Sustainability.</p>
-        <h2 id="hero-intro-title">CreatAura Leading the Path</h2>
+        <h2 id="hero-intro-title">Capitalnext Leading the Path</h2>
     </section>
     {% endblock %}
 
@@ -68,7 +69,7 @@
 
     <footer class="bg-light text-gray text-center py-5">
         <div class="container">
-            <p class="mb-0">&copy; {% now "Y" %} CreatAura. All rights reserved.</p>
+            <p class="mb-0">&copy; {% now "Y" %} Capitalnext. All rights reserved.</p>
         </div>
     </footer>
 

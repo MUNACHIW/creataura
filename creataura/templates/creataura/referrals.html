@@ -1,16 +1,19 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | Refer and Earn More</title>
+    <title>Capitalnext | Refer and Earn More</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
+
 <body class="settings-body referrals-page">
     <main class="settings-page">
         <header class="settings-header">
@@ -24,7 +27,8 @@
                 <p>You can refer users by sharing your referral link:</p>
                 <div class="referral-link-row">
                     <input id="referralLink" type="text" value="{{ referral_link }}" readonly>
-                    <button id="copyReferralLink" type="button" aria-label="Copy referral link"><i class="bi bi-copy"></i></button>
+                    <button id="copyReferralLink" type="button" aria-label="Copy referral link"><i
+                            class="bi bi-copy"></i></button>
                 </div>
                 <div class="referral-summary">
                     <span>or your Referral ID</span>
@@ -33,11 +37,11 @@
                 <div class="referred-by">
                     <span>You were referred by</span>
                     {% if referrer %}
-                        <i class="bi bi-person-fill"></i>
-                        <strong>{{ referrer.username }}</strong>
+                    <i class="bi bi-person-fill"></i>
+                    <strong>{{ referrer.username }}</strong>
                     {% else %}
-                        <i class="bi bi-person-fill"></i>
-                        <strong>null</strong>
+                    <i class="bi bi-person-fill"></i>
+                    <strong>null</strong>
                     {% endif %}
                 </div>
             </section>
@@ -60,17 +64,17 @@
                         </thead>
                         <tbody>
                             {% for referred in referred_users %}
-                                <tr>
-                                    <td>{{ referred.user.get_full_name|default:referred.user.username }}</td>
-                                    <td>1</td>
-                                    <td>{{ referral_id }}</td>
-                                    <td>Active</td>
-                                    <td>{{ referred.user.date_joined|date:"M. d, Y" }}</td>
-                                </tr>
+                            <tr>
+                                <td>{{ referred.user.get_full_name|default:referred.user.username }}</td>
+                                <td>1</td>
+                                <td>{{ referral_id }}</td>
+                                <td>Active</td>
+                                <td>{{ referred.user.date_joined|date:"M. d, Y" }}</td>
+                            </tr>
                             {% empty %}
-                                <tr>
-                                    <td colspan="5" class="referrals-empty">No referrals yet.</td>
-                                </tr>
+                            <tr>
+                                <td colspan="5" class="referrals-empty">No referrals yet.</td>
+                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -80,11 +84,16 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
     <script>
         document.getElementById("copyReferralLink").addEventListener("click", async function () {
@@ -95,4 +104,5 @@
         });
     </script>
 </body>
+
 </html>

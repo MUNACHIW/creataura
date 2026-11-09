@@ -1,12 +1,16 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page Not Found - Creataura</title>
+    <title>Page Not Found - Capitalnext</title>
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             min-height: 100vh;
             margin: 0;
@@ -17,28 +21,34 @@
             text-align: center;
             font-family: Poppins, Arial, sans-serif;
         }
+
         .not-found {
             width: min(520px, calc(100% - 40px));
         }
+
         .not-found h1 {
             margin: 0;
             font-size: 6rem;
             line-height: 1;
             color: #ff4d4d;
         }
+
         .not-found h2 {
             margin: 16px 0 8px;
             font-size: 24px;
         }
+
         .not-found p {
             font-size: 1.25rem;
             color: #ccc;
         }
+
         .not-found-actions {
             display: flex;
             justify-content: center;
             margin-top: 20px;
         }
+
         .not-found-actions a {
             min-width: 170px;
             border-radius: 8px;
@@ -50,6 +60,7 @@
         }
     </style>
 </head>
+
 <body>
     <main class="not-found">
         <h1>404</h1>
@@ -57,11 +68,12 @@
         <p>Oops! The page you’re looking for doesn’t exist or has moved.</p>
         <div class="not-found-actions">
             {% if request.user.is_authenticated %}
-                <a href="{% url 'dashboard' %}">Back to Dashboard</a>
+            <a href="{% url 'dashboard' %}">Back to Dashboard</a>
             {% else %}
-                <a href="{% url 'login' %}">Back to Login</a>
+            <a href="{% url 'login' %}">Back to Login</a>
             {% endif %}
         </div>
     </main>
 </body>
+
 </html>

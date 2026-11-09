@@ -1,17 +1,20 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | Withdraw ROI</title>
+    <title>Capitalnext | Withdraw ROI</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/withdraw_roi.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
+
 <body class="settings-body withdraw-roi-page">
     <main class="settings-page withdraw-roi-main">
         <header class="settings-header withdraw-roi-header">
@@ -47,7 +50,8 @@
                 </label>
                 <label>
                     <span>Amount</span>
-                    <input type="number" name="amount" min="0.01" max="{{ available_roi }}" step="0.01" placeholder="$0.00" required>
+                    <input type="number" name="amount" min="0.01" max="{{ available_roi }}" step="0.01"
+                        placeholder="$0.00" required>
                 </label>
                 <label id="bitcoinAddressRow">
                     <span>Bitcoin address</span>
@@ -86,11 +90,16 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
 
     <script>
@@ -103,4 +112,5 @@
         }
     </script>
 </body>
+
 </html>

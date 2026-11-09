@@ -1,17 +1,20 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | Advanced Account Security</title>
+    <title>Capitalnext | Advanced Account Security</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/advanced_account_settings.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
 </head>
+
 <body class="settings-body advanced-security-page">
     <main class="settings-page advanced-security-main">
         <header class="settings-header advanced-security-header">
@@ -30,18 +33,21 @@
                 <h2>Two Factor Authentication</h2>
                 <p class="two-factor-status">
                     {% if profile.two_factor_enabled %}
-                    Two factor authentication is enabled. You will be asked for an additional security token during authentication.
+                    Two factor authentication is enabled. You will be asked for an additional security token during
+                    authentication.
                     {% else %}
                     You have not enabled two factor authentication.
                     {% endif %}
                 </p>
-                <p>Add additional security to your account using two factor authentication. When enabled, you will be prompted for a secure, random token during authentication.</p>
+                <p>Add additional security to your account using two factor authentication. When enabled, you will be
+                    prompted for a secure, random token during authentication.</p>
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="security_action" value="two_factor">
                     <label class="security-password">
                         <span>Confirm Password</span>
-                        <input type="password" name="password" autocomplete="current-password" placeholder="Password" required>
+                        <input type="password" name="password" autocomplete="current-password" placeholder="Password"
+                            required>
                     </label>
                     <button type="submit" class="{% if profile.two_factor_enabled %}disable-two-factor{% endif %}">
                         {% if profile.two_factor_enabled %}Disable{% else %}Enable{% endif %}
@@ -51,15 +57,18 @@
 
             <section class="security-card browser-sessions-card">
                 <h2>Browser Sessions</h2>
-                <p>Manage and log out your active sessions on other browsers and devices. Review these sessions regularly and log out any browser session you do not recognize.</p>
+                <p>Manage and log out your active sessions on other browsers and devices. Review these sessions
+                    regularly and log out any browser session you do not recognize.</p>
                 <div class="browser-session-list">
                     {% for session in browser_sessions %}
                     <article>
                         <i class="bi bi-display"></i>
                         <div>
-                            <strong>{% if session.is_current %}This device{% else %}Other browser session{% endif %}</strong>
+                            <strong>{% if session.is_current %}This device{% else %}Other browser session{% endif
+                                %}</strong>
                             {% if session.ip_address %}<span>{{ session.ip_address }}</span>{% endif %}
-                            <span>{% if session.is_current %}Current session{% else %}Expires {{ session.expire_date|date:"M j, Y g:i A" }}{% endif %}</span>
+                            <span>{% if session.is_current %}Current session{% else %}Expires {{
+                                session.expire_date|date:"M j, Y g:i A" }}{% endif %}</span>
                         </div>
                     </article>
                     {% empty %}
@@ -75,27 +84,37 @@
 
             <section class="security-card delete-account-card">
                 <h2>Delete Account</h2>
-                <p>Permanently delete your account. Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting any account, please download any data or information that you wish to retain.</p>
-                <form method="post" onsubmit="return confirm('Permanently delete your account? This cannot be undone.');">
+                <p>Permanently delete your account. Once your account is deleted, all of its resources and data will be
+                    permanently deleted. Before deleting any account, please download any data or information that you
+                    wish to retain.</p>
+                <form method="post"
+                    onsubmit="return confirm('Permanently delete your account? This cannot be undone.');">
                     {% csrf_token %}
                     <input type="hidden" name="security_action" value="delete_account">
-                    <input class="delete-password" type="password" name="password" autocomplete="current-password" placeholder="Confirm password" required>
+                    <input class="delete-password" type="password" name="password" autocomplete="current-password"
+                        placeholder="Confirm password" required>
                     <button type="submit" class="delete-account-button">Delete Account</button>
                 </form>
             </section>
         </div>
 
         <footer class="settings-footer advanced-security-footer">
-            <strong>&copy; Copyright &copy; CreatAura 2026. All Rights Reserved.</strong>
-            <span>CreatAura Financial Institutions.</span>
+            <strong>&copy; Copyright &copy; Capitalnext 2026. All Rights Reserved.</strong>
+            <span>Capitalnext Financial Institutions.</span>
         </footer>
     </main>
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
 </body>
+
 </html>

@@ -1,28 +1,32 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | Fund Your Account</title>
+    <title>Capitalnext | Fund Your Account</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/deposit.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
+
 <body>
     <main class="deposit-page">
         <header class="deposit-header">
             <a href="{% url 'dashboard' %}" aria-label="Back"><i class="bi bi-chevron-left"></i></a>
             <h1>Fund Your Account</h1>
-            <button type="button" class="refresh-button" aria-label="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
+            <button type="button" class="refresh-button" aria-label="Refresh"><i
+                    class="bi bi-arrow-clockwise"></i></button>
         </header>
 
         {% if messages %}
-            <div class="deposit-messages">
-                {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
-            </div>
+        <div class="deposit-messages">
+            {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
+        </div>
         {% endif %}
 
         <form method="post" action="{% url 'deposit' %}" class="deposit-form">
@@ -49,7 +53,8 @@
             <div class="deposit-amount-field">
                 <label for="depositAmount">From</label>
                 <div class="amount-row">
-                    <input id="depositAmount" name="amount" type="number" min="0.01" step="0.01" placeholder="Enter amount to deposit" required>
+                    <input id="depositAmount" name="amount" type="number" min="0.01" step="0.01"
+                        placeholder="Enter amount to deposit" required>
                     <span>Balance: ${{ available_balance|floatformat:2 }}</span>
                 </div>
             </div>
@@ -57,12 +62,20 @@
         </form>
     </main>
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}"><span
+                class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction
+                History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
-    <footer class="deposit-footer"><strong>&copy; Copyright © Creataura 2026. All Rights Reserved.</strong><span>Creataura Financial Institutions.</span></footer>
+    <footer class="deposit-footer"><strong>&copy; Copyright © Capitalnext 2026. All Rights
+            Reserved.</strong><span>Capitalnext Financial Institutions.</span></footer>
 </body>
+
 </html>

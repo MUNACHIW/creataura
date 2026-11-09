@@ -1,28 +1,31 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | XRP Withdrawal</title>
+    <title>Capitalnext | XRP Withdrawal</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/withdrawal.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
 </head>
+
 <body>
     <main class="withdrawal-page btc-withdrawal-page">
         <header class="withdrawal-header">
-            <a href="{% url 'withdrawal' %}" class="back-button" aria-label="Back to withdrawal methods"><i class="bi bi-chevron-left"></i></a>
+            <a href="{% url 'withdrawal' %}" class="back-button" aria-label="Back to withdrawal methods"><i
+                    class="bi bi-chevron-left"></i></a>
             <h1>Withdrawal</h1>
             <a href="{% url 'dashboard' %}" class="btc-home-link">Home</a>
         </header>
 
         {% if messages %}
-            <div class="withdrawal-messages btc-page-messages" aria-live="polite">
-                {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
-            </div>
+        <div class="withdrawal-messages btc-page-messages" aria-live="polite">
+            {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
+        </div>
         {% endif %}
 
         <section class="btc-request-content">
@@ -41,18 +44,21 @@
                     {% csrf_token %}
                     <label>
                         <span>Enter Amount to withdraw</span>
-                        <input type="number" name="amount" min="{{ minimum_amount }}" max="{{ maximum_amount }}" step="0.01" placeholder="Enter Amount" required>
+                        <input type="number" name="amount" min="{{ minimum_amount }}" max="{{ maximum_amount }}"
+                            step="0.01" placeholder="Enter Amount" required>
                     </label>
                     <label>
                         <span>Enter OTP</span>
-                        <input type="text" name="otpcode" maxlength="10" autocomplete="one-time-code" placeholder="Enter Code" required>
+                        <input type="text" name="otpcode" maxlength="10" autocomplete="one-time-code"
+                            placeholder="Enter Code" required>
                     </label>
                     <p class="otp-help">OTP will be sent to your email when you request</p>
                     <label>
                         <span>Enter XRP Address</span>
                         <input type="text" name="xrp_address" placeholder="Enter XRP Address" required>
                     </label>
-                    <p class="otp-help">XRP is not a default withdrawal option in your account, please enter the correct wallet address to receive your funds.</p>
+                    <p class="otp-help">XRP is not a default withdrawal option in your account, please enter the correct
+                        wallet address to receive your funds.</p>
                     <button type="submit" class="btc-complete-request">Complete Request</button>
                 </form>
             </article>
@@ -60,15 +66,21 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
     <footer class="withdrawal-footer">
-        <strong>&copy; Copyright © Creataura 2026. All Rights Reserved.</strong>
-        <span>Creataura Financial Institutions.</span>
+        <strong>&copy; Copyright © Capitalnext 2026. All Rights Reserved.</strong>
+        <span>Capitalnext Financial Institutions.</span>
     </footer>
 </body>
+
 </html>

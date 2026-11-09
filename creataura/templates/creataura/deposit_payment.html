@@ -1,16 +1,19 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | Make Payment</title>
+    <title>Capitalnext | Make Payment</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/deposit.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
+
 <body>
     <main class="deposit-page payment-page">
         <header class="deposit-header payment-header">
@@ -20,23 +23,28 @@
         </header>
         <div class="payment-subtitle">Payment</div>
         {% if messages %}
-            <div class="deposit-messages">
-                {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
-            </div>
+        <div class="deposit-messages">
+            {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
+        </div>
         {% endif %}
         <article class="payment-card">
-            <p class="payment-instruction">You are to make payment of <b>${{ deposit_amount|floatformat:2 }}</b> using your selected payment method. Screenshot and upload the proof of payment.</p>
+            <p class="payment-instruction">You are to make payment of <b>${{ deposit_amount|floatformat:2 }}</b> using
+                your selected payment method. Screenshot and upload the proof of payment.</p>
             {% if payment_mode == "bitcoin" %}
-                <div class="selected-method"><span class="payment-icon bitcoin-icon large"><b>₿</b></span><strong>Bitcoin</strong></div>
+            <div class="selected-method"><span
+                    class="payment-icon bitcoin-icon large"><b>₿</b></span><strong>Bitcoin</strong></div>
             {% elif payment_mode == "ethereum" %}
-                <div class="selected-method"><span class="payment-icon ethereum-icon large"><i class="bi bi-diamond-fill"></i></span><strong>Ethereum</strong></div>
+            <div class="selected-method"><span class="payment-icon ethereum-icon large"><i
+                        class="bi bi-diamond-fill"></i></span><strong>Ethereum</strong></div>
             {% else %}
-                <div class="selected-method"><span class="payment-icon xrp-icon large"><b>X</b></span><strong>XRP</strong></div>
+            <div class="selected-method"><span class="payment-icon xrp-icon large"><b>X</b></span><strong>XRP</strong>
+            </div>
             {% endif %}
             <label class="wallet-address-label">{{ payment_label }} Address:</label>
             <div class="wallet-address-row">
                 <input id="walletAddress" type="text" value="{{ wallet_address }}" readonly>
-                <button type="button" id="copyWallet" aria-label="Copy wallet address"><i class="bi bi-copy"></i></button>
+                <button type="button" id="copyWallet" aria-label="Copy wallet address"><i
+                        class="bi bi-copy"></i></button>
             </div>
             <p class="network-type"><b>Network Type:</b> {{ network_type }}</p>
             <p class="proof-label">Upload Payment proof after payment.</p>
@@ -48,13 +56,20 @@
         </article>
     </main>
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}"><span
+                class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction
+                History</span></a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
-    <footer class="deposit-footer"><strong>&copy; Copyright © Creataura 2026. All Rights Reserved.</strong><span>Creataura Financial Institutions.</span></footer>
+    <footer class="deposit-footer"><strong>&copy; Copyright © Capitalnext 2026. All Rights
+            Reserved.</strong><span>Capitalnext Financial Institutions.</span></footer>
     <script>
         document.getElementById("copyWallet").addEventListener("click", async () => {
             const input = document.getElementById("walletAddress");
@@ -62,4 +77,5 @@
         });
     </script>
 </body>
+
 </html>

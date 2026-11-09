@@ -1,30 +1,35 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Createaura | Crypto Exchange</title>
+    <title>Capitalnext | Crypto Exchange</title>
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/crypto_exchange.css' %}">
     <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
     <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
+
 <body>
     <main class="exchange-page">
         <header class="exchange-header">
-            <a href="{% url 'dashboard' %}" class="back-button" aria-label="Back to dashboard"><i class="bi bi-chevron-left"></i></a>
+            <a href="{% url 'dashboard' %}" class="back-button" aria-label="Back to dashboard"><i
+                    class="bi bi-chevron-left"></i></a>
             <h1>Crypto Exchange</h1>
-            <button class="refresh-button" type="button" aria-label="Refresh balances"><i class="bi bi-arrow-clockwise"></i></button>
+            <button class="refresh-button" type="button" aria-label="Refresh balances"><i
+                    class="bi bi-arrow-clockwise"></i></button>
         </header>
 
         {% if messages %}
-            <div class="exchange-messages" aria-live="polite">
-                {% for message in messages %}
-                    <p class="{{ message.tags }}">{{ message }}</p>
-                {% endfor %}
-            </div>
+        <div class="exchange-messages" aria-live="polite">
+            {% for message in messages %}
+            <p class="{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
         {% endif %}
 
         <section class="wallet-list" aria-label="Crypto balances">
@@ -80,7 +85,8 @@
             <label class="exchange-field">
                 <span class="field-heading"><span>From</span><small id="fromBalance">Balance : 0 bnb</small></span>
                 <span class="field-input">
-                    <input id="fromAmount" name="from_amount" type="number" min="0" step="any" placeholder="Enter amount of bnb" required>
+                    <input id="fromAmount" name="from_amount" type="number" min="0" step="any"
+                        placeholder="Enter amount of bnb" required>
                     <span class="asset-select">
                         <select id="fromAsset" name="from_asset" aria-label="Asset to exchange from">
                             <option value="usd">USD</option>
@@ -98,7 +104,8 @@
                     </span>
                 </span>
             </label>
-            <button class="swap-button" id="swapButton" type="button" aria-label="Swap currencies"><i class="bi bi-arrow-down-up"></i></button>
+            <button class="swap-button" id="swapButton" type="button" aria-label="Swap currencies"><i
+                    class="bi bi-arrow-down-up"></i></button>
             <label class="exchange-field">
                 <span class="field-heading"><span>To</span><small>Balance : null usd</small></span>
                 <span class="field-input">
@@ -128,40 +135,45 @@
                 <div class="tradingview-widget-container__widget"></div>
                 <script type="text/javascript"
                     src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                    {
-                        "autosize": true,
-                        "symbol": "BINANCE:BNBUSDT",
-                        "interval": "30",
-                        "timezone": "Etc/UTC",
-                        "theme": "light",
-                        "style": "1",
-                        "locale": "en",
-                        "backgroundColor": "rgba(255, 255, 255, 1)",
-                        "gridColor": "rgba(242, 242, 242, 1)",
-                        "hide_top_toolbar": false,
-                        "hide_legend": false,
-                        "allow_symbol_change": true,
-                        "save_image": false,
-                        "calendar": false,
-                        "support_host": "https://www.tradingview.com"
-                    }
-                </script>
+                        {
+                            "autosize": true,
+                                "symbol": "BINANCE:BNBUSDT",
+                                    "interval": "30",
+                                        "timezone": "Etc/UTC",
+                                            "theme": "light",
+                                                "style": "1",
+                                                    "locale": "en",
+                                                        "backgroundColor": "rgba(255, 255, 255, 1)",
+                                                            "gridColor": "rgba(242, 242, 242, 1)",
+                                                                "hide_top_toolbar": false,
+                                                                    "hide_legend": false,
+                                                                        "allow_symbol_change": true,
+                                                                            "save_image": false,
+                                                                                "calendar": false,
+                                                                                    "support_host": "https://www.tradingview.com"
+                        }
+                    </script>
             </div>
         </section>
 
         <button class="exchange-submit" type="submit" form="exchange-form">Exchange</button>
         <footer class="exchange-footer">
-            <strong>&copy; Copyright © Creataura 2026. All Rights Reserved.</strong>
-            <span>Creataura Financial Institutions</span>
+            <strong>&copy; Copyright © Capitalnext 2026. All Rights Reserved.</strong>
+            <span>Capitalnext Financial Institutions</span>
         </footer>
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
+                    class="bi bi-gear"></i></span><span>Settings</span></a>
     </nav>
 
     <script>
@@ -171,7 +183,7 @@
         const fromAsset = document.getElementById("fromAsset");
         const toAsset = document.getElementById("toAsset");
         const accountBalance = Number("{{ account_balance }}");
-        const rates = {usd: 1, btc: 97000, eth: 3500, ltc: 100, link: 25, bnb: 710.58, ada: 0.5, aave: 300, usdt: 1, bch: 500, xlm: 0.1};
+        const rates = { usd: 1, btc: 97000, eth: 3500, ltc: 100, link: 25, bnb: 710.58, ada: 0.5, aave: 300, usdt: 1, bch: 500, xlm: 0.1 };
         const balances = {
             usd: accountBalance,
             btc: Number("{{ asset_balances.btc }}"), eth: Number("{{ asset_balances.eth }}"),
@@ -202,4 +214,5 @@
         updateConversion();
     </script>
 </body>
+
 </html>
