@@ -36,19 +36,28 @@
         <section class="settings-content">
             {% if messages %}
             {% for message in messages %}
-            <p class="settings-message {{ message.tags }}">{{ message }}</p>
+            <p class="settings-message {{ message.tags }}">
+                {{ message }}
+            </p>
             {% endfor %}
             {% endif %}
 
             <nav class="settings-tabs" aria-label="Profile settings sections">
-                <button type="button" class="active" data-settings-tab="personal" aria-selected="true">Personal
-                    Settings</button>
-                <button type="button" data-settings-tab="withdrawals" aria-selected="false">Withdrawals
-                    Settings</button>
-                <button type="button" data-settings-tab="security" aria-selected="false">Password/Security</button>
-                <button type="button" data-settings-tab="other" aria-selected="false">Other Settings</button>
+                <button type="button" class="active" data-settings-tab="personal" aria-selected="true">
+                    Personal Settings
+                </button>
+                <button type="button" data-settings-tab="withdrawals" aria-selected="false">
+                    Withdrawals Settings
+                </button>
+                <button type="button" data-settings-tab="security" aria-selected="false">
+                    Password/Security
+                </button>
+                <button type="button" data-settings-tab="other" aria-selected="false">
+                    Other Settings
+                </button>
             </nav>
 
+            <!-- Personal -->
             <form class="settings-form-card settings-panel" data-settings-panel="personal" method="post"
                 action="{% url 'settings' %}">
                 {% csrf_token %}
@@ -85,6 +94,8 @@
                 </label>
                 <button class="settings-submit" type="submit">Update Profile</button>
             </form>
+
+            <!-- Withdrawals -->
             <form class="settings-form-card withdrawal-settings settings-panel" data-settings-panel="withdrawals"
                 method="post" action="{% url 'settings' %}" hidden>
                 {% csrf_token %}
@@ -138,6 +149,8 @@
 
                 <button class="settings-submit" type="submit">Save</button>
             </form>
+
+            <!-- Security -->
             <form class="settings-form-card security-settings settings-panel" data-settings-panel="security"
                 method="post" action="{% url 'settings' %}" hidden>
                 {% csrf_token %}
@@ -155,51 +168,81 @@
                     <input type="password" name="confirm_password" autocomplete="new-password" required>
                 </label>
                 <button class="settings-submit" type="submit">Update Password</button>
-                <a class="advanced-account-settings" href="{% url 'advanced_account_settings' %}">Advance Account
-                    Settings <i class="bi bi-arrow-right"></i></a>
+                <a class="advanced-account-settings" href="{% url 'advanced_account_settings' %}">
+                    Advance Account Settings <i class="bi bi-arrow-right"></i>
+                </a>
             </form>
+
+            <!-- Other -->
             <form class="settings-form-card other-settings settings-panel" data-settings-panel="other" method="post"
                 action="{% url 'settings' %}" hidden>
                 {% csrf_token %}
                 <input type="hidden" name="settings_action" value="other">
+
                 <fieldset class="other-setting-field">
                     <legend>Send confirmation OTP to my email when withdrawing my funds.</legend>
-                    <label><input type="radio" name="email_withdrawal_otp" value="yes" {% if
-                            profile.email_withdrawal_otp %}checked{% endif %}> <span>Yes</span></label>
-                    <label><input type="radio" name="email_withdrawal_otp" value="no" {% if not
-                            profile.email_withdrawal_otp %}checked{% endif %}> <span>No</span></label>
+                    <label>
+                        <input type="radio" name="email_withdrawal_otp" value="yes" {{ otp_yes }}>
+                        <span>Yes</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="email_withdrawal_otp" value="no" {{ otp_no }}>
+                        <span>No</span>
+                    </label>
                 </fieldset>
+
                 <fieldset class="other-setting-field">
                     <legend>Send me email when I get profit.</legend>
-                    <label><input type="radio" name="email_profit_notification" value="yes" {% if
-                            profile.email_profit_notification %}checked{% endif %}> <span>Yes</span></label>
-                    <label><input type="radio" name="email_profit_notification" value="no" {% if not
-                            profile.email_profit_notification %}checked{% endif %}> <span>No</span></label>
+                    <label>
+                        <input type="radio" name="email_profit_notification" value="yes" {{ profit_yes }}>
+                        <span>Yes</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="email_profit_notification" value="no" {{ profit_no }}>
+                        <span>No</span>
+                    </label>
                 </fieldset>
+
                 <fieldset class="other-setting-field">
                     <legend>Send me email when my investment plan expires.</legend>
-                    <label><input type="radio" name="email_plan_expiry_notification" value="yes" {% if
-                            profile.email_plan_expiry_notification %}checked{% endif %}> <span>Yes</span></label>
-                    <label><input type="radio" name="email_plan_expiry_notification" value="no" {% if not
-                            profile.email_plan_expiry_notification %}checked{% endif %}> <span>No</span></label>
+                    <label>
+                        <input type="radio" name="email_plan_expiry_notification" value="yes" {{ expiry_yes }}>
+                        <span>Yes</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="email_plan_expiry_notification" value="no" {{ expiry_no }}>
+                        <span>No</span>
+                    </label>
                 </fieldset>
+
                 <button class="settings-submit" type="submit">Save</button>
             </form>
         </section>
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span>
+            <span>Dashboard</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span>
+            <span>Transaction History</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
+            <span>Crypto Exchange</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'investments' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
+            <span>Invest</span>
+        </a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'settings' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-gear"></i></span>
+            <span>Settings</span>
+        </a>
     </nav>
+
     <script>
         document.querySelectorAll("[data-settings-tab]").forEach((button) => {
             button.addEventListener("click", () => {

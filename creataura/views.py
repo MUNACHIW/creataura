@@ -1105,11 +1105,29 @@ def support(request):
     )
 
 
+def _checked(value):
+    return "checked" if value else ""
+
+
+def _get_profile(user):
+    profile = getattr(user, "creataura_profile", None)
+    if profile is None:
+        profile = UserProfile.objects.create(
+            user=user,
+            full_name=user.get_full_name() or user.username,
+            phone_number="",
+            bitcoin_address="",
+            country="",
+        )
+    return profile
+from django.contrib.auth import update_session_auth_hash
 @login_required(login_url="login")
 def settings(request):
-    profile = getattr(request.user, "creataura_profile", None)
+    profile = _get_profile(request.user)
+    action_name = request.POST.get("settings_action", "")
+
     if request.method == "POST":
-        if request.POST.get("settings_action") == "withdrawals":
+        if action_name == "withdrawals":
             withdrawal_account, _ = BankAccount.objects.get_or_create(user=request.user)
             withdrawal_account.bank_name = request.POST.get("bank_name", "").strip()
             withdrawal_account.account_name = request.POST.get(
@@ -1127,7 +1145,8 @@ def settings(request):
             ).strip()
             withdrawal_account.save()
             messages.success(request, "Withdrawal settings saved successfully.")
-        elif request.POST.get("settings_action") == "password":
+
+        elif action_name == "password":
             old_password = request.POST.get("old_password", "")
             new_password = request.POST.get("new_password", "")
             confirm_password = request.POST.get("confirm_password", "")
@@ -1146,17 +1165,10 @@ def settings(request):
                 else:
                     request.user.set_password(new_password)
                     request.user.save(update_fields=["password"])
-                    login(request, request.user)
+                    update_session_auth_hash(request, request.user)
                     messages.success(request, "Password updated successfully.")
-        elif request.POST.get("settings_action") == "other":
-            if profile is None:
-                profile = UserProfile.objects.create(
-                    user=request.user,
-                    full_name=request.user.get_full_name() or request.user.username,
-                    phone_number="",
-                    bitcoin_address="",
-                    country="",
-                )
+
+        elif action_name == "other":
             profile.email_withdrawal_otp = (
                 request.POST.get("email_withdrawal_otp") == "yes"
             )
@@ -1174,6 +1186,7 @@ def settings(request):
                 ]
             )
             messages.success(request, "Other settings saved successfully.")
+
         else:
             full_name = request.POST.get("full_name", "").strip()
             email = request.POST.get("email", "").strip().lower()
@@ -1185,14 +1198,32 @@ def settings(request):
             elif User.objects.filter(email=email).exclude(pk=request.user.pk).exists():
                 messages.error(request, "That email is already registered.")
             else:
+                email_changed = email != request.user.email.lower()
+
                 request.user.email = email
                 request.user.first_name = full_name
                 request.user.save(update_fields=["email", "first_name"])
+
                 profile.full_name = full_name
                 profile.phone_number = phone_number
                 profile.country = full_address
-                profile.save(update_fields=["full_name", "phone_number", "country"])
+
+                if email_changed:
+                    profile.email_verified = False
+                    profile.email_verified_at = None
+
+                profile.save()
+
+                if email_changed:
+                    send_verification_email(request, request.user)
+                    messages.success(
+                        request,
+                        "Profile updated. We've sent a verification link to your new email.",
+                    )
+                    return redirect("verify_email")
+
                 messages.success(request, "Profile updated successfully.")
+
         return redirect("settings")
 
     withdrawal_account = getattr(request.user, "withdrawal_account", None)
@@ -1201,8 +1232,14 @@ def settings(request):
         request,
         "creataura/settings.html",
         {
-            "profile": profile or request.user,
+            "profile": profile,
             "withdrawal_account": withdrawal_account,
+            "otp_yes": _checked(profile.email_withdrawal_otp),
+            "otp_no": _checked(not profile.email_withdrawal_otp),
+            "profit_yes": _checked(profile.email_profit_notification),
+            "profit_no": _checked(not profile.email_profit_notification),
+            "expiry_yes": _checked(profile.email_plan_expiry_notification),
+            "expiry_no": _checked(not profile.email_plan_expiry_notification),
         },
     )
 
