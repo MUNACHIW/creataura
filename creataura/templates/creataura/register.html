@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'creataura/style.css' %}">
-    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
 </head>
 
 <body class="auth-body">
@@ -23,36 +22,68 @@
             <p>Create an account</p>
         </div>
         {% if messages %}
-        <div class="auth-messages">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>
+        <div class="auth-messages">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
         {% endif %}
-        <form method="post" class="auth-form">
+        <form method="post" class="auth-form" autocomplete="off">
             {% csrf_token %}
             <div class="theme-panel">
                 <span class="theme-label">Theme</span>
                 <div class="theme-row">
                     <span class="theme-icon"><i class="bi bi-moon-stars-fill"></i></span>
                     <span>Dark Mode</span>
-                    <label class="theme-switch" aria-label="Toggle dark mode"><input type="checkbox"
-                            class="theme-toggle"><span></span></label>
+                    <label class="theme-switch" aria-label="Toggle dark mode">
+                        <input type="checkbox" class="theme-toggle">
+                        <span></span>
+                    </label>
                 </div>
             </div>
             <div class="auth-fields">
-                <label>Username<input type="text" name="username" placeholder="Your Username" required></label>
-                <label>E-mail<input type="email" name="email" placeholder="Your e-mail" required></label>
-                <label>Full Name<input type="text" name="full_name" placeholder="Your Full Name" required></label>
-                <label>Phone Number<input type="tel" name="phone_number" placeholder="Your Phone Number"
-                        required></label>
-                <label>Bitcoin Address<input type="text" name="bitcoin_address" placeholder="Your Bitcoin Address"
-                        required></label>
-                <label>Country<select name="country" required>
-                        <option value="" selected disabled>Choose Country</option>{% for country in countries %}<option
-                            value="{{ country }}">{{ country }}</option>{% endfor %}
-                    </select></label>
-                <label>Password<input type="password" name="password" placeholder="Your password" required></label>
-                <label>Password Again<input type="password" name="password_again" placeholder="Type password again"
-                        required></label>
-                <label>Referral ID<input type="text" name="referral_id" value="{{ initial_referral_id }}"
-                        placeholder="optional referral id"></label>
+                <label>Username
+                    <input type="text" name="username" value="{{ form_data.username }}" placeholder="Your Username"
+                        autocomplete="username" required>
+                </label>
+                <label>E-mail
+                    <input type="email" name="email" value="{{ form_data.email }}" placeholder="Your e-mail"
+                        autocomplete="email" required>
+                </label>
+                <label>Full Name
+                    <input type="text" name="full_name" value="{{ form_data.full_name }}" placeholder="Your Full Name"
+                        autocomplete="name" required>
+                </label>
+                <label>Phone Number
+                    <input type="tel" name="phone_number" value="{{ form_data.phone_number }}"
+                        placeholder="Your Phone Number" autocomplete="tel" required>
+                </label>
+                <label>Bitcoin Address
+                    <input type="text" name="bitcoin_address" value="{{ form_data.bitcoin_address }}"
+                        placeholder="Your Bitcoin Address" autocomplete="off" required>
+                </label>
+                <label>Country
+                    <select name="country" autocomplete="country-name" required>
+                        <option value="" disabled>Choose Country</option>
+                        {% for country in countries %}
+                        <option value="{{ country.name }}" {{ country.selected }}>
+                            {{ country.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Password
+                    <input type="password" name="password" placeholder="Your password" autocomplete="new-password"
+                        required>
+                </label>
+                <label>Password Again
+                    <input type="password" name="password_again" placeholder="Type password again"
+                        autocomplete="new-password" required>
+                </label>
+                <label>Referral ID
+                    <input type="text" name="referral_id" value="{{ initial_referral_id }}"
+                        placeholder="optional referral id" autocomplete="off">
+                </label>
             </div>
             <button type="submit" class="auth-submit">Register</button>
         </form>
