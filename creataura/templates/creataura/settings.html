@@ -59,45 +59,48 @@
 
             <!-- Personal -->
             <form class="settings-form-card settings-panel" data-settings-panel="personal" method="post"
-                action="{% url 'settings' %}">
+                action="{% url 'settings' %}" autocomplete="off">
                 {% csrf_token %}
+                <input type="hidden" name="settings_action" value="personal">
                 <label class="settings-field">
                     <span>Fullname</span>
-                    <input type="text" name="full_name" value="{{ profile.full_name }}" required>
+                    <input type="text" name="full_name" value="{{ profile.full_name }}" autocomplete="name" required>
                 </label>
                 <label class="settings-field">
                     <span>Email</span>
-                    <input type="email" name="email" value="{{ request.user.email }}" required>
+                    <input type="email" name="email" value="{{ request.user.email }}" autocomplete="email" required>
                 </label>
                 <label class="settings-field">
                     <span>Phone Number</span>
-                    <input type="text" name="phone_number" value="{{ profile.phone_number }}" required>
+                    <input type="text" name="phone_number" value="{{ profile.phone_number }}" autocomplete="tel"
+                        required>
                 </label>
                 <label class="settings-field">
                     <span>Date of Birth</span>
-                    <input type="date" name="date_of_birth">
+                    <input type="date" name="date_of_birth" value="{{ dob_value }}" autocomplete="bday">
                 </label>
                 <label class="settings-field">
                     <span>Nationality</span>
                     <select name="nationality" aria-label="Nationality">
                         <option value="">Select nationality</option>
-                        <option>United States</option>
-                        <option>United Kingdom</option>
-                        <option>Nigeria</option>
-                        <option>Canada</option>
-                        <option>Other</option>
+                        {% for option in nationality_options %}
+                        <option value="{{ option.name }}" {{ option.selected }}>
+                            {{ option.name }}
+                        </option>
+                        {% endfor %}
                     </select>
                 </label>
                 <label class="settings-field">
                     <span>Full Address</span>
-                    <input type="text" name="full_address" value="{{ profile.country }}" required>
+                    <input type="text" name="full_address" value="{{ profile.full_address }}"
+                        placeholder="Street, city, state" autocomplete="street-address">
                 </label>
                 <button class="settings-submit" type="submit">Update Profile</button>
             </form>
 
             <!-- Withdrawals -->
             <form class="settings-form-card withdrawal-settings settings-panel" data-settings-panel="withdrawals"
-                method="post" action="{% url 'settings' %}" hidden>
+                method="post" action="{% url 'settings' %}" autocomplete="off" hidden>
                 {% csrf_token %}
                 <input type="hidden" name="settings_action" value="withdrawals">
 
@@ -106,22 +109,22 @@
                     <label class="settings-field">
                         <span>Bank Name</span>
                         <input type="text" name="bank_name" value="{{ withdrawal_account.bank_name }}"
-                            placeholder="Enter bank name">
+                            placeholder="Enter bank name" autocomplete="off">
                     </label>
                     <label class="settings-field">
                         <span>Account Name</span>
                         <input type="text" name="account_name" value="{{ withdrawal_account.account_name }}"
-                            placeholder="Enter Account name">
+                            placeholder="Enter Account name" autocomplete="off">
                     </label>
                     <label class="settings-field">
                         <span>Account Number</span>
                         <input type="text" name="account_number" value="{{ withdrawal_account.account_number }}"
-                            placeholder="Enter Account Number">
+                            placeholder="Enter Account Number" autocomplete="off">
                     </label>
                     <label class="settings-field">
                         <span>Swift Code</span>
                         <input type="text" name="swift_code" value="{{ withdrawal_account.swift_code }}"
-                            placeholder="Enter Swift Code">
+                            placeholder="Enter Swift Code" autocomplete="off">
                     </label>
                 </div>
 
@@ -129,20 +132,20 @@
                     <h2>Cryptocurrency</h2>
                     <label class="settings-field">
                         <span>Bitcoin</span>
-                        <input type="text" value="{{ profile.bitcoin_address }}" placeholder="Enter Bitcoin Address"
-                            readonly>
+                        <input type="text" name="bitcoin_address" value="{{ profile.bitcoin_address }}"
+                            placeholder="Enter Bitcoin Address" autocomplete="off" required>
                     </label>
-                    <p class="withdrawal-help">Your Bitcoin Address from signup</p>
+                    <p class="withdrawal-help">Enter your Bitcoin Address that will be used to withdraw your funds</p>
                     <label class="settings-field">
                         <span>Ethereum</span>
                         <input type="text" name="ethereum_address" value="{{ withdrawal_account.ethereum_address }}"
-                            placeholder="Enter Ethereum Address">
+                            placeholder="Enter Ethereum Address" autocomplete="off">
                     </label>
                     <p class="withdrawal-help">Enter your Ethereum Address that will be used to withdraw your funds</p>
                     <label class="settings-field">
                         <span>Litecoin</span>
                         <input type="text" name="litecoin_address" value="{{ withdrawal_account.litecoin_address }}"
-                            placeholder="Enter Litecoin Address">
+                            placeholder="Enter Litecoin Address" autocomplete="off">
                     </label>
                     <p class="withdrawal-help">Enter your Litecoin Address that will be used to withdraw your funds</p>
                 </div>
@@ -233,7 +236,7 @@
             <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
             <span>Crypto Exchange</span>
         </a>
-        <a class="fixed-nav-item" href="/invest">
+        <a class="fixed-nav-item" href="{% url 'invest' %}">
             <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
             <span>Invest</span>
         </a>
@@ -258,5 +261,7 @@
         });
     </script>
 </body>
+
+</html>
 
 </html>

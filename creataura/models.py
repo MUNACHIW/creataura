@@ -15,6 +15,9 @@ class UserProfile(models.Model):
     phone_number = models.CharField(max_length=40)
     bitcoin_address = models.CharField(max_length=150)
     country = models.CharField(max_length=100)
+    full_address = models.CharField(max_length=255, blank=True)
+    nationality = models.CharField(max_length=100, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     referral_id = models.CharField(max_length=100, blank=True)
     email_withdrawal_otp = models.BooleanField(default=True)
     email_profit_notification = models.BooleanField(default=True)
@@ -304,7 +307,6 @@ class DepositWallet(models.Model):
 
     def __str__(self):
         return f"{self.get_crypto_display()} - {self.wallet_address}"
-
 
 class Payment(models.Model):
     CRYPTO_CHOICES = (
