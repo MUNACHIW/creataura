@@ -102,6 +102,7 @@ urlpatterns = [
     path("investments/", RedirectView.as_view(pattern_name="invest", permanent=False)),
     path("invest/<int:plan_id>/join/", join_investment, name="join_investment"),
     path("investments/<int:plan_id>/join/", join_investment),
+   path("invest/<int:investment_id>/", views.investment_detail, name="investment_detail"),
     path("ref/<str:referral_id>/", register, name="referral_signup"),
     path("verify-email/", views.verify_email, name="verify_email"),
     path("verify-email/resend/", views.resend_verification, name="resend_verification"),

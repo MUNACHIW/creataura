@@ -35,3 +35,34 @@ html[data-theme="dark"] .investments-page, html[data-theme="dark"] .investments-
 html[data-theme="dark"] .investment-plan-card, html[data-theme="dark"] .investment-record, html[data-theme="dark"] .investment-record-empty { border-color: #29254a !important; }
 html[data-theme="dark"] .investment-plan-card h3, html[data-theme="dark"] .investment-plan-price, html[data-theme="dark"] .investments-content > h2 { color: #fff !important; }
 html[data-theme="dark"] .investments-header button { color: #fff !important; }
+a.investment-record {
+    color: inherit;
+    text-decoration: none;
+}
+
+.investment-record progress,
+.investment-summary progress {
+    display: block;
+    width: 100%;
+    height: 8px;
+    margin-top: 6px;
+    accent-color: #470617;
+}
+
+.investment-summary dl {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 16px;
+    margin: 16px 0;
+}
+
+.investment-summary dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+}
+
+.investment-note {
+    font-size: 13px;
+    opacity: 0.75;
+}

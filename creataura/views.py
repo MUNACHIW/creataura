@@ -19,7 +19,7 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.db import models, transaction
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
@@ -254,6 +254,50 @@ def get_available_balance(user):
     return max(balance, Decimal("0"))
 
 
+
+def _investment_rows(user):
+    items = list(UserInvestment.objects.filter(user=user).select_related("plan"))
+    totals = {
+        row["investment"]: row
+        for row in ProfitRecord.objects.filter(user=user, investment__isnull=False)
+        .order_by()
+        .values("investment")
+        .annotate(total=models.Sum("amount"), days=models.Count("id"))
+    }
+    now = timezone.now()
+    rows = []
+    for item in items:
+        plan = item.plan
+        total_days = plan.duration_days
+        end = item.expires_at or (item.date_created + timedelta(days=total_days))
+        elapsed = max(0, min((now - item.date_created).days, total_days))
+        if item.status == "completed":
+            elapsed = total_days
+        daily = (item.amount * plan.daily_roi / Decimal("100")).quantize(
+            Decimal("0.01")
+        )
+        earned = totals.get(item.pk, {}).get("total") or Decimal("0")
+        progress = int(elapsed * 100 / total_days) if total_days else 0
+        rows.append(
+            {
+                "id": item.pk,
+                "plan_name": plan.name,
+                "status": item.status,
+                "status_label": _status_label(item.status),
+                "amount": _money(item.amount),
+                "daily_rate": f"{plan.daily_roi:.2f}%",
+                "daily_profit": _money(daily),
+                "earned": _money(earned),
+                "expected_total": _money(daily * total_days),
+                "day_text": f"Day {elapsed} of {total_days}",
+                "days_left": max(total_days - elapsed, 0),
+                "progress": progress,
+                "started": timezone.localtime(item.date_created).strftime("%b %d, %Y"),
+                "ends": timezone.localtime(end).strftime("%b %d, %Y"),
+                "date_created": item.date_created,
+            }
+        )
+    return rows
 # =========================================================
 # Public pages
 # =========================================================
@@ -1136,19 +1180,7 @@ def investments(request):
         }
         for plan in plan_rows
     ]
-
-    user_investments = [
-        {
-            "plan_name": item.plan.name,
-            "started": timezone.localtime(item.date_created).strftime("%b %d, %Y"),
-            "amount": _money(item.amount),
-            "status": item.status,
-            "status_label": _status_label(item.status),
-        }
-        for item in UserInvestment.objects.filter(user=request.user).select_related(
-            "plan"
-        )
-    ]
+    user_investments = _investment_rows(request.user)
 
     action.send(request.user, verb="viewed investment plans ")
     return render(
@@ -1202,6 +1234,39 @@ def join_investment(request, plan_id):
         )
     messages.success(request, f"You joined the {plan.name} successfully.")
     return redirect("invest")
+
+@login_required(login_url="login")
+def investment_detail(request, investment_id):
+    item = get_object_or_404(
+        UserInvestment.objects.select_related("plan"),
+        pk=investment_id,
+        user=request.user,
+    )
+    summary = next(
+        row for row in _investment_rows(request.user) if row["id"] == item.pk
+    )
+    profit_rows = [
+        {
+            "day": f"Day {record.profit_day}" if record.profit_day else "Credit",
+            "amount": _money(record.amount),
+            "date": _when(record.date_created),
+        }
+        for record in ProfitRecord.objects.filter(investment=item).order_by(
+            "-date_created"
+        )
+    ]
+    action.send(request.user, verb="viewed investment details")
+    return render(
+        request,
+        "creataura/investment_detail.html",
+        {"inv": summary, "profit_rows": profit_rows},
+    )
+
+
+
+
+
+
 
 
 @login_required(login_url="login")

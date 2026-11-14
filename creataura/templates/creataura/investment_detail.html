@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capitalnext | Investment details</title>
+    <link rel="stylesheet" href="{% static 'creataura/bootstrap-icons/bootstrap-icons.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'creataura/settings.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/investments.css' %}">
+    <link rel="stylesheet" href="{% static 'creataura/dashboard-theme.css' %}">
+    <script src="{% static 'creataura/dashboard-theme.js' %}" defer></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'creataura/images/profile.png' %}">
+</head>
+
+<body class="settings-body investments-page">
+    <main class="settings-page">
+        <header class="settings-header investments-header">
+            <a href="{% url 'invest' %}" aria-label="Back"><i class="bi bi-chevron-left"></i></a>
+            <h1>{{ inv.plan_name }}</h1>
+            <span></span>
+        </header>
+
+        <section class="investments-content">
+            <div class="investment-summary">
+                <progress max="100" value="{{ inv.progress }}"></progress>
+                <p><strong>{{ inv.day_text }}</strong> ({{ inv.days_left }} days left)</p>
+                <dl>
+                    <dt>Status</dt>
+                    <dd>{{ inv.status_label }}</dd>
+                    <dt>Amount invested</dt>
+                    <dd>{{ inv.amount }}</dd>
+                    <dt>Daily rate</dt>
+                    <dd>{{ inv.daily_rate }}</dd>
+                    <dt>Profit per day</dt>
+                    <dd>{{ inv.daily_profit }}</dd>
+                    <dt>Profit earned so far</dt>
+                    <dd>{{ inv.earned }}</dd>
+                    <dt>Expected total profit</dt>
+                    <dd>{{ inv.expected_total }}</dd>
+                    <dt>Started</dt>
+                    <dd>{{ inv.started }}</dd>
+                    <dt>Ends</dt>
+                    <dd>{{ inv.ends }}</dd>
+                </dl>
+                <p class="investment-note">
+                    Profit is credited once a day. Your amount returns to your balance when the plan ends.
+                </p>
+            </div>
+
+            <h2>Profit history</h2>
+            <div class="investment-records">
+                {% for row in profit_rows %}
+                <article class="investment-record">
+                    <div>
+                        <strong>{{ row.day }}</strong>
+                        <span>{{ row.date }}</span>
+                    </div>
+                    <div>
+                        <strong>+ {{ row.amount }}</strong>
+                    </div>
+                </article>
+                {% empty %}
+                <p class="investment-record-empty">No profit credited yet. Your first profit arrives after 24 hours.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span>
+            <span>Dashboard</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span>
+            <span>Transaction History</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
+            <span>Crypto Exchange</span>
+        </a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'invest' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
+            <span>Invest</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-gear"></i></span>
+            <span>Settings</span>
+        </a>
+    </nav>
+</body>
+
+</html>

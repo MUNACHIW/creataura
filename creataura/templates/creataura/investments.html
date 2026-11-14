@@ -37,18 +37,20 @@
 
             <div class="investment-records">
                 {% for item in user_investments %}
-                <article class="investment-record">
+                <a class="investment-record" href="{% url 'investment_detail' item.id %}">
                     <div>
                         <strong>{{ item.plan_name }}</strong>
-                        <span>Started {{ item.started }}</span>
+                        <span>{{ item.day_text }}</span>
+                        <progress max="100" value="{{ item.progress }}"></progress>
                     </div>
                     <div>
                         <strong>{{ item.amount }}</strong>
+                        <span>Earned {{ item.earned }}</span>
                         <span class="investment-status investment-status-{{ item.status }}">
                             {{ item.status_label }}
                         </span>
                     </div>
-                </article>
+                </a>
                 {% empty %}
                 <p class="investment-record-empty">No investments recorded yet.</p>
                 {% endfor %}
