@@ -195,13 +195,15 @@
             <div class="empty-transaction">
                 <span class="transaction-icon"><i class="bi bi-cash"></i></span>
                 <div>
-                    <strong>
-                        {% if latest_deposits %}
-                        {{ latest_deposits|length }}
-                        {% else %}
-                        No transaction yet
-                        {% endif%}
-                    </strong>
+                    {% if latest_deposit %}
+                    <div class="transaction-item">
+                        <strong>${{ latest_deposit.amount }}</strong>
+                        <small>{{ latest_deposit.get_payment_mode_display }}</small>
+                        <small>{{ latest_deposit.status|title }}</small>
+                    </div>
+                    {% else %}
+                    <p>No transaction yet</p>
+                    {% endif %}
                     <small>Deposit</small>
                 </div>
             </div>

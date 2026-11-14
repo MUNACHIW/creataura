@@ -379,9 +379,9 @@ def dashboard(request):
         models.Q(send_to_all=True) | models.Q(recipients=request.user)
     ).distinct()
     unread_notifications = notification_list.exclude(read_by=request.user)
-    latest_deposits = Deposit.objects.filter(
+    latest_deposit = Deposit.objects.filter(
     user=request.user
-      ).order_by("-date_created")[:1]  # latest 5 deposits
+      ).order_by("-date_created").first()  # 
       # latest 5 withdrawals
     action.send(request.user, verb="viewed dashboard")
     return render(
@@ -398,7 +398,7 @@ def dashboard(request):
             "total_referral_bonus": referral_total,
             "total_withdrawals": approved_withdrawal_total,
             "notifications": unread_notifications[:10],
-            "latest_deposits": latest_deposits,
+            "latest_deposit": latest_deposit,
             "unread_notification_count": unread_notifications.count(),
         },
     )
