@@ -19,3 +19,18 @@ html[data-theme="dark"] body, html[data-theme="dark"] .deposit-page { background
 html[data-theme="dark"] .deposit-header, html[data-theme="dark"] .payment-card, html[data-theme="dark"] .payment-option, html[data-theme="dark"] .deposit-amount-field, html[data-theme="dark"] .deposit-footer, html[data-theme="dark"] .fixed-dashboard-nav { background: #161129 !important; border-color: #2a2538 !important; color: #fff !important; }
 html[data-theme="dark"] .deposit-header h1, html[data-theme="dark"] .deposit-header a, html[data-theme="dark"] .payment-call, html[data-theme="dark"] .payment-subtitle, html[data-theme="dark"] .payment-card, html[data-theme="dark"] .payment-option strong, html[data-theme="dark"] .amount-row input, html[data-theme="dark"] .wallet-address-row input, html[data-theme="dark"] .fixed-nav-item { color: #fff !important; }
 @media (min-width: 768px) { .deposit-header { height: 72px; }.deposit-header h1 { font-size: 17px; }.payment-heading { height: 54px; display: flex; align-items: center; font-size: 14px; }.payment-option { height: 86px; margin-inline: 16px; }.deposit-amount-field { margin-inline: 16px; }.proceed-deposit { width: calc(100% - 32px); margin-inline: 16px; }.payment-card { margin-top: 10px; }.fixed-dashboard-nav { height: 62px; }.fixed-nav-item { font-size: 8px; }.fixed-nav-icon { font-size: 20px; } }
+.usdt-icon {
+    background: #26a17b;
+    color: #fff;
+}
+
+.network-warning {
+    margin: 8px 0 16px;
+    padding: 10px 12px;
+    border-left: 3px solid #c44f43;
+    border-radius: 6px;
+    background: #fbf3f2;
+    color: #4a3f3f;
+    font-size: 13px;
+    line-height: 1.5;
+}
