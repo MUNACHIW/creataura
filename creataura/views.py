@@ -398,91 +398,130 @@ def dashboard(request):
         },
     )
 
+EXCHANGE_ASSETS = (
+    "usd", "btc", "eth", "ltc", "link", "bnb",
+    "ada", "aave", "usdt", "bch", "xlm",
+)
+EXCHANGE_RATES = {
+    "usd": Decimal("1"),
+    "btc": Decimal("97000"),
+    "eth": Decimal("3500"),
+    "ltc": Decimal("100"),
+    "link": Decimal("25"),
+    "bnb": Decimal("710.58"),
+    "ada": Decimal("0.50"),
+    "aave": Decimal("300"),
+    "usdt": Decimal("1"),
+    "bch": Decimal("500"),
+    "xlm": Decimal("0.10"),
+}
+def _coin(value):
+    text = f"{value:.8f}".rstrip("0").rstrip(".")
+    return text or "0"
 
+
+def _exchange_balances(user):
+    """Coin holdings (everything except USD) built from completed exchanges."""
+    balances = {asset: Decimal("0") for asset in EXCHANGE_ASSETS if asset != "usd"}
+    for record in CryptoExchange.objects.filter(user=user, status="completed"):
+        if record.to_asset in balances:
+            balances[record.to_asset] += record.to_amount
+        if record.from_asset in balances:
+            balances[record.from_asset] -= record.from_amount
+    return balances
 @login_required(login_url="login")
 def crypto_exchange(request):
-    assets = (
-        "usd", "btc", "eth", "ltc", "link", "bnb",
-        "ada", "aave", "usdt", "bch", "xlm",
-    )
-    rates = {
-        "usd": Decimal("1"),
-        "btc": Decimal("97000"),
-        "eth": Decimal("3500"),
-        "ltc": Decimal("100"),
-        "link": Decimal("25"),
-        "bnb": Decimal("710.58"),
-        "ada": Decimal("0.50"),
-        "aave": Decimal("300"),
-        "usdt": Decimal("1"),
-        "bch": Decimal("500"),
-        "xlm": Decimal("0.10"),
-    }
-    labels = {asset: asset.upper() for asset in assets}
-
-    completed = CryptoExchange.objects.filter(user=request.user, status="completed")
-    account_balance = get_available_balance(request.user)
-
-    asset_balances = {}
-    for asset in assets:
-        received = sum(
-            (r.to_amount for r in completed if r.to_asset == asset), Decimal("0")
-        )
-        sent = sum(
-            (r.from_amount for r in completed if r.from_asset == asset), Decimal("0")
-        )
-        asset_balances[asset] = received - sent
-
     if request.method == "POST":
         from_asset = request.POST.get("from_asset", "").lower()
         to_asset = request.POST.get("to_asset", "").lower()
         try:
             from_amount = Decimal(request.POST.get("from_amount", "").strip())
+            if from_amount.is_finite():
+                from_amount = from_amount.quantize(Decimal("0.00000001"))
         except (InvalidOperation, AttributeError):
             from_amount = Decimal("0")
 
-        if from_asset not in assets or to_asset not in assets or from_asset == to_asset:
+        if (
+            from_asset not in EXCHANGE_ASSETS
+            or to_asset not in EXCHANGE_ASSETS
+            or from_asset == to_asset
+        ):
             messages.error(request, "Choose two different assets.")
         elif not from_amount.is_finite() or from_amount <= 0:
             messages.error(request, "Enter a valid amount.")
-        elif from_asset == "usd" and from_amount > account_balance:
-            messages.error(request, "Insufficient account balance.")
-        elif from_asset != "usd" and from_amount > asset_balances.get(
-            from_asset, Decimal("0")
-        ):
-            messages.error(request, f"Insufficient {labels[from_asset]} balance.")
         else:
-            exchange_rate = rates[to_asset] / rates[from_asset]
-            gross_value = from_amount * rates[from_asset]
-            commission = gross_value * Decimal("0.02")
-            to_amount = (gross_value - commission) / rates[to_asset]
-            CryptoExchange.objects.create(
-                user=request.user,
-                from_asset=from_asset,
-                to_asset=to_asset,
-                from_amount=from_amount.quantize(Decimal("0.00000001")),
-                to_amount=to_amount.quantize(Decimal("0.00000001")),
-                exchange_rate=exchange_rate.quantize(Decimal("0.00000001")),
-                commission=commission.quantize(Decimal("0.00000001")),
-                status="completed",
-            )
-            messages.success(
-                request,
-                f"Exchange completed: {from_amount} {labels[from_asset]} to "
-                f"{to_amount.quantize(Decimal('0.00000001'))} {labels[to_asset]}.",
-            )
+            with transaction.atomic():
+                # Lock so two simultaneous exchanges can't spend the same funds
+                _lock_user(request.user)
+                usd_balance = get_available_balance(request.user)
+                coin_balances = _exchange_balances(request.user)
+
+                if from_asset == "usd" and from_amount > usd_balance:
+                    messages.error(request, "Insufficient account balance.")
+                elif from_asset != "usd" and from_amount > coin_balances[from_asset]:
+                    messages.error(
+                        request, f"Insufficient {from_asset.upper()} balance."
+                    )
+                else:
+                    rate_from = EXCHANGE_RATES[from_asset]
+                    rate_to = EXCHANGE_RATES[to_asset]
+                    gross_value = from_amount * rate_from
+                    commission = gross_value * Decimal("0.02")
+                    to_amount = (gross_value - commission) / rate_to
+                    CryptoExchange.objects.create(
+                        user=request.user,
+                        from_asset=from_asset,
+                        to_asset=to_asset,
+                        from_amount=from_amount,
+                        to_amount=to_amount.quantize(Decimal("0.00000001")),
+                        exchange_rate=(rate_to / rate_from).quantize(
+                            Decimal("0.00000001")
+                        ),
+                        commission=commission.quantize(Decimal("0.00000001")),
+                        status="completed",
+                    )
+                    messages.success(
+                        request,
+                        f"Exchange completed: {_coin(from_amount)} {from_asset.upper()} "
+                        f"to {_coin(to_amount)} {to_asset.upper()}.",
+                    )
         return redirect("crypto_exchange")
+
+    usd_balance = get_available_balance(request.user)
+    coin_balances = _exchange_balances(request.user)
+
+    balances = {"usd": _money(usd_balance)}
+    for asset, value in coin_balances.items():
+        balances[asset] = f"{_coin(value)} {asset.upper()}"
+
+    exchange_data = {
+        "rates": {asset: float(rate) for asset, rate in EXCHANGE_RATES.items()},
+        "balances": {
+            "usd": float(usd_balance),
+            **{asset: float(value) for asset, value in coin_balances.items()},
+        },
+    }
+
+    exchange_rows = [
+        {
+            "pair": f"{record.from_asset.upper()} to {record.to_asset.upper()}",
+            "sent": f"{_coin(record.from_amount)} {record.from_asset.upper()}",
+            "received": f"{_coin(record.to_amount)} {record.to_asset.upper()}",
+            "status": record.status,
+            "status_label": _status_label(record.status),
+            "date": _when(record.date_created),
+        }
+        for record in CryptoExchange.objects.filter(user=request.user)[:10]
+    ]
 
     action.send(request.user, verb="viewed cryptoexchange")
     return render(
         request,
         "creataura/crypto_exchange.html",
         {
-            "account_balance": account_balance,
-            "asset_balances": asset_balances,
-            "asset_labels": labels,
-            "assets": assets,
-            "exchange_records": completed[:10],
+            "balances": balances,
+            "exchange_data": exchange_data,
+            "exchange_rows": exchange_rows,
         },
     )
 

@@ -17,17 +17,21 @@
 <body>
     <main class="exchange-page">
         <header class="exchange-header">
-            <a href="{% url 'dashboard' %}" class="back-button" aria-label="Back to dashboard"><i
-                    class="bi bi-chevron-left"></i></a>
+            <a href="{% url 'dashboard' %}" class="back-button" aria-label="Back to dashboard">
+                <i class="bi bi-chevron-left"></i>
+            </a>
             <h1>Crypto Exchange</h1>
-            <button class="refresh-button" type="button" aria-label="Refresh balances"><i
-                    class="bi bi-arrow-clockwise"></i></button>
+            <button class="refresh-button" id="refreshButton" type="button" aria-label="Refresh balances">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </header>
 
         {% if messages %}
         <div class="exchange-messages" aria-live="polite">
             {% for message in messages %}
-            <p class="{{ message.tags }}">{{ message }}</p>
+            <p class="{{ message.tags }}">
+                {{ message }}
+            </p>
             {% endfor %}
         </div>
         {% endif %}
@@ -36,57 +40,70 @@
             <article class="wallet-row">
                 <span class="coin-icon usd">$</span>
                 <div><small>Type</small><strong>Account Balance</strong></div>
-                <b>${{ account_balance|floatformat:2 }}</b>
+                <b>{{ balances.usd }}</b>
             </article>
             <article class="wallet-row">
                 <img src="{% static 'creataura/images/bitcoin.png' %}" alt="">
-                <div><small>Type</small><strong>BTC Balance</strong></div><b>0 BTC</b>
+                <div><small>Type</small><strong>BTC Balance</strong></div>
+                <b>{{ balances.btc }}</b>
             </article>
             <article class="wallet-row">
                 <img src="{% static 'creataura/images/ethereum.png' %}" alt="">
-                <div><small>Type</small><strong>ETH Balance</strong></div><b>0 ETH</b>
+                <div><small>Type</small><strong>ETH Balance</strong></div>
+                <b>{{ balances.eth }}</b>
             </article>
             <article class="wallet-row">
                 <span class="coin-icon ltc">Ł</span>
-                <div><small>Type</small><strong>LTC Balance</strong></div><b>0 LTC</b>
+                <div><small>Type</small><strong>LTC Balance</strong></div>
+                <b>{{ balances.ltc }}</b>
             </article>
             <article class="wallet-row">
                 <img src="{% static 'creataura/images/chainlink.png' %}" alt="">
-                <div><small>Type</small><strong>LINK Balance</strong></div><b>0 LINK</b>
+                <div><small>Type</small><strong>LINK Balance</strong></div>
+                <b>{{ balances.link }}</b>
             </article>
             <article class="wallet-row">
                 <span class="coin-icon bnb">◆</span>
-                <div><small>Type</small><strong>BNB Balance</strong></div><b>0 BNB</b>
+                <div><small>Type</small><strong>BNB Balance</strong></div>
+                <b>{{ balances.bnb }}</b>
             </article>
             <article class="wallet-row">
                 <span class="coin-icon ada">A</span>
-                <div><small>Type</small><strong>ADA Balance</strong></div><b>0 ADA</b>
+                <div><small>Type</small><strong>ADA Balance</strong></div>
+                <b>{{ balances.ada }}</b>
             </article>
             <article class="wallet-row">
                 <span class="coin-icon aave">AAVE</span>
-                <div><small>Type</small><strong>AAVE Balance</strong></div><b>0 AAVE</b>
+                <div><small>Type</small><strong>AAVE Balance</strong></div>
+                <b>{{ balances.aave }}</b>
             </article>
             <article class="wallet-row">
                 <img src="{% static 'creataura/images/tether--v2.png' %}" alt="">
-                <div><small>Type</small><strong>USDT Balance</strong></div><b>0 USDT</b>
+                <div><small>Type</small><strong>USDT Balance</strong></div>
+                <b>{{ balances.usdt }}</b>
             </article>
             <article class="wallet-row">
                 <span class="coin-icon bch">₿</span>
-                <div><small>Type</small><strong>BCH Balance</strong></div><b>0 BCH</b>
+                <div><small>Type</small><strong>BCH Balance</strong></div>
+                <b>{{ balances.bch }}</b>
             </article>
             <article class="wallet-row">
                 <span class="coin-icon xlm">✦</span>
-                <div><small>Type</small><strong>XLM Balance</strong></div><b>0 XLM</b>
+                <div><small>Type</small><strong>XLM Balance</strong></div>
+                <b>{{ balances.xlm }}</b>
             </article>
         </section>
 
-        <form class="exchange-form" id="exchange-form" method="post" aria-label="Exchange form">
+        <form class="exchange-form" id="exchange-form" method="post" aria-label="Exchange form" autocomplete="off">
             {% csrf_token %}
             <label class="exchange-field">
-                <span class="field-heading"><span>From</span><small id="fromBalance">Balance : 0 bnb</small></span>
+                <span class="field-heading">
+                    <span>From</span>
+                    <small id="fromBalance">Balance : 0</small>
+                </span>
                 <span class="field-input">
                     <input id="fromAmount" name="from_amount" type="number" min="0" step="any"
-                        placeholder="Enter amount of bnb" required>
+                        placeholder="Enter amount" required>
                     <span class="asset-select">
                         <select id="fromAsset" name="from_asset" aria-label="Asset to exchange from">
                             <option value="usd">USD</option>
@@ -104,12 +121,18 @@
                     </span>
                 </span>
             </label>
-            <button class="swap-button" id="swapButton" type="button" aria-label="Swap currencies"><i
-                    class="bi bi-arrow-down-up"></i></button>
+
+            <button class="swap-button" id="swapButton" type="button" aria-label="Swap currencies">
+                <i class="bi bi-arrow-down-up"></i>
+            </button>
+
             <label class="exchange-field">
-                <span class="field-heading"><span>To</span><small>Balance : null usd</small></span>
+                <span class="field-heading">
+                    <span>To</span>
+                    <small id="toBalance">Balance : 0</small>
+                </span>
                 <span class="field-input">
-                    <input id="toAmount" type="number" min="0" step="any" placeholder="Quantity of usd" readonly>
+                    <input id="toAmount" type="number" min="0" step="any" placeholder="Quantity" readonly>
                     <span class="asset-select">
                         <select id="toAsset" name="to_asset" aria-label="Asset to receive">
                             <option value="usd" selected>USD</option>
@@ -156,6 +179,25 @@
             </div>
         </section>
 
+        <section class="wallet-list" aria-label="Recent exchanges">
+            {% for row in exchange_rows %}
+            <article class="wallet-row">
+                <div>
+                    <small>{{ row.date }}</small>
+                    <strong>{{ row.pair }}</strong>
+                </div>
+                <b>{{ row.sent }} to {{ row.received }}</b>
+            </article>
+            {% empty %}
+            <article class="wallet-row">
+                <div>
+                    <small>Recent exchanges</small>
+                    <strong>No exchanges yet</strong>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+
         <button class="exchange-submit" type="submit" form="exchange-form">Exchange</button>
         <footer class="exchange-footer">
             <strong>&copy; Copyright © Capitalnext 2026. All Rights Reserved.</strong>
@@ -164,43 +206,58 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span>
+            <span>Dashboard</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span>
+            <span>Transaction History</span>
+        </a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'crypto_exchange' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
+            <span>Crypto Exchange</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
+            <span>Invest</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-gear"></i></span>
+            <span>Settings</span>
+        </a>
     </nav>
 
+    {{ exchange_data|json_script:"exchange-data" }}
+
     <script>
+        const data = JSON.parse(document.getElementById("exchange-data").textContent);
+        const rates = data.rates;
+        const balances = data.balances;
+
         const fromAmount = document.getElementById("fromAmount");
         const toAmount = document.getElementById("toAmount");
         const swapButton = document.getElementById("swapButton");
         const fromAsset = document.getElementById("fromAsset");
         const toAsset = document.getElementById("toAsset");
-        const accountBalance = Number("{{ account_balance }}");
-        const rates = { usd: 1, btc: 97000, eth: 3500, ltc: 100, link: 25, bnb: 710.58, ada: 0.5, aave: 300, usdt: 1, bch: 500, xlm: 0.1 };
-        const balances = {
-            usd: accountBalance,
-            btc: Number("{{ asset_balances.btc }}"), eth: Number("{{ asset_balances.eth }}"),
-            ltc: Number("{{ asset_balances.ltc }}"), link: Number("{{ asset_balances.link }}"),
-            bnb: Number("{{ asset_balances.bnb }}"), ada: Number("{{ asset_balances.ada }}"),
-            aave: Number("{{ asset_balances.aave }}"), usdt: Number("{{ asset_balances.usdt }}"),
-            bch: Number("{{ asset_balances.bch }}"), xlm: Number("{{ asset_balances.xlm }}")
-        };
+
+        function trim(number, places) {
+            return number.toFixed(places).replace(/\.?0+$/, "") || "0";
+        }
+
         function updateConversion() {
             const value = Number(fromAmount.value || 0);
             const grossUsd = value * rates[fromAsset.value];
             const received = value > 0 ? (grossUsd * 0.98) / rates[toAsset.value] : 0;
-            toAmount.value = received ? received.toFixed(8).replace(/\.?0+$/, "") : "";
-            fromAmount.placeholder = `Enter amount of ${fromAsset.value}`;
+
+            toAmount.value = received ? trim(received, 8) : "";
+            fromAmount.placeholder = "Enter amount of " + fromAsset.value;
             document.getElementById("fromBalance").textContent =
-                `Balance : ${balances[fromAsset.value].toFixed(8).replace(/\.?0+$/, "")} ${fromAsset.value}`;
+                "Balance : " + trim(balances[fromAsset.value], 8) + " " + fromAsset.value;
+            document.getElementById("toBalance").textContent =
+                "Balance : " + trim(balances[toAsset.value], 8) + " " + toAsset.value;
         }
+
         fromAmount.addEventListener("input", updateConversion);
         fromAsset.addEventListener("change", updateConversion);
         toAsset.addEventListener("change", updateConversion);
@@ -210,6 +267,9 @@
             toAsset.value = previousFrom;
             swapButton.classList.toggle("rotated");
             updateConversion();
+        });
+        document.getElementById("refreshButton").addEventListener("click", () => {
+            window.location.reload();
         });
         updateConversion();
     </script>

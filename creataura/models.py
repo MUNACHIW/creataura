@@ -217,8 +217,8 @@ class CryptoExchange(models.Model):
     )
     from_asset = models.CharField(max_length=20)
     to_asset = models.CharField(max_length=20)
-    from_amount = models.DecimalField(max_digits=12, decimal_places=8)
-    to_amount = models.DecimalField(max_digits=12, decimal_places=8)
+    from_amount = models.DecimalField(max_digits=24, decimal_places=8)
+    to_amount = models.DecimalField(max_digits=24, decimal_places=8)
     exchange_rate = models.DecimalField(
         max_digits=20,
         decimal_places=8,
