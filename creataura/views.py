@@ -36,7 +36,7 @@ from .models import (
     InvestmentPlan,
     KYCVerification,
     Notification,
-    ProfitRecord,
+    ProfitRecord, 
     ReferralBonus,
     SupportMessage,
     UserInvestment,
@@ -61,6 +61,17 @@ LOCKOUT_SECONDS = 15 * 60
 # =========================================================
 def _checked(value):
     return "checked" if value else ""
+
+def _status_label(value):
+    return str(value or "").replace("_", " ").title()
+
+
+def _money(value):
+    return f"${value:,.2f}"
+
+
+def _when(value):
+    return timezone.localtime(value).strftime("%b %d, %Y, %I:%M %p")
 
 
 def _get_profile(user):
@@ -831,36 +842,54 @@ def deposit_payment(request, payment_mode):
 
 @login_required(login_url="login")
 def transaction_history(request):
-    bitcoin_withdrawals = WithdrawalBTC.objects.filter(user=request.user)
-    xrp_withdrawals = WithdrawalXRP.objects.filter(user=request.user)
-    withdrawals = []
-    for item in list(bitcoin_withdrawals) + list(xrp_withdrawals):
-        withdrawals.append(
-            {
-                "amount": item.amount,
-                "amount_with_charges": item.amount + item.charges,
-                "receiving_mode": item.cryptocoin,
-                "status": item.status,
-                "date_created": item.date_created,
-            }
-        )
-    withdrawals.sort(key=lambda record: record["date_created"], reverse=True)
+    deposits = [
+        {
+            "amount": _money(item.amount),
+            "payment_mode": item.get_payment_mode_display(),
+            "status": item.status,
+            "status_label": _status_label(item.status),
+            "date": _when(item.date_created),
+        }
+        for item in Deposit.objects.filter(user=request.user)
+    ]
 
-    other_transactions = []
+    withdrawal_rows = []
+    for item in WithdrawalBTC.objects.filter(user=request.user):
+        withdrawal_rows.append(item)
+    for item in WithdrawalXRP.objects.filter(user=request.user):
+        withdrawal_rows.append(item)
+    withdrawal_rows.sort(key=lambda record: record.date_created, reverse=True)
+
+    withdrawals = [
+        {
+            "amount": _money(item.amount),
+            "amount_with_charges": _money(item.amount + item.charges),
+            "receiving_mode": item.cryptocoin,
+            "status": item.status,
+            "status_label": _status_label(item.status),
+            "date": _when(item.date_created),
+        }
+        for item in withdrawal_rows
+    ]
+
+    other_rows = []
     signup_bonus = Bonus.objects.filter(
         user=request.user, plan_narration="SignUp Bonus"
     ).first()
     if signup_bonus:
-        other_transactions.append(
+        other_rows.append(
             {
                 "amount": signup_bonus.amount,
                 "type": "Bonus",
                 "plan_narration": "SignUp Bonus",
+                "status": "completed",
                 "date_created": signup_bonus.date_created,
             }
         )
-    for investment in UserInvestment.objects.filter(user=request.user):
-        other_transactions.append(
+    for investment in UserInvestment.objects.filter(
+        user=request.user
+    ).select_related("plan"):
+        other_rows.append(
             {
                 "amount": investment.amount,
                 "type": "Investment",
@@ -869,20 +898,30 @@ def transaction_history(request):
                 "date_created": investment.date_created,
             }
         )
-    other_transactions.sort(key=lambda record: record["date_created"], reverse=True)
+    other_rows.sort(key=lambda record: record["date_created"], reverse=True)
+
+    other_transactions = [
+        {
+            "amount": _money(row["amount"]),
+            "type": row["type"],
+            "plan_narration": row["plan_narration"],
+            "status": row["status"],
+            "status_label": _status_label(row["status"]),
+            "date": _when(row["date_created"]),
+        }
+        for row in other_rows
+    ]
+
     action.send(request.user, verb="viewed transaction history")
     return render(
         request,
         "creataura/transactions.html",
         {
-            "deposits": Deposit.objects.filter(user=request.user),
-            "bitcoin_withdrawals": bitcoin_withdrawals,
-            "xrp_withdrawals": xrp_withdrawals,
+            "deposits": deposits,
             "withdrawals": withdrawals,
             "other_transactions": other_transactions,
         },
     )
-
 
 # =========================================================
 # Investments

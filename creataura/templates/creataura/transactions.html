@@ -29,6 +29,7 @@
                 <button type="button" data-transaction-tab="others">Others</button>
             </div>
 
+            <!-- Deposits -->
             <section class="transaction-table-card" data-transaction-panel="deposits">
                 <h2>Deposit Table</h2>
                 <div class="transaction-table-wrap">
@@ -42,13 +43,16 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for transaction in deposits %}
+                            {% for row in deposits %}
                             <tr>
-                                <td>${{ transaction.amount|floatformat:2 }}</td>
-                                <td>{{ transaction.get_payment_mode_display }}</td>
-                                <td><span class="transaction-status status-{{ transaction.status }}">{{
-                                        transaction.status|title }}</span></td>
-                                <td>{{ transaction.date_created|date:"M j, Y, g:i A" }}</td>
+                                <td>{{ row.amount }}</td>
+                                <td>{{ row.payment_mode }}</td>
+                                <td>
+                                    <span class="transaction-status status-{{ row.status }}">
+                                        {{ row.status_label }}
+                                    </span>
+                                </td>
+                                <td>{{ row.date }}</td>
                             </tr>
                             {% empty %}
                             <tr>
@@ -60,6 +64,7 @@
                 </div>
             </section>
 
+            <!-- Withdrawals -->
             <section class="transaction-table-card" data-transaction-panel="withdrawals" hidden>
                 <h2>Withdrawal Table</h2>
                 <div class="transaction-table-wrap">
@@ -74,14 +79,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for transaction in withdrawals %}
+                            {% for row in withdrawals %}
                             <tr>
-                                <td>${{ transaction.amount|floatformat:2 }}</td>
-                                <td>${{ transaction.amount_with_charges|floatformat:2 }}</td>
-                                <td>{{ transaction.receiving_mode }}</td>
-                                <td><span class="transaction-status status-{{ transaction.status }}">{{
-                                        transaction.status|title }}</span></td>
-                                <td>{{ transaction.date_created|date:"M j, Y, g:i A" }}</td>
+                                <td>{{ row.amount }}</td>
+                                <td>{{ row.amount_with_charges }}</td>
+                                <td>{{ row.receiving_mode }}</td>
+                                <td>
+                                    <span class="transaction-status status-{{ row.status }}">
+                                        {{ row.status_label }}
+                                    </span>
+                                </td>
+                                <td>{{ row.date }}</td>
                             </tr>
                             {% empty %}
                             <tr>
@@ -93,6 +101,7 @@
                 </div>
             </section>
 
+            <!-- Others -->
             <section class="transaction-table-card" data-transaction-panel="others" hidden>
                 <h2>Other Transactions</h2>
                 <div class="transaction-table-wrap">
@@ -102,20 +111,26 @@
                                 <th>Amount</th>
                                 <th>Type</th>
                                 <th>Plan/Narration</th>
+                                <th>Status</th>
                                 <th>Date Created</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for transaction in other_transactions %}
+                            {% for row in other_transactions %}
                             <tr>
-                                <td>${{ transaction.amount|floatformat:0 }}</td>
-                                <td>{{ transaction.type }}</td>
-                                <td>{{ transaction.plan_narration }}</td>
-                                <td>{{ transaction.date_created|date:"D, M j, Y g:i A" }}</td>
+                                <td>{{ row.amount }}</td>
+                                <td>{{ row.type }}</td>
+                                <td>{{ row.plan_narration }}</td>
+                                <td>
+                                    <span class="transaction-status status-{{ row.status }}">
+                                        {{ row.status_label }}
+                                    </span>
+                                </td>
+                                <td>{{ row.date }}</td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td class="transaction-empty" colspan="4">No transactions found.</td>
+                                <td class="transaction-empty" colspan="5">No transactions found.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -131,25 +146,37 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}"><span
-                class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction
-                History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span>
+            <span>Dashboard</span>
+        </a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span>
+            <span>Transaction History</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
+            <span>Crypto Exchange</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
+            <span>Invest</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-gear"></i></span>
+            <span>Settings</span>
+        </a>
     </nav>
+
     <script>
         const tabButtons = document.querySelectorAll("[data-transaction-tab]");
         const tabPanels = document.querySelectorAll("[data-transaction-panel]");
         const initialTab = new URLSearchParams(window.location.search).get("tab") || "deposits";
 
         function selectTransactionTab(tabName) {
-            tabButtons.forEach((tab) => tab.classList.toggle("active", tab.dataset.transactionTab === tabName));
+            tabButtons.forEach((tab) => {
+                tab.classList.toggle("active", tab.dataset.transactionTab === tabName);
+            });
             tabPanels.forEach((panel) => {
                 panel.hidden = panel.dataset.transactionPanel !== tabName;
             });
