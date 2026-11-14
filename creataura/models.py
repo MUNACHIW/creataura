@@ -175,6 +175,11 @@ class ProfitRecord(models.Model):
         null=True,
         blank=True,
     )
+    profit_day = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Day number of the investment this profit belongs to.",
+    )
     amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -187,6 +192,12 @@ class ProfitRecord(models.Model):
         ordering = ["-date_created"]
         verbose_name = "Profit record"
         verbose_name_plural = "Profit records"
+        constraints = [
+            models.UniqueConstraint(
+                fields=("investment", "profit_day"),
+                name="unique_profit_day_per_investment",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.user.username} - ${self.amount}"

@@ -25,21 +25,36 @@
         {% if messages %}
         <div class="withdraw-roi-messages" aria-live="polite">
             {% for message in messages %}
-            <p class="{{ message.tags }}">{{ message }}</p>
+            <p class="{{ message.tags }}">
+                {{ message }}
+            </p>
             {% endfor %}
         </div>
         {% endif %}
 
         <section class="withdraw-roi-content">
             <article class="roi-balance-card">
-                <div><span>Available ROI</span><strong>${{ available_roi|floatformat:2 }}</strong></div>
-                <div><span>Total earned</span><strong>${{ total_profit|floatformat:2 }}</strong></div>
+                <div>
+                    <span>Available ROI</span>
+                    <strong>{{ available_roi }}</strong>
+                </div>
+                <div>
+                    <span>Total earned</span>
+                    <strong>{{ total_profit }}</strong>
+                </div>
             </article>
 
-            {% if available_roi > 0 %}
-            <form method="post" class="roi-withdraw-form">
+            {% if has_roi %}
+            <form method="post" class="roi-withdraw-form roi-otp-form">
                 {% csrf_token %}
-                <h2>Withdrawal details</h2>
+                <input type="hidden" name="action" value="request_otp">
+                <h2>Step 1: get your OTP</h2>
+                <button type="submit">Send OTP to my email</button>
+            </form>
+
+            <form method="post" class="roi-withdraw-form" autocomplete="off">
+                {% csrf_token %}
+                <h2>Step 2: withdrawal details</h2>
                 <label>
                     <span>Payment method</span>
                     <select name="payment_mode" id="roiPaymentMode" required>
@@ -50,7 +65,7 @@
                 </label>
                 <label>
                     <span>Amount</span>
-                    <input type="number" name="amount" min="0.01" max="{{ available_roi }}" step="0.01"
+                    <input type="number" name="amount" min="0.01" max="{{ available_roi_max }}" step="0.01"
                         placeholder="$0.00" required>
                 </label>
                 <label id="bitcoinAddressRow">
@@ -60,6 +75,11 @@
                 <label id="xrpAddressRow" hidden>
                     <span>XRP address</span>
                     <input type="text" name="xrp_address" placeholder="Enter XRP wallet address">
+                </label>
+                <label>
+                    <span>OTP code</span>
+                    <input type="text" name="otpcode" maxlength="10" placeholder="Enter the code from your email"
+                        required>
                 </label>
                 <button type="submit">Submit ROI Withdrawal</button>
             </form>
@@ -73,14 +93,16 @@
 
             <section class="roi-withdraw-history">
                 <h2>ROI withdrawal requests</h2>
-                {% for withdrawal in roi_withdrawals %}
+                {% for item in roi_withdrawals %}
                 <article>
                     <div>
-                        <strong>{{ withdrawal.cryptocoin }}</strong>
-                        <span>{{ withdrawal.date_created|date:"M j, Y g:i A" }}</span>
+                        <strong>{{ item.cryptocoin }}</strong>
+                        <span>{{ item.date }}</span>
                     </div>
-                    <strong>${{ withdrawal.amount|floatformat:2 }}</strong>
-                    <span class="roi-status status-{{ withdrawal.status }}">{{ withdrawal.status|title }}</span>
+                    <strong>{{ item.amount }}</strong>
+                    <span class="roi-status status-{{ item.status }}">
+                        {{ item.status_label }}
+                    </span>
                 </article>
                 {% empty %}
                 <p>No ROI withdrawal requests found.</p>
@@ -90,16 +112,26 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span>
+            <span>Dashboard</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span>
+            <span>Transaction History</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
+            <span>Crypto Exchange</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
+            <span>Invest</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-gear"></i></span>
+            <span>Settings</span>
+        </a>
     </nav>
 
     <script>

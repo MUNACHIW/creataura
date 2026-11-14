@@ -50,10 +50,12 @@ from .verification import (
     is_email_verified,
     send_password_reset_email,
     send_verification_email,
+     send_simple_email,
 )
 
 MAX_LOGIN_ATTEMPTS = 5
 LOCKOUT_SECONDS = 15 * 60
+ROI_OTP_MINUTES = 10
 
 
 # =========================================================
@@ -444,13 +446,31 @@ def kyc(request):
 
 @login_required(login_url="login")
 def roi_history(request):
-    records = ProfitRecord.objects.filter(user=request.user)
+    records = ProfitRecord.objects.filter(user=request.user).select_related(
+        "investment__plan"
+    )
     total_profit = records.aggregate(total=models.Sum("amount"))["total"] or Decimal("0")
+
+    roi_rows = [
+        {
+            "narration": record.narration,
+            "plan_name": (
+                record.investment.plan.name if record.investment else "Manual credit"
+            ),
+            "amount": _money(record.amount),
+            "date": _when(record.date_created),
+        }
+        for record in records
+    ]
+
     action.send(request.user, verb="viewed ROI")
     return render(
         request,
         "creataura/roi_history.html",
-        {"roi_records": records, "total_profit": total_profit},
+        {
+            "roi_rows": roi_rows,
+            "total_profit": _money(total_profit),
+        },
     )
 
 
@@ -479,15 +499,51 @@ def withdraw_roi(request):
             messages.error(request, "Nothing to withdraw at the moment!")
             return redirect("withdraw_roi")
 
+        # Step 1: send the OTP
+        if request.POST.get("action") == "request_otp":
+            if not request.user.email:
+                messages.error(request, "Add an email address to your account first.")
+                return redirect("withdraw_roi")
+            otp = secrets.token_hex(3).upper()
+            request.session["roi_withdrawal_otp"] = {
+                "code": otp,
+                "at": timezone.now().timestamp(),
+            }
+            sent = send_simple_email(
+                request.user.email,
+                "Capitalnext ROI Withdrawal OTP",
+                f"Your ROI withdrawal OTP is {otp}. It expires in {ROI_OTP_MINUTES} minutes.",
+            )
+            if sent:
+                messages.success(request, "Withdrawal OTP sent to your email.")
+            else:
+                messages.error(
+                    request, "We couldn't send the OTP. Please try again shortly."
+                )
+            return redirect("withdraw_roi")
+
+        # Step 2: validate and submit the withdrawal
         payment_mode = request.POST.get("payment_mode", "").strip().lower()
+        otp_code = request.POST.get("otpcode", "").strip().upper()
         try:
             amount = Decimal(request.POST.get("amount", "").strip())
         except (InvalidOperation, AttributeError):
             amount = Decimal("0")
 
-        if payment_mode == "bitcoin":
-            address = bitcoin_address.strip()
-            if not address:
+        stored = request.session.get("roi_withdrawal_otp") or {}
+        expected = stored.get("code", "")
+        age_seconds = timezone.now().timestamp() - stored.get("at", 0)
+        otp_expired = age_seconds > ROI_OTP_MINUTES * 60
+
+        if not expected:
+            messages.error(request, "Request an OTP before completing withdrawal.")
+        elif otp_expired:
+            request.session.pop("roi_withdrawal_otp", None)
+            messages.error(request, "Your OTP has expired. Request a new one.")
+        elif not secrets.compare_digest(otp_code, expected):
+            messages.error(request, "The withdrawal OTP is incorrect.")
+        elif payment_mode == "bitcoin":
+            if not bitcoin_address.strip():
                 messages.error(request, "Add your Bitcoin address in Settings first.")
             elif not amount.is_finite() or amount <= 0:
                 messages.error(request, "Enter a valid withdrawal amount.")
@@ -498,9 +554,11 @@ def withdraw_roi(request):
                     user=request.user,
                     cryptocoin="Bitcoin",
                     amount=amount,
+                    otpcode=otp_code,
                     status="pending",
                     source="roi",
                 )
+                request.session.pop("roi_withdrawal_otp", None)
                 messages.success(request, "ROI withdrawal submitted for approval.")
                 return redirect("withdraw_roi")
         elif payment_mode == "xrp":
@@ -516,31 +574,46 @@ def withdraw_roi(request):
                     user=request.user,
                     cryptocoin="XRP",
                     amount=amount,
+                    otpcode=otp_code,
                     xrp_address=address,
                     status="pending",
                     source="roi",
                 )
+                request.session.pop("roi_withdrawal_otp", None)
                 messages.success(request, "ROI withdrawal submitted for approval.")
                 return redirect("withdraw_roi")
         else:
             messages.error(request, "Select a valid payment method.")
 
-    roi_withdrawals = list(btc_roi_withdrawals) + list(xrp_roi_withdrawals)
-    roi_withdrawals.sort(key=lambda record: record.date_created, reverse=True)
+    withdrawal_rows = list(btc_roi_withdrawals) + list(xrp_roi_withdrawals)
+    withdrawal_rows.sort(key=lambda record: record.date_created, reverse=True)
+    roi_withdrawals = [
+        {
+            "cryptocoin": item.cryptocoin,
+            "amount": _money(item.amount),
+            "status": item.status,
+            "status_label": _status_label(item.status),
+            "date": _when(item.date_created),
+        }
+        for item in withdrawal_rows
+    ]
+
     if request.method == "GET" and available_roi <= 0:
         messages.error(request, "Nothing to withdraw at the moment!")
+
     action.send(request.user, verb="viewed withdraw roi")
     return render(
         request,
         "creataura/withdraw_roi.html",
         {
-            "total_profit": total_profit,
-            "available_roi": available_roi,
+            "has_roi": available_roi > 0,
+            "available_roi": _money(available_roi),
+            "available_roi_max": f"{available_roi:.2f}",
+            "total_profit": _money(total_profit),
             "bitcoin_address": bitcoin_address,
             "roi_withdrawals": roi_withdrawals,
         },
     )
-
 
 # =========================================================
 # Withdrawals
@@ -616,16 +689,14 @@ def withdrawal_btc(request):
         if request.POST.get("action") == "request_otp":
             otp = secrets.token_hex(3).upper()
             request.session["btc_withdrawal_otp"] = otp
-            # The OTP is always required, so it is always sent.
-            if request.user.email:
-                send_mail(
-                    "Createaura Bitcoin Withdrawal OTP",
-                    f"Your Bitcoin withdrawal OTP is {otp}.",
-                    None,
-                    [request.user.email],
-                    fail_silently=True,
-                )
-            messages.success(request, "Withdrawal OTP sent to your email.")
+            if request.user.email and send_simple_email(
+                request.user.email,
+                "Capitalnext Bitcoin Withdrawal OTP",
+                f"Your Bitcoin withdrawal OTP is {otp}.",
+            ):
+                messages.success(request, "Withdrawal OTP sent to your email.")
+            else:
+                messages.error(request, "We couldn't send the OTP. Please try again.")
             return redirect("withdrawal_btc")
 
         try:
@@ -698,15 +769,14 @@ def withdrawal_xrp(request):
         if request.POST.get("action") == "request_otp":
             otp = secrets.token_hex(3).upper()
             request.session["xrp_withdrawal_otp"] = otp
-            if request.user.email:
-                send_mail(
-                    "Createaura XRP Withdrawal OTP",
-                    f"Your XRP withdrawal OTP is {otp}.",
-                    None,
-                    [request.user.email],
-                    fail_silently=True,
-                )
-            messages.success(request, "Withdrawal OTP sent to your email.")
+            if request.user.email and send_simple_email(
+                request.user.email,
+                "Capitalnext XRP Withdrawal OTP",
+                f"Your XRP withdrawal OTP is {otp}.",
+            ):
+                messages.success(request, "Withdrawal OTP sent to your email.")
+            else:
+                messages.error(request, "We couldn't send the OTP. Please try again.")
             return redirect("withdrawal_xrp")
 
         try:

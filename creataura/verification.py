@@ -172,3 +172,24 @@ def verification_status(request):
     if user is not None and user.is_authenticated:
         return {"email_unverified": not is_email_verified(user)}
     return {}
+
+def send_simple_email(to_email, subject, body):
+    """Plain-text email through Resend. Returns True if it was sent."""
+    if not settings.RESEND_API_KEY:
+        logger.warning("RESEND_API_KEY not set. Email to %s:\n%s", to_email, body)
+        return settings.DEBUG
+
+    resend.api_key = settings.RESEND_API_KEY
+    try:
+        resend.Emails.send(
+            {
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": [to_email],
+                "subject": subject,
+                "text": body,
+            }
+        )
+        return True
+    except Exception:
+        logger.exception("Failed to send email to %s", to_email)
+        return False
