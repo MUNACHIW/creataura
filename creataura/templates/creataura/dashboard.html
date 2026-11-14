@@ -195,21 +195,9 @@
             <div class="empty-transaction">
                 <span class="transaction-icon"><i class="bi bi-cash"></i></span>
                 <div>
-                    <strong>No transaction yet</strong>
+                    <strong>{% if latest_deposits %}{{ latest_deposits|length }}{% else %}No transaction yet{% endif
+                        %}</strong>
                     <small>Deposit</small>
-                </div>
-            </div>
-        </article>
-        <article class="transaction-group">
-            <div class="transaction-heading">
-                <h2>Withdrawal Transactions</h2>
-                <a href="{% url 'transaction_history' %}">View All</a>
-            </div>
-            <div class="empty-transaction">
-                <span class="transaction-icon"><i class="bi bi-cash"></i></span>
-                <div>
-                    <strong>No transaction yet</strong>
-                    <small>Withdrawal</small>
                 </div>
             </div>
         </article>
