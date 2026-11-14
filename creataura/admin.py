@@ -130,7 +130,7 @@ class DepositWalletAdmin(admin.ModelAdmin):
     list_display = ("crypto", "wallet_address", "network_type", "is_active", "updated_at")
     list_filter = ("crypto", "is_active")
     search_fields = ("wallet_address",)
-    list_editable = ("is_active",)
+    list_editable = ("wallet_address", "network_type", "is_active")
     readonly_fields = ("updated_at",)
 
 
