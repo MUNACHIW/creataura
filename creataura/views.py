@@ -420,6 +420,17 @@ EXCHANGE_RATES = {
     "bch": Decimal("500"),
     "xlm": Decimal("0.10"),
 }
+
+DEPOSIT_METHODS = {
+    "bitcoin": {"label": "Bitcoin", "icon_class": "bitcoin-icon", "icon_symbol": "₿"},
+    "usdt_tron20": {
+        "label": "USDT (TRC20)",
+        "icon_class": "usdt-icon",
+        "icon_symbol": "₮",
+    },
+    "ethereum": {"label": "Ethereum", "icon_class": "ethereum-icon", "icon_symbol": "Ξ"},
+    "xrp": {"label": "XRP", "icon_class": "xrp-icon", "icon_symbol": "X"},
+}
 def _coin(value):
     text = f"{value:.8f}".rstrip("0").rstrip(".")
     return text or "0"
@@ -900,7 +911,7 @@ def deposit(request):
             amount = Decimal(request.POST.get("amount", "").strip())
         except (InvalidOperation, AttributeError):
             amount = Decimal("0")
-        if payment_mode not in ("bitcoin", "ethereum", "xrp"):
+        if payment_mode not in DEPOSIT_METHODS:
             messages.error(request, "Select a valid payment method.")
         elif not amount.is_finite() or amount <= 0:
             messages.error(request, "Enter a valid deposit amount.")
@@ -910,17 +921,23 @@ def deposit(request):
             return redirect("deposit_payment", payment_mode=payment_mode)
     action.send(request.user, verb="viewed deposit")
 
+    methods = [
+        {"value": key, **details} for key, details in DEPOSIT_METHODS.items()
+    ]
     return render(
         request,
         "creataura/deposit.html",
-        {"available_balance": get_available_balance(request.user)},
+        {
+            "methods": methods,
+            "available_balance": _money(get_available_balance(request.user)),
+        },
     )
 
 
 @login_required(login_url="login")
 def deposit_payment(request, payment_mode):
     payment_mode = payment_mode.lower()
-    if payment_mode not in ("bitcoin", "ethereum", "xrp"):
+    if payment_mode not in DEPOSIT_METHODS:
         return redirect("deposit")
 
     amount_value = request.session.get("deposit_amount")
@@ -932,7 +949,6 @@ def deposit_payment(request, payment_mode):
     except InvalidOperation:
         return redirect("deposit")
 
-    # No placeholder addresses: customers must never be shown a dead wallet.
     wallet = DepositWallet.objects.filter(crypto=payment_mode, is_active=True).first()
     if not wallet:
         messages.error(request, "This payment method is temporarily unavailable.")
@@ -959,18 +975,20 @@ def deposit_payment(request, payment_mode):
             messages.success(request, "Deposit proof submitted for approval.")
             return redirect("transaction_history")
 
+    method = DEPOSIT_METHODS[payment_mode]
     return render(
         request,
         "creataura/deposit_payment.html",
         {
             "payment_mode": payment_mode,
-            "payment_label": payment_mode.title(),
+            "payment_label": method["label"],
+            "icon_class": method["icon_class"],
+            "icon_symbol": method["icon_symbol"],
             "network_type": network_type,
             "wallet_address": wallet_address,
-            "deposit_amount": amount,
+            "deposit_amount": _money(amount),
         },
     )
-
 
 @login_required(login_url="login")
 def transaction_history(request):

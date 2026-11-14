@@ -21,32 +21,43 @@
             <h1>Make Payment</h1>
             <span class="payment-call"><i class="bi bi-telephone"></i></span>
         </header>
+
         <div class="payment-subtitle">Payment</div>
+
         {% if messages %}
         <div class="deposit-messages">
-            {% for message in messages %}<p class="{{ message.tags }}">{{ message }}</p>{% endfor %}
+            {% for message in messages %}
+            <p class="{{ message.tags }}">
+                {{ message }}
+            </p>
+            {% endfor %}
         </div>
         {% endif %}
+
         <article class="payment-card">
-            <p class="payment-instruction">You are to make payment of <b>${{ deposit_amount|floatformat:2 }}</b> using
-                your selected payment method. Screenshot and upload the proof of payment.</p>
-            {% if payment_mode == "bitcoin" %}
-            <div class="selected-method"><span
-                    class="payment-icon bitcoin-icon large"><b>₿</b></span><strong>Bitcoin</strong></div>
-            {% elif payment_mode == "ethereum" %}
-            <div class="selected-method"><span class="payment-icon ethereum-icon large"><i
-                        class="bi bi-diamond-fill"></i></span><strong>Ethereum</strong></div>
-            {% else %}
-            <div class="selected-method"><span class="payment-icon xrp-icon large"><b>X</b></span><strong>XRP</strong>
+            <p class="payment-instruction">
+                You are to make payment of <b>{{ deposit_amount }}</b> using your selected payment method.
+                Screenshot and upload the proof of payment.
+            </p>
+
+            <div class="selected-method">
+                <span class="payment-icon large {{ icon_class }}"><b>{{ icon_symbol }}</b></span>
+                <strong>{{ payment_label }}</strong>
             </div>
-            {% endif %}
+
             <label class="wallet-address-label">{{ payment_label }} Address:</label>
             <div class="wallet-address-row">
                 <input id="walletAddress" type="text" value="{{ wallet_address }}" readonly>
-                <button type="button" id="copyWallet" aria-label="Copy wallet address"><i
-                        class="bi bi-copy"></i></button>
+                <button type="button" id="copyWallet" aria-label="Copy wallet address">
+                    <i class="bi bi-copy"></i>
+                </button>
             </div>
             <p class="network-type"><b>Network Type:</b> {{ network_type }}</p>
+            <p class="network-warning">
+                Send only {{ payment_label }} on the network shown above. Funds sent on a different
+                network cannot be recovered.
+            </p>
+
             <p class="proof-label">Upload Payment proof after payment.</p>
             <form method="post" enctype="multipart/form-data" action="{% url 'deposit_payment' payment_mode %}">
                 {% csrf_token %}
@@ -55,25 +66,44 @@
             </form>
         </article>
     </main>
+
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}"><span
-                class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span><span>Transaction
-                History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span>
+            <span>Dashboard</span>
+        </a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'transaction_history' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span>
+            <span>Transaction History</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
+            <span>Crypto Exchange</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'invest' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
+            <span>Invest</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-gear"></i></span>
+            <span>Settings</span>
+        </a>
     </nav>
-    <footer class="deposit-footer"><strong>&copy; Copyright © Capitalnext 2026. All Rights
-            Reserved.</strong><span>Capitalnext Financial Institutions.</span></footer>
+
+    <footer class="deposit-footer">
+        <strong>&copy; Copyright © Capitalnext 2026. All Rights Reserved.</strong>
+        <span>Capitalnext Financial Institutions.</span>
+    </footer>
+
     <script>
         document.getElementById("copyWallet").addEventListener("click", async () => {
             const input = document.getElementById("walletAddress");
-            await navigator.clipboard.writeText(input.value);
+            try {
+                await navigator.clipboard.writeText(input.value);
+            } catch (error) {
+                input.select();
+                document.execCommand("copy");
+            }
         });
     </script>
 </body>

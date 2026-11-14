@@ -303,6 +303,7 @@ class DepositWallet(models.Model):
     CRYPTO_CHOICES = (
         ("bitcoin", "Bitcoin"),
         ("ethereum", "Ethereum"),
+        ("usdt_tron20", "USDT (TRON20)"),
         ("xrp", "XRP"),
     )
     crypto = models.CharField(max_length=20, choices=CRYPTO_CHOICES, unique=True)
