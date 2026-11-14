@@ -1,4 +1,4 @@
-from datetime import timedelta
+ffrom datetime import timedelta
 from decimal import Decimal, ROUND_HALF_UP
 
 from django.core.management.base import BaseCommand
@@ -74,7 +74,7 @@ class Command(BaseCommand):
 
             if new_days:
                 credited += len(new_days)
-                self._notify(investment, len(new_days), daily_profit)
+                self._notify_profit(investment, len(new_days), daily_profit)
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -82,13 +82,16 @@ class Command(BaseCommand):
             )
         )
 
-    def _notify(self, investment, days, daily_profit):
+    def _notify_profit(self, investment, days, daily_profit):
         profile = getattr(investment.user, "creataura_profile", None)
-        if not (profile and profile.email_profit_notification and investment.user.email):
+        if not (
+            profile and profile.email_profit_notification and investment.user.email
+        ):
             return
         total = daily_profit * days
         send_simple_email(
             investment.user.email,
             "You received investment profit",
-            f"${total:,.2f} profit from your {investment.plan.name} was added to your account.",
+            f"${total:,.2f} profit from your {investment.plan.name} "
+            "was added to your account.",
         )

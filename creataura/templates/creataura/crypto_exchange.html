@@ -178,26 +178,6 @@
                     </script>
             </div>
         </section>
-
-        <section class="wallet-list" aria-label="Recent exchanges">
-            {% for row in exchange_rows %}
-            <article class="wallet-row">
-                <div>
-                    <small>{{ row.date }}</small>
-                    <strong>{{ row.pair }}</strong>
-                </div>
-                <b>{{ row.sent }} to {{ row.received }}</b>
-            </article>
-            {% empty %}
-            <article class="wallet-row">
-                <div>
-                    <small>Recent exchanges</small>
-                    <strong>No exchanges yet</strong>
-                </div>
-            </article>
-            {% endfor %}
-        </section>
-
         <button class="exchange-submit" type="submit" form="exchange-form">Exchange</button>
         <footer class="exchange-footer">
             <strong>&copy; Copyright © Capitalnext 2026. All Rights Reserved.</strong>

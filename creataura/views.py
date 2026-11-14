@@ -1303,22 +1303,10 @@ def settings(request):
                     messages.success(request, "Password updated successfully.")
 
         elif action_name == "other":
-            profile.email_withdrawal_otp = (
-                request.POST.get("email_withdrawal_otp") == "yes"
-            )
             profile.email_profit_notification = (
                 request.POST.get("email_profit_notification") == "yes"
             )
-            profile.email_plan_expiry_notification = (
-                request.POST.get("email_plan_expiry_notification") == "yes"
-            )
-            profile.save(
-                update_fields=[
-                    "email_withdrawal_otp",
-                    "email_profit_notification",
-                    "email_plan_expiry_notification",
-                ]
-            )
+            profile.save(update_fields=["email_profit_notification"])
             messages.success(request, "Other settings saved successfully.")
 
         else:
@@ -1392,12 +1380,8 @@ def settings(request):
             "dob_value": (
                 profile.date_of_birth.isoformat() if profile.date_of_birth else ""
             ),
-            "otp_yes": _checked(profile.email_withdrawal_otp),
-            "otp_no": _checked(not profile.email_withdrawal_otp),
             "profit_yes": _checked(profile.email_profit_notification),
             "profit_no": _checked(not profile.email_profit_notification),
-            "expiry_yes": _checked(profile.email_plan_expiry_notification),
-            "expiry_no": _checked(not profile.email_plan_expiry_notification),
         },
     )
 

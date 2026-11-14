@@ -183,18 +183,6 @@
                 <input type="hidden" name="settings_action" value="other">
 
                 <fieldset class="other-setting-field">
-                    <legend>Send confirmation OTP to my email when withdrawing my funds.</legend>
-                    <label>
-                        <input type="radio" name="email_withdrawal_otp" value="yes" {{ otp_yes }}>
-                        <span>Yes</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="email_withdrawal_otp" value="no" {{ otp_no }}>
-                        <span>No</span>
-                    </label>
-                </fieldset>
-
-                <fieldset class="other-setting-field">
                     <legend>Send me email when I get profit.</legend>
                     <label>
                         <input type="radio" name="email_profit_notification" value="yes" {{ profit_yes }}>
@@ -202,18 +190,6 @@
                     </label>
                     <label>
                         <input type="radio" name="email_profit_notification" value="no" {{ profit_no }}>
-                        <span>No</span>
-                    </label>
-                </fieldset>
-
-                <fieldset class="other-setting-field">
-                    <legend>Send me email when my investment plan expires.</legend>
-                    <label>
-                        <input type="radio" name="email_plan_expiry_notification" value="yes" {{ expiry_yes }}>
-                        <span>Yes</span>
-                    </label>
-                    <label>
-                        <input type="radio" name="email_plan_expiry_notification" value="no" {{ expiry_no }}>
                         <span>No</span>
                     </label>
                 </fieldset>
@@ -261,7 +237,5 @@
         });
     </script>
 </body>
-
-</html>
 
 </html>
