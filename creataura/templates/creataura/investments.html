@@ -20,29 +20,33 @@
         <header class="settings-header investments-header">
             <a href="{% url 'dashboard' %}" aria-label="Back"><i class="bi bi-chevron-left"></i></a>
             <h1>My investments</h1>
-            <button type="button" aria-label="Add investment"
-                onclick="document.getElementById('investment-packages').scrollIntoView({behavior: 'smooth'})"><i
-                    class="bi bi-plus-lg"></i></button>
+            <button type="button" aria-label="Add investment" id="scrollToPackages">
+                <i class="bi bi-plus-lg"></i>
+            </button>
         </header>
 
         <section class="investments-content">
             <h2>Investment records</h2>
             {% if messages %}
             {% for message in messages %}
-            <p class="settings-message {{ message.tags }}">{{ message }}</p>
+            <p class="settings-message {{ message.tags }}">
+                {{ message }}
+            </p>
             {% endfor %}
             {% endif %}
+
             <div class="investment-records">
-                {% for investment in user_investments %}
+                {% for item in user_investments %}
                 <article class="investment-record">
                     <div>
-                        <strong>{{ investment.plan.name }}</strong>
-                        <span>Started {{ investment.date_created|date:"M j, Y" }}</span>
+                        <strong>{{ item.plan_name }}</strong>
+                        <span>Started {{ item.started }}</span>
                     </div>
                     <div>
-                        <strong>${{ investment.amount|floatformat:2 }}</strong>
-                        <span class="investment-status investment-status-{{ investment.status }}">{{
-                            investment.status|title }}</span>
+                        <strong>{{ item.amount }}</strong>
+                        <span class="investment-status investment-status-{{ item.status }}">
+                            {{ item.status_label }}
+                        </span>
                     </div>
                 </article>
                 {% empty %}
@@ -51,30 +55,31 @@
             </div>
 
             <h2 id="investment-packages" class="investment-packages-heading">Available packages</h2>
-            <p>Available balance: <strong>${{ available_balance|floatformat:2 }}</strong></p>
+            <p>Available balance: <strong>{{ available_balance }}</strong></p>
+
             <div class="investment-plans">
                 {% for plan in plans %}
                 <article class="investment-plan-card">
                     <div class="investment-plan-body">
                         <i class="bi bi-suit-diamond-fill investment-plan-icon"></i>
                         <h3>{{ plan.name }}</h3>
-                        <strong class="investment-plan-price">$ {{ plan.amount|floatformat:0 }}</strong>
+                        <strong class="investment-plan-price">$ {{ plan.price }}</strong>
                         <div class="investment-plan-details">
-                            <span>Minimum Deposit: ${{ plan.minimum_deposit|floatformat:0 }}</span>
-                            <span>Maximum Deposit: ${{ plan.maximum_deposit|floatformat:0 }}</span>
-                            <span>Daily ROI: {{ plan.daily_roi|floatformat:1 }}%</span>
-                            <span>Weekly ROI: {{ plan.weekly_roi|floatformat:1 }}%</span>
-                            <span>Gift Bonus: ${{ plan.gift_bonus|floatformat:0 }}</span>
-                            <span>Duration: {{ plan.duration_days }} Days</span>
+                            <span>Minimum Deposit: ${{ plan.minimum }}</span>
+                            <span>Maximum Deposit: ${{ plan.maximum }}</span>
+                            <span>Daily ROI: {{ plan.daily_roi }}%</span>
+                            <span>Weekly ROI: {{ plan.weekly_roi }}%</span>
+                            <span>Gift Bonus: ${{ plan.gift_bonus }}</span>
+                            <span>Duration: {{ plan.duration }} Days</span>
                         </div>
                     </div>
                     {% if plan.id %}
                     <form method="post" action="{% url 'join_investment' plan.id %}">
                         {% csrf_token %}
                         <label class="investment-amount-field">
-                            <span>Amount to invest: (${{ plan.amount|floatformat:0 }} default)</span>
-                            <input type="number" name="amount" value="{{ plan.amount }}"
-                                min="{{ plan.minimum_deposit }}" max="{{ plan.maximum_deposit }}" step="0.01" required>
+                            <span>Amount to invest: (${{ plan.price }} default)</span>
+                            <input type="number" name="amount" value="{{ plan.input_default }}"
+                                min="{{ plan.input_min }}" max="{{ plan.input_max }}" step="0.01" required>
                         </label>
                         <button class="investment-plan-button" type="submit">Join plan</button>
                     </form>
@@ -88,17 +93,33 @@
     </main>
 
     <nav class="fixed-dashboard-nav" aria-label="Dashboard navigation">
-        <a class="fixed-nav-item" href="{% url 'dashboard' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-pie-chart"></i></span><span>Dashboard</span></a>
-        <a class="fixed-nav-item" href="{% url 'transaction_history' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-file-earmark-text"></i></span><span>Transaction History</span></a>
-        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-grid"></i></span><span>Crypto Exchange</span></a>
-        <a class="fixed-nav-item fixed-nav-active" href="{% url 'invest' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-credit-card"></i></span><span>Invest</span></a>
-        <a class="fixed-nav-item" href="{% url 'settings' %}"><span class="fixed-nav-icon"><i
-                    class="bi bi-gear"></i></span><span>Settings</span></a>
+        <a class="fixed-nav-item" href="{% url 'dashboard' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-pie-chart"></i></span>
+            <span>Dashboard</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'transaction_history' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-file-earmark-text"></i></span>
+            <span>Transaction History</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'crypto_exchange' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-grid"></i></span>
+            <span>Crypto Exchange</span>
+        </a>
+        <a class="fixed-nav-item fixed-nav-active" href="{% url 'invest' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-credit-card"></i></span>
+            <span>Invest</span>
+        </a>
+        <a class="fixed-nav-item" href="{% url 'settings' %}">
+            <span class="fixed-nav-icon"><i class="bi bi-gear"></i></span>
+            <span>Settings</span>
+        </a>
     </nav>
+
+    <script>
+        document.getElementById("scrollToPackages").addEventListener("click", () => {
+            document.getElementById("investment-packages").scrollIntoView({ behavior: "smooth" });
+        });
+    </script>
 </body>
 
 </html>

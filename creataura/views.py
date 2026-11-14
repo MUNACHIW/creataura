@@ -74,6 +74,10 @@ def _when(value):
     return timezone.localtime(value).strftime("%b %d, %Y, %I:%M %p")
 
 
+def _plain(value, places=0):
+    return f"{float(value):.{places}f}"
+
+
 def _get_profile(user):
     profile = getattr(user, "creataura_profile", None)
     if profile is None:
@@ -928,10 +932,9 @@ def transaction_history(request):
 # =========================================================
 @login_required(login_url="login")
 def investments(request):
-    plans = InvestmentPlan.objects.filter(is_active=True)
-    user_investments = UserInvestment.objects.filter(user=request.user)
-    if not plans.exists():
-        plans = [
+    plan_rows = list(InvestmentPlan.objects.filter(is_active=True))
+    if not plan_rows:
+        plan_rows = [
             {
                 "id": 0,
                 "name": "Beginner Plan",
@@ -966,6 +969,41 @@ def investments(request):
                 "duration_days": 60,
             },
         ]
+
+    def field(plan, name):
+        return plan[name] if isinstance(plan, dict) else getattr(plan, name)
+
+    plans = [
+        {
+            "id": field(plan, "id"),
+            "name": field(plan, "name"),
+            "price": _plain(field(plan, "amount")),
+            "minimum": _plain(field(plan, "minimum_deposit")),
+            "maximum": _plain(field(plan, "maximum_deposit")),
+            "daily_roi": _plain(field(plan, "daily_roi"), 1),
+            "weekly_roi": _plain(field(plan, "weekly_roi"), 1),
+            "gift_bonus": _plain(field(plan, "gift_bonus")),
+            "duration": field(plan, "duration_days"),
+            "input_default": str(field(plan, "amount")),
+            "input_min": str(field(plan, "minimum_deposit")),
+            "input_max": str(field(plan, "maximum_deposit")),
+        }
+        for plan in plan_rows
+    ]
+
+    user_investments = [
+        {
+            "plan_name": item.plan.name,
+            "started": timezone.localtime(item.date_created).strftime("%b %d, %Y"),
+            "amount": _money(item.amount),
+            "status": item.status,
+            "status_label": _status_label(item.status),
+        }
+        for item in UserInvestment.objects.filter(user=request.user).select_related(
+            "plan"
+        )
+    ]
+
     action.send(request.user, verb="viewed investment plans ")
     return render(
         request,
@@ -973,7 +1011,7 @@ def investments(request):
         {
             "plans": plans,
             "user_investments": user_investments,
-            "available_balance": get_available_balance(request.user),
+            "available_balance": _money(get_available_balance(request.user)),
         },
     )
 
