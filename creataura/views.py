@@ -56,6 +56,8 @@ from .verification import (
 MAX_LOGIN_ATTEMPTS = 5
 LOCKOUT_SECONDS = 15 * 60
 ROI_OTP_MINUTES = 10
+OTP_MINUTES = 10
+OTP_MAX_TRIES = 5
 
 
 # =========================================================
@@ -78,6 +80,76 @@ def _when(value):
 
 def _plain(value, places=0):
     return f"{float(value):.{places}f}"
+
+def _issue_otp(request, session_key, label):
+    """Create an OTP, store it in the session and email it."""
+    if not request.user.email:
+        messages.error(request, "Add an email address to your account first.")
+        return
+    otp = secrets.token_hex(3).upper()
+    request.session[session_key] = {
+        "code": otp,
+        "at": timezone.now().timestamp(),
+        "tries": 0,
+    }
+    sent = send_simple_email(
+        request.user.email,
+        f"Capitalnext {label} Withdrawal OTP",
+        f"Your {label} withdrawal OTP is {otp}. It expires in {OTP_MINUTES} minutes.",
+    )
+    if sent:
+        messages.success(request, "Withdrawal OTP sent to your email.")
+    else:
+        messages.error(request, "We couldn't send the OTP. Please try again shortly.")
+
+
+def _otp_error(request, session_key, code):
+    """Return an error message if the OTP is not valid, otherwise None."""
+    stored = request.session.get(session_key) or {}
+    expected = stored.get("code", "")
+    if not expected:
+        return "Request an OTP before completing withdrawal."
+
+    age = timezone.now().timestamp() - stored.get("at", 0)
+    if age > OTP_MINUTES * 60:
+        request.session.pop(session_key, None)
+        return "Your OTP has expired. Request a new one."
+
+    if secrets.compare_digest(code.encode(), expected.encode()):
+        return None
+
+    stored["tries"] = stored.get("tries", 0) + 1
+    if stored["tries"] >= OTP_MAX_TRIES:
+        request.session.pop(session_key, None)
+        return "Too many wrong attempts. Request a new OTP."
+    request.session[session_key] = stored
+    return "The withdrawal OTP is incorrect."
+
+
+def _lock_user(user):
+    """Lock the user's row so concurrent requests can't spend the same money."""
+    User.objects.select_for_update().get(pk=user.pk)
+
+
+def _roi_figures(user):
+    """Return (total_profit, withdrawable_roi).
+
+    withdrawable_roi can never exceed the real account balance, so ROI
+    cannot be withdrawn on top of money that was already paid out.
+    """
+    total_profit = ProfitRecord.objects.filter(user=user).aggregate(
+        total=models.Sum("amount")
+    )["total"] or Decimal("0")
+
+    reserved = Decimal("0")
+    for model in (WithdrawalBTC, WithdrawalXRP):
+        reserved += model.objects.filter(user=user, source="roi").exclude(
+            status="rejected"
+        ).aggregate(total=models.Sum("amount"))["total"] or Decimal("0")
+
+    available_roi = max(total_profit - reserved, Decimal("0"))
+    balance = get_available_balance(user)
+    return total_profit, min(available_roi, balance)
 
 
 def _get_profile(user):
@@ -476,116 +548,79 @@ def roi_history(request):
 
 @login_required(login_url="login")
 def withdraw_roi(request):
-    total_profit = ProfitRecord.objects.filter(user=request.user).aggregate(
-        total=models.Sum("amount")
-    )["total"] or Decimal("0")
-
-    btc_roi_withdrawals = WithdrawalBTC.objects.filter(
-        user=request.user, source="roi"
-    ).exclude(status="rejected")
-    xrp_roi_withdrawals = WithdrawalXRP.objects.filter(
-        user=request.user, source="roi"
-    ).exclude(status="rejected")
-    reserved_roi = sum(
-        (r.amount for r in list(btc_roi_withdrawals) + list(xrp_roi_withdrawals)),
-        Decimal("0"),
-    )
-    available_roi = max(total_profit - reserved_roi, Decimal("0"))
     profile = getattr(request.user, "creataura_profile", None)
     bitcoin_address = profile.bitcoin_address if profile else ""
+    session_key = "roi_withdrawal_otp"
 
     if request.method == "POST":
-        if available_roi <= 0:
+        total_profit, withdrawable = _roi_figures(request.user)
+        if withdrawable <= 0:
             messages.error(request, "Nothing to withdraw at the moment!")
             return redirect("withdraw_roi")
 
-        # Step 1: send the OTP
         if request.POST.get("action") == "request_otp":
-            if not request.user.email:
-                messages.error(request, "Add an email address to your account first.")
-                return redirect("withdraw_roi")
-            otp = secrets.token_hex(3).upper()
-            request.session["roi_withdrawal_otp"] = {
-                "code": otp,
-                "at": timezone.now().timestamp(),
-            }
-            sent = send_simple_email(
-                request.user.email,
-                "Capitalnext ROI Withdrawal OTP",
-                f"Your ROI withdrawal OTP is {otp}. It expires in {ROI_OTP_MINUTES} minutes.",
-            )
-            if sent:
-                messages.success(request, "Withdrawal OTP sent to your email.")
-            else:
-                messages.error(
-                    request, "We couldn't send the OTP. Please try again shortly."
-                )
+            _issue_otp(request, session_key, "ROI")
             return redirect("withdraw_roi")
 
-        # Step 2: validate and submit the withdrawal
         payment_mode = request.POST.get("payment_mode", "").strip().lower()
         otp_code = request.POST.get("otpcode", "").strip().upper()
+        xrp_address = request.POST.get("xrp_address", "").strip()
         try:
             amount = Decimal(request.POST.get("amount", "").strip())
         except (InvalidOperation, AttributeError):
             amount = Decimal("0")
 
-        stored = request.session.get("roi_withdrawal_otp") or {}
-        expected = stored.get("code", "")
-        age_seconds = timezone.now().timestamp() - stored.get("at", 0)
-        otp_expired = age_seconds > ROI_OTP_MINUTES * 60
-
-        if not expected:
-            messages.error(request, "Request an OTP before completing withdrawal.")
-        elif otp_expired:
-            request.session.pop("roi_withdrawal_otp", None)
-            messages.error(request, "Your OTP has expired. Request a new one.")
-        elif not secrets.compare_digest(otp_code, expected):
-            messages.error(request, "The withdrawal OTP is incorrect.")
-        elif payment_mode == "bitcoin":
-            if not bitcoin_address.strip():
-                messages.error(request, "Add your Bitcoin address in Settings first.")
-            elif not amount.is_finite() or amount <= 0:
-                messages.error(request, "Enter a valid withdrawal amount.")
-            elif amount > available_roi:
-                messages.error(request, "Amount exceeds your available ROI balance.")
-            else:
-                WithdrawalBTC.objects.create(
-                    user=request.user,
-                    cryptocoin="Bitcoin",
-                    amount=amount,
-                    otpcode=otp_code,
-                    status="pending",
-                    source="roi",
-                )
-                request.session.pop("roi_withdrawal_otp", None)
-                messages.success(request, "ROI withdrawal submitted for approval.")
-                return redirect("withdraw_roi")
-        elif payment_mode == "xrp":
-            address = request.POST.get("xrp_address", "").strip()
-            if not address:
-                messages.error(request, "Enter your XRP wallet address.")
-            elif not amount.is_finite() or amount <= 0:
-                messages.error(request, "Enter a valid withdrawal amount.")
-            elif amount > available_roi:
-                messages.error(request, "Amount exceeds your available ROI balance.")
-            else:
-                WithdrawalXRP.objects.create(
-                    user=request.user,
-                    cryptocoin="XRP",
-                    amount=amount,
-                    otpcode=otp_code,
-                    xrp_address=address,
-                    status="pending",
-                    source="roi",
-                )
-                request.session.pop("roi_withdrawal_otp", None)
-                messages.success(request, "ROI withdrawal submitted for approval.")
-                return redirect("withdraw_roi")
-        else:
+        if payment_mode not in ("bitcoin", "xrp"):
             messages.error(request, "Select a valid payment method.")
+        elif not amount.is_finite() or amount <= 0:
+            messages.error(request, "Enter a valid withdrawal amount.")
+        elif payment_mode == "bitcoin" and not bitcoin_address.strip():
+            messages.error(request, "Add your Bitcoin address in Settings first.")
+        elif payment_mode == "xrp" and not xrp_address:
+            messages.error(request, "Enter your XRP wallet address.")
+        else:
+            error = _otp_error(request, session_key, otp_code)
+            if error:
+                messages.error(request, error)
+            else:
+                with transaction.atomic():
+                    _lock_user(request.user)
+                    # Re-check inside the lock with fresh numbers
+                    _, withdrawable = _roi_figures(request.user)
+                    if amount > withdrawable:
+                        messages.error(
+                            request, "Amount exceeds your available ROI balance."
+                        )
+                        return redirect("withdraw_roi")
 
-    withdrawal_rows = list(btc_roi_withdrawals) + list(xrp_roi_withdrawals)
+                    if payment_mode == "bitcoin":
+                        WithdrawalBTC.objects.create(
+                            user=request.user,
+                            cryptocoin="Bitcoin",
+                            amount=amount,
+                            otpcode=otp_code,
+                            status="pending",
+                            source="roi",
+                        )
+                    else:
+                        WithdrawalXRP.objects.create(
+                            user=request.user,
+                            cryptocoin="XRP",
+                            amount=amount,
+                            otpcode=otp_code,
+                            xrp_address=xrp_address,
+                            status="pending",
+                            source="roi",
+                        )
+                request.session.pop(session_key, None)
+                messages.success(request, "ROI withdrawal submitted for approval.")
+                return redirect("withdraw_roi")
+
+    total_profit, withdrawable = _roi_figures(request.user)
+
+    withdrawal_rows = list(
+        WithdrawalBTC.objects.filter(user=request.user, source="roi")
+    ) + list(WithdrawalXRP.objects.filter(user=request.user, source="roi"))
     withdrawal_rows.sort(key=lambda record: record.date_created, reverse=True)
     roi_withdrawals = [
         {
@@ -598,7 +633,7 @@ def withdraw_roi(request):
         for item in withdrawal_rows
     ]
 
-    if request.method == "GET" and available_roi <= 0:
+    if request.method == "GET" and withdrawable <= 0:
         messages.error(request, "Nothing to withdraw at the moment!")
 
     action.send(request.user, verb="viewed withdraw roi")
@@ -606,15 +641,14 @@ def withdraw_roi(request):
         request,
         "creataura/withdraw_roi.html",
         {
-            "has_roi": available_roi > 0,
-            "available_roi": _money(available_roi),
-            "available_roi_max": f"{available_roi:.2f}",
+            "has_roi": withdrawable > 0,
+            "available_roi": _money(withdrawable),
+            "available_roi_max": f"{withdrawable:.2f}",
             "total_profit": _money(total_profit),
             "bitcoin_address": bitcoin_address,
             "roi_withdrawals": roi_withdrawals,
         },
     )
-
 # =========================================================
 # Withdrawals
 # =========================================================
@@ -682,21 +716,11 @@ def withdrawal_btc(request):
     maximum = method.maximum_amount if method else Decimal("50000000")
     charge_type = method.charge_type if method else "Percentage"
     charge_amount = method.charge_amount if method else Decimal("0")
-
-    available_balance = get_available_balance(request.user)
+    session_key = "btc_withdrawal_otp"
 
     if request.method == "POST":
         if request.POST.get("action") == "request_otp":
-            otp = secrets.token_hex(3).upper()
-            request.session["btc_withdrawal_otp"] = otp
-            if request.user.email and send_simple_email(
-                request.user.email,
-                "Capitalnext Bitcoin Withdrawal OTP",
-                f"Your Bitcoin withdrawal OTP is {otp}.",
-            ):
-                messages.success(request, "Withdrawal OTP sent to your email.")
-            else:
-                messages.error(request, "We couldn't send the OTP. Please try again.")
+            _issue_otp(request, session_key, "Bitcoin")
             return redirect("withdrawal_btc")
 
         try:
@@ -704,41 +728,41 @@ def withdrawal_btc(request):
         except (InvalidOperation, AttributeError):
             amount = Decimal("0")
         otp_code = request.POST.get("otpcode", "").strip().upper()
-        expected_otp = request.session.get("btc_withdrawal_otp", "")
-
         charges = (
             amount * charge_amount / Decimal("100")
             if "percentage" in charge_type.lower()
             else charge_amount
         )
+
         if not amount.is_finite() or amount <= 0:
             messages.error(request, "Enter a valid withdrawal amount.")
         elif amount < minimum or amount > maximum:
             messages.error(
                 request, f"Amount must be between ${minimum} and ${maximum}."
             )
-        elif amount + charges > available_balance:
-            messages.error(request, "Insufficient account balance.")
-        elif not expected_otp:
-            messages.error(request, "Request an OTP before completing withdrawal.")
-        elif otp_code != expected_otp:
-            messages.error(request, "The withdrawal OTP is incorrect.")
+        elif not profile or not profile.bitcoin_address.strip():
+            messages.error(request, "Add your Bitcoin address in withdrawal settings.")
+            return redirect("settings")
         else:
-            if not profile or not profile.bitcoin_address.strip():
-                messages.error(
-                    request, "Add your Bitcoin address in withdrawal settings."
-                )
-                return redirect("settings")
-            WithdrawalBTC.objects.create(
-                user=request.user,
-                cryptocoin="Bitcoin",
-                amount=amount,
-                otpcode=otp_code,
-                charges=charges,
-                status="pending",
-            )
-            request.session.pop("btc_withdrawal_otp", None)
-            messages.success(request, "Bitcoin withdrawal request submitted.")
+            error = _otp_error(request, session_key, otp_code)
+            if error:
+                messages.error(request, error)
+            else:
+                with transaction.atomic():
+                    _lock_user(request.user)
+                    if amount + charges > get_available_balance(request.user):
+                        messages.error(request, "Insufficient account balance.")
+                        return redirect("withdrawal_btc")
+                    WithdrawalBTC.objects.create(
+                        user=request.user,
+                        cryptocoin="Bitcoin",
+                        amount=amount,
+                        otpcode=otp_code,
+                        charges=charges,
+                        status="pending",
+                    )
+                request.session.pop(session_key, None)
+                messages.success(request, "Bitcoin withdrawal request submitted.")
         return redirect("withdrawal_btc")
 
     return render(
@@ -748,10 +772,9 @@ def withdrawal_btc(request):
             "bitcoin_address": profile.bitcoin_address if profile else "",
             "minimum_amount": minimum,
             "maximum_amount": maximum,
-            "available_balance": available_balance,
+            "available_balance": get_available_balance(request.user),
         },
     )
-
 
 @login_required(login_url="login")
 def withdrawal_xrp(request):
@@ -762,21 +785,11 @@ def withdrawal_xrp(request):
     maximum = method.maximum_amount if method else Decimal("1000000")
     charge_type = method.charge_type if method else "Percentage"
     charge_amount = method.charge_amount if method else Decimal("0")
-
-    available_balance = get_available_balance(request.user)
+    session_key = "xrp_withdrawal_otp"
 
     if request.method == "POST":
         if request.POST.get("action") == "request_otp":
-            otp = secrets.token_hex(3).upper()
-            request.session["xrp_withdrawal_otp"] = otp
-            if request.user.email and send_simple_email(
-                request.user.email,
-                "Capitalnext XRP Withdrawal OTP",
-                f"Your XRP withdrawal OTP is {otp}.",
-            ):
-                messages.success(request, "Withdrawal OTP sent to your email.")
-            else:
-                messages.error(request, "We couldn't send the OTP. Please try again.")
+            _issue_otp(request, session_key, "XRP")
             return redirect("withdrawal_xrp")
 
         try:
@@ -785,7 +798,6 @@ def withdrawal_xrp(request):
             amount = Decimal("0")
         otp_code = request.POST.get("otpcode", "").strip().upper()
         xrp_address = request.POST.get("xrp_address", "").strip()
-        expected_otp = request.session.get("xrp_withdrawal_otp", "")
         charges = (
             amount * charge_amount / Decimal("100")
             if "percentage" in charge_type.lower()
@@ -798,26 +810,29 @@ def withdrawal_xrp(request):
             messages.error(
                 request, f"Amount must be between ${minimum} and ${maximum}."
             )
-        elif amount + charges > available_balance:
-            messages.error(request, "Insufficient account balance.")
         elif not xrp_address:
             messages.error(request, "Enter your XRP wallet address.")
-        elif not expected_otp:
-            messages.error(request, "Request an OTP before completing withdrawal.")
-        elif otp_code != expected_otp:
-            messages.error(request, "The withdrawal OTP is incorrect.")
         else:
-            WithdrawalXRP.objects.create(
-                user=request.user,
-                cryptocoin="XRP",
-                amount=amount,
-                otpcode=otp_code,
-                xrp_address=xrp_address,
-                charges=charges,
-                status="pending",
-            )
-            request.session.pop("xrp_withdrawal_otp", None)
-            messages.success(request, "XRP withdrawal request submitted.")
+            error = _otp_error(request, session_key, otp_code)
+            if error:
+                messages.error(request, error)
+            else:
+                with transaction.atomic():
+                    _lock_user(request.user)
+                    if amount + charges > get_available_balance(request.user):
+                        messages.error(request, "Insufficient account balance.")
+                        return redirect("withdrawal_xrp")
+                    WithdrawalXRP.objects.create(
+                        user=request.user,
+                        cryptocoin="XRP",
+                        amount=amount,
+                        otpcode=otp_code,
+                        xrp_address=xrp_address,
+                        charges=charges,
+                        status="pending",
+                    )
+                request.session.pop(session_key, None)
+                messages.success(request, "XRP withdrawal request submitted.")
         return redirect("withdrawal_xrp")
 
     return render(
@@ -826,10 +841,9 @@ def withdrawal_xrp(request):
         {
             "minimum_amount": minimum,
             "maximum_amount": maximum,
-            "available_balance": available_balance,
+            "available_balance": get_available_balance(request.user),
         },
     )
-
 
 # =========================================================
 # Deposits
