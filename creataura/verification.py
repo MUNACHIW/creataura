@@ -139,7 +139,7 @@ def send_password_reset_email(request, user):
     url = _build_url(request, "reset_password", user, default_token_generator)
     return _send(
         user.email,
-        "Reset your Capiatalnext password",
+        "Reset your Capitalnext password",
         {
             "heading": "Reset your password",
             "intro": "We received a request to reset your password. "
