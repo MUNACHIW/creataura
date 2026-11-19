@@ -1,84 +1,35 @@
-from datetime import timedelta
-from decimal import Decimal, ROUND_HALF_UP
-
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
-from django.db import transaction
-from django.utils import timezone
 
-from creataura.models import ProfitRecord, UserInvestment
+from creataura.profits import credit_due_profits
 from creataura.verification import send_simple_email
 
 
 class Command(BaseCommand):
-    help = "Credit daily ROI profit for every active investment."
+    help = "Credit daily ROI profit (including back-pay) for active investments."
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Show what would be credited without writing anything.",
+        )
+        parser.add_argument("--user", help="Only this username.")
 
     def handle(self, *args, **options):
-        now = timezone.now()
-        credited = 0
-        completed = 0
+        user = None
+        if options["user"]:
+            user = User.objects.get(username=options["user"])
 
-        investment_ids = list(
-            UserInvestment.objects.filter(status="active").values_list("pk", flat=True)
-        )
+        dry = options["dry_run"]
+        result = credit_due_profits(user=user, notify=not dry, dry_run=dry)
 
-        for pk in investment_ids:
-            new_days = []
-            daily_profit = Decimal("0")
-
-            with transaction.atomic():
-                investment = (
-                    UserInvestment.objects.select_for_update(of=("self",))
-                    .select_related("plan", "user")
-                    .get(pk=pk)
-                )
-                if investment.status != "active":
-                    continue
-
-                plan = investment.plan
-                end = investment.expires_at or (
-                    investment.date_created + timedelta(days=plan.duration_days)
-                )
-                cutoff = min(now, end)
-
-                days_due = (cutoff - investment.date_created).days
-                days_total = (end - investment.date_created).days
-                days_due = max(0, min(days_due, days_total))
-
-                paid_days = set(
-                    ProfitRecord.objects.filter(
-                        investment=investment, profit_day__isnull=False
-                    ).values_list("profit_day", flat=True)
-                )
-
-                daily_profit = (
-                    investment.amount * plan.daily_roi / Decimal("100")
-                ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-                if daily_profit > 0:
-                    for day in range(1, days_due + 1):
-                        if day in paid_days:
-                            continue
-                        ProfitRecord.objects.create(
-                            user=investment.user,
-                            investment=investment,
-                            profit_day=day,
-                            amount=daily_profit,
-                            narration=f"Daily ROI - {plan.name} (day {day})",
-                        )
-                        new_days.append(day)
-
-                if now >= end:
-                    investment.status = "completed"
-                    investment.save(update_fields=["status"])
-                    completed += 1
-
-            if new_days:
-                credited += len(new_days)
-                self._notify_profit(investment, len(new_days), daily_profit)
-
+        prefix = "[DRY RUN] Would credit" if dry else "Credited"
         self.stdout.write(
             self.style.SUCCESS(
-                f"Credited {credited} profit record(s); completed {completed} investment(s)."
+                f"{prefix} {result['days']} profit day(s) totalling "
+                f"${result['amount']:,.2f}; "
+                f"{result['completed']} investment(s) finished."
             )
         )
 

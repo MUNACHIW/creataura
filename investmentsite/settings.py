@@ -68,6 +68,7 @@ MIDDLEWARE = [
     "creataura.verification.EmailVerificationMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "creataura.middleware.Custom404Middleware",
+    "creataura.verification.ProfitSyncMiddleware",
 ]
 
 ROOT_URLCONF = "investmentsite.urls"

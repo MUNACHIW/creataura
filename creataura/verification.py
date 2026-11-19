@@ -9,6 +9,7 @@ from django.contrib.auth.tokens import (
     PasswordResetTokenGenerator,
     default_token_generator,
 )
+from django.core.cache import cache
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -34,6 +35,12 @@ UNVERIFIED_ALLOWED = {
     "careers",
     "faq",
     "about",
+    "cryptocurrency",
+    "renewable_energy",
+    "stocks_etfs",
+    "real_estate",
+    "oil_gas",
+    "foreign_investor_protection",
     # auth
     "login",
     "logout",
@@ -61,7 +68,7 @@ class EmailVerificationMiddleware:
     def process_view(self, request, view_func, view_args, view_kwargs):
         user = request.user
         if not user.is_authenticated or user.is_staff:
-            return None  # staff/superusers have no profile, so skip them
+            return None
 
         match = request.resolver_match
         if match and match.url_name in UNVERIFIED_ALLOWED:
@@ -71,6 +78,25 @@ class EmailVerificationMiddleware:
             return None
 
         return redirect("verify_email")
+
+
+class ProfitSyncMiddleware:
+    """Credits any profit a logged-in user is owed, at most once a minute."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        user = getattr(request, "user", None)
+        if user is not None and user.is_authenticated:
+            if cache.add(f"profit-sync:{user.pk}", 1, timeout=60):
+                try:
+                    from .profits import credit_due_profits
+
+                    credit_due_profits(user)
+                except Exception:
+                    logger.exception("Profit sync failed for user %s", user.pk)
+        return self.get_response(request)
 
 
 class EmailVerificationTokenGenerator(PasswordResetTokenGenerator):
@@ -99,7 +125,6 @@ def _send(to_email, subject, context):
     text = render_to_string("creataura/emails/action_email.txt", context)
 
     if not settings.RESEND_API_KEY:
-        # Dev fallback: print the link instead of sending
         logger.warning("RESEND_API_KEY not set. Email to %s:\n%s", to_email, text)
         return settings.DEBUG
 
@@ -120,11 +145,33 @@ def _send(to_email, subject, context):
         return False
 
 
+def send_simple_email(to_email, subject, body):
+    """Plain-text email through Resend. Returns True if it was sent."""
+    if not settings.RESEND_API_KEY:
+        logger.warning("RESEND_API_KEY not set. Email to %s:\n%s", to_email, body)
+        return settings.DEBUG
+
+    resend.api_key = settings.RESEND_API_KEY
+    try:
+        resend.Emails.send(
+            {
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": [to_email],
+                "subject": subject,
+                "text": body,
+            }
+        )
+        return True
+    except Exception:
+        logger.exception("Failed to send email to %s", to_email)
+        return False
+
+
 def send_verification_email(request, user):
     url = _build_url(request, "verify_email_confirm", user, email_verification_token)
     return _send(
         user.email,
-        "Verify your Capiatalnext email",
+        "Verify your Capitalnext email",
         {
             "heading": f"Welcome, {user.first_name or user.username}!",
             "intro": "Please confirm your email address to verify your account.",
@@ -164,32 +211,3 @@ def verified_required(view_func):
         return view_func(request, *args, **kwargs)
 
     return _wrapped
-
-
-def verification_status(request):
-    """Context processor: exposes `email_unverified` to every template."""
-    user = getattr(request, "user", None)
-    if user is not None and user.is_authenticated:
-        return {"email_unverified": not is_email_verified(user)}
-    return {}
-
-def send_simple_email(to_email, subject, body):
-    """Plain-text email through Resend. Returns True if it was sent."""
-    if not settings.RESEND_API_KEY:
-        logger.warning("RESEND_API_KEY not set. Email to %s:\n%s", to_email, body)
-        return settings.DEBUG
-
-    resend.api_key = settings.RESEND_API_KEY
-    try:
-        resend.Emails.send(
-            {
-                "from": settings.DEFAULT_FROM_EMAIL,
-                "to": [to_email],
-                "subject": subject,
-                "text": body,
-            }
-        )
-        return True
-    except Exception:
-        logger.exception("Failed to send email to %s", to_email)
-        return False
