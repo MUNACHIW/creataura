@@ -1582,7 +1582,11 @@ def register(request, referral_id=None):
         password = request.POST.get("password", "")
         password_again = request.POST.get("password_again", "")
         referral_id = request.POST.get("referral_id", "").strip() or referral_id
-        referral_id = referral_id or ""
+        referral_id = (referral_id or "").strip()
+
+        referrer = None
+        if referral_id:
+            referrer = User.objects.filter(username__iexact=referral_id).first()
 
         # Passwords are never sent back to the browser.
         form_data = {
@@ -1609,10 +1613,14 @@ def register(request, referral_id=None):
             messages.error(request, "Please complete all required fields.")
         elif password != password_again:
             messages.error(request, "Passwords do not match.")
-        elif User.objects.filter(username=username).exists():
+        elif User.objects.filter(username__iexact=username).exists():
             messages.error(request, "That username is already in use.")
         elif User.objects.filter(email__iexact=email).exists():
             messages.error(request, "That email is already registered.")
+        elif referral_id and not referrer:
+            messages.error(request, "That referral ID does not exist.")
+        elif referrer and referrer.username.lower() == username.lower():
+            messages.error(request, "You cannot refer yourself.")
         else:
             user = User(username=username, email=email, first_name=full_name)
             try:
@@ -1629,7 +1637,7 @@ def register(request, referral_id=None):
                         phone_number=phone_number,
                         bitcoin_address=bitcoin_address,
                         country=country,
-                        referral_id=referral_id,
+                        referral_id=referrer.username if referrer else "",
                     )
                     award_signup_bonus(user)
 
@@ -1653,7 +1661,6 @@ def register(request, referral_id=None):
             "form_data": form_data,
         },
     )
-
 
 def user_login(request):
     if request.user.is_authenticated:

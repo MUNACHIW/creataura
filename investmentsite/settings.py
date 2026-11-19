@@ -29,6 +29,8 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
 ALLOWED_HOSTS = ["*"]
 
+REFERRAL_PERCENT = 5          # percent of the deposit paid to the referrer
+REFERRAL_FIRST_DEPOSIT_ONLY = True
 
 # Application definition
 

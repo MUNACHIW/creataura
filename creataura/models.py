@@ -568,6 +568,13 @@ class ReferralBonus(models.Model):
         on_delete=models.CASCADE,
         related_name="referral_bonuses_received",
     )
+    deposit = models.OneToOneField(
+        "Deposit",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="referral_bonus",
+    )
     referred_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
